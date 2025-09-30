@@ -128,6 +128,33 @@ export async function listDrives() {
   }
 }
 
+// Disks tools API
+export async function psCheckBitlockerAdmin() {
+  const res = await fetch(`${BASE_URL}/disk/check-bitlocker-admin`)
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  return res.json()
+}
+
+export async function psBitlockerOffAdmin() {
+  const res = await fetch(`${BASE_URL}/disk/bitlocker-off-admin`)
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  return res.json()
+}
+
+export async function psChkdskUi() {
+  const res = await fetch(`${BASE_URL}/disk/chkdsk?ui=1`)
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  return res.json()
+}
+
+export async function psDefragUi() {
+  const res = await fetch(`${BASE_URL}/disk/defrag?ui=1`)
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  return res.json()
+}
+
+// psVolumeInfoUi removed per request
+
 export async function bitlockerStatusDrive(letter) {
   const url = `${BASE_URL}/bitlocker/status/${letter}`
   console.log('[API] GET', url)

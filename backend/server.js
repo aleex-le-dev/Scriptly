@@ -102,6 +102,91 @@ app.get("/test-message", async (_request, response, next) => {
   }
 });
 
+// PowerShell scripts launcher (disk utilities)
+function launchScriptPs1(scriptName, openUi) {
+  const psScript = path.join(scriptsDir, "powershell", scriptName);
+  if (openUi) {
+    try {
+      execFile(
+        "cmd.exe",
+        [
+          "/c",
+          "start",
+          "",
+          "powershell.exe",
+          "-NoProfile",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-NoExit",
+          "-File",
+          psScript,
+        ],
+        { windowsHide: false },
+        () => { /* started */ }
+      );
+    } catch { /* ignore UI start failures */ }
+  }
+  return new Promise((resolve) => {
+    execFile(
+      "powershell.exe",
+      ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", psScript],
+      { windowsHide: true },
+      (_error, stdout) => {
+        resolve({ ok: true, stdout: stdout?.toString() || "" });
+      }
+    );
+  });
+}
+
+// Elevated admin: launch .bat that elevates PowerShell for BitLocker check
+app.get("/disk/check-bitlocker-admin", async (_request, response, next) => {
+  try {
+    const batPath = path.join(scriptsDir, "powershell", "check-bitlocker.bat");
+    execFile("cmd.exe", ["/c", "start", "", batPath], { windowsHide: false }, (error) => {
+      if (error) {
+        return response.status(200).json({ ok: false, error: error.message });
+      }
+      response.status(200).json({ ok: true });
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/disk/bitlocker-off-admin", async (_request, response, next) => {
+  try {
+    const batPath = path.join(scriptsDir, "powershell", "bitlocker-off.bat");
+    execFile("cmd.exe", ["/c", "start", "", batPath], { windowsHide: false }, (error) => {
+      if (error) {
+        return response.status(200).json({ ok: false, error: error.message });
+      }
+      response.status(200).json({ ok: true });
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/disk/chkdsk", async (request, response, next) => {
+  try {
+    const ui = String(request?.query?.ui ?? "").toLowerCase();
+    const result = await launchScriptPs1("chkdsk-drive.ps1", ui === "1" || ui === "true");
+    response.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/disk/defrag", async (request, response, next) => {
+  try {
+    const ui = String(request?.query?.ui ?? "").toLowerCase();
+    const result = await launchScriptPs1("defrag-drive.ps1", ui === "1" || ui === "true");
+    response.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Execute Batch script that opens a CMD window (non-blocking via 'start')
 app.get("/test-bat", async (_request, response, next) => {
   try {
@@ -121,8 +206,32 @@ app.get("/test-bat", async (_request, response, next) => {
 // BitLocker router mounted at /bitlocker
 const bitlocker = Router();
 
-bitlocker.get("/status", async (_request, response, next) => {
+bitlocker.get("/status", async (request, response, next) => {
   try {
+    const wantUi = String(request?.query?.ui ?? "").toLowerCase();
+
+    if (wantUi === "1" || wantUi === "true") {
+      try {
+        execFile(
+          "cmd.exe",
+          [
+            "/c",
+            "start",
+            "",
+            "powershell.exe",
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-NoExit",
+            "-Command",
+            "manage-bde -status",
+          ],
+          { windowsHide: false },
+          () => { /* window started */ }
+        );
+      } catch { /* ignore UI start failures */ }
+    }
+
     exec("manage-bde -status", { windowsHide: true }, (error, stdout, stderr) => {
       if (error) {
         return response.status(200).json({ ok: false, stdout: stdout?.toString() || "", stderr: stderr?.toString() || error.message });
@@ -140,6 +249,30 @@ bitlocker.get("/status/:letter", async (request, response, next) => {
     if (!/^[A-Z]$/.test(letter)) {
       return response.status(400).json({ ok: false, error: "Invalid drive letter" });
     }
+    const wantUi = String(request?.query?.ui ?? "").toLowerCase();
+
+    if (wantUi === "1" || wantUi === "true") {
+      try {
+        execFile(
+          "cmd.exe",
+          [
+            "/c",
+            "start",
+            "",
+            "powershell.exe",
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-NoExit",
+            "-Command",
+            `manage-bde -status ${letter}:`,
+          ],
+          { windowsHide: false },
+          () => { /* window started */ }
+        );
+      } catch { /* ignore UI start failures */ }
+    }
+
     exec(`manage-bde -status ${letter}:`, { windowsHide: true }, (error, stdout, stderr) => {
       if (error) {
         return response.status(200).json({ ok: false, stdout: stdout?.toString() || "", stderr: stderr?.toString() || error.message });
@@ -157,7 +290,31 @@ bitlocker.post("/off", async (request, response, next) => {
     if (!/^[A-Z]$/.test(letter)) {
       return response.status(400).json({ ok: false, error: "Invalid drive letter" });
     }
+    const wantUi = String(request?.query?.ui ?? "").toLowerCase();
     const command = `manage-bde -off ${letter}:`;
+
+    if (wantUi === "1" || wantUi === "true") {
+      try {
+        execFile(
+          "cmd.exe",
+          [
+            "/c",
+            "start",
+            "",
+            "powershell.exe",
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-NoExit",
+            "-Command",
+            command,
+          ],
+          { windowsHide: false },
+          () => { /* window started */ }
+        );
+      } catch { /* ignore UI start failures */ }
+    }
+
     exec(command, { windowsHide: true }, (error, stdout, stderr) => {
       if (error) {
         return response.status(200).json({ ok: false, stdout: stdout?.toString() || "", stderr: stderr?.toString() || error.message });
@@ -170,7 +327,6 @@ bitlocker.post("/off", async (request, response, next) => {
 });
 
 app.use("/bitlocker", bitlocker);
-console.log("[INIT] BitLocker routes mounted at /bitlocker");
 
 // Compatibility fallback routes (in case mounting is bypassed)
 app.get("/bitlocker-status", async (_request, response, next) => {
@@ -369,7 +525,7 @@ const PORT = Number(env.PORT) || 3001;
 const HOST = env.HOST || "0.0.0.0";
 
 app.listen(PORT, HOST, () => {
-  console.log(`Backend server listening at http://${HOST}:${PORT}`);
+  console.log(`Serveur démarré sur http://${HOST}:${PORT}`);
 });
 
 

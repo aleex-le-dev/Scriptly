@@ -13,8 +13,8 @@ function App() {
     <div className="max-w-2xl mx-auto px-4 py-10">
       <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 flex flex-col items-stretch gap-6">
         <div>
-          <h2 className='text-xl font-semibold text-gray-900'>BitLocker</h2>
-          <p className="text-sm text-gray-600">Voir le statut de chiffrement ou lancer un déchiffrement d’un lecteur.</p>
+          <h2 className='text-xl font-semibold text-gray-900'>Disque dur</h2>
+          <p className="text-sm text-gray-600">Regroupe tous les scripts liés aux opérations sur les disques.</p>
           <div className="mt-3">
             <BitLocker />
           </div>
