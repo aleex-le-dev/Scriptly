@@ -77,29 +77,8 @@ app.get("/__routes", (_request, response) => {
 });
 
 // Execute PowerShell script that shows a MessageBox
-app.get("/test-message", async (_request, response, next) => {
-  try {
-    const psScript = path.join(scriptsDir, "debug", "powershells", "test-message.ps1");
-    execFile(
-      "powershell.exe",
-      [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        psScript,
-      ],
-      { windowsHide: true },
-      (error, stdout, stderr) => {
-        if (error) {
-          return response.status(200).json({ ok: false, stdout, stderr: stderr?.toString() || error.message });
-        }
-        response.status(200).json({ ok: true, stdout: stdout?.toString() || "" });
-      }
-    );
-  } catch (error) {
-    next(error);
-  }
+app.get("/test-message", async (_request, response) => {
+  response.status(200).json({ ok: true, message: "Server ping ok" });
 });
 
 // PowerShell scripts launcher (disk utilities)
@@ -188,19 +167,8 @@ app.get("/disk/defrag", async (request, response, next) => {
 });
 
 // Execute Batch script that opens a CMD window (non-blocking via 'start')
-app.get("/test-bat", async (_request, response, next) => {
-  try {
-    const batScript = path.join(scriptsDir, "debug", "batch", "test-message.bat");
-    // Use 'start' to open in a new window and return immediately
-    execFile("cmd.exe", ["/c", "start", "", batScript], { windowsHide: false }, (error) => {
-      if (error) {
-        return response.status(200).json({ ok: false, stdout: "", stderr: error.message });
-      }
-      response.status(200).json({ ok: true, stdout: "" });
-    });
-  } catch (error) {
-    next(error);
-  }
+app.get("/test-bat", async (_request, response) => {
+  response.status(200).json({ ok: true, message: "No debug batch configured" });
 });
 
 // BitLocker router mounted at /bitlocker

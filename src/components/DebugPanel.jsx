@@ -2,7 +2,7 @@
 // - Affiche des boutons pour tester le serveur et déclencher les scripts côté front
 
 import { useState } from 'react'
-import { fetchHealth, runPowershellMessage, runBatchWindow } from '../services/api'
+import { fetchHealth } from '../services/api'
 
 export function DebugPanel({ onError }) {
   const [serverState, setServerState] = useState('idle') // idle | loading | ok | error
@@ -24,23 +24,7 @@ export function DebugPanel({ onError }) {
     setTimeout(() => setServerState('idle'), 1200)
   }
 
-  const onClickTestPs1 = async () => {
-    try {
-      const result = await runPowershellMessage()
-      if (!result.ok) onError(`Erreur d'exécution: ${result.stderr || 'échec'}`)
-    } catch {
-      onError('Erreur réseau vers le serveur local')
-    }
-  }
-
-  const onClickTestBat = async () => {
-    try {
-      const result = await runBatchWindow()
-      if (!result.ok) onError(`Erreur d'exécution: ${result.stderr || 'échec'}`)
-    } catch {
-      onError('Erreur réseau vers le serveur local')
-    }
-  }
+  // Boutons PowerShell/Batch retirés en debug
 
   return (
     <div className="fixed top-4 right-4 z-40">
@@ -73,12 +57,7 @@ export function DebugPanel({ onError }) {
             >
               Serveur
             </button>
-            <button onClick={onClickTestPs1} className="px-2.5 py-1 rounded-md bg-gray-700 text-white text-[11px] inline-flex items-center justify-center whitespace-nowrap">
-              PowerShell
-            </button>
-            <button onClick={onClickTestBat} className="px-2.5 py-1 rounded-md bg-gray-700 text-white text-[11px] inline-flex items-center justify-center whitespace-nowrap">
-              Batch
-            </button>
+
           </div>
         )}
       </div>
