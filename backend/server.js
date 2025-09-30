@@ -220,7 +220,29 @@ app.get("/network/cloudflare-dns-admin", async (_request, response, next) => {
 // Applications: lancer le gestionnaire winget update (nécessite admin)
 app.get("/apps/winget-update-admin", async (_request, response, next) => {
   try {
-    const batPath = path.join(scriptsDir, "applications", "batch", "winget-update-manager.bat");
+    // Utiliser un lanceur dédié qui force l'élévation UAC puis exécute le manager
+    const batPath = path.join(scriptsDir, "applications", "batch", "winget-update-admin.bat");
+    execFile(
+      "cmd.exe",
+      ["/c", "start", "", batPath],
+      { windowsHide: false },
+      (error) => {
+        if (error) {
+          return response.status(200).json({ ok: false, error: error.message });
+        }
+        response.status(200).json({ ok: true });
+      }
+    );
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Systeme: basculer le menu contextuel classique Windows 11 (nécessite admin)
+app.get("/system/context-menu-classic-admin", async (_request, response, next) => {
+  try {
+    // Utilise le lanceur qui force l'UAC puis exécute le toggle
+    const batPath = path.join(scriptsDir, "systeme", "batch", "context-menu-classic-admin.bat");
     execFile(
       "cmd.exe",
       ["/c", "start", "", batPath],

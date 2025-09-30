@@ -6,10 +6,12 @@ color 0A
 :: Vérifier privilèges administrateur
 net session >nul 2>&1
 if %errorlevel% neq 0 (
-  echo Demande d'élévation des privilèges...
+  echo [INFO] Ce script nécessite des droits administrateur.
+  echo [UAC] Demande d'élévation en cours...
   powershell -Command "Start-Process '%~0' -Verb RunAs"
   exit /b
 )
+echo [OK] Exécution avec privilèges administrateur confirmée.
 
 :menu
 cls
