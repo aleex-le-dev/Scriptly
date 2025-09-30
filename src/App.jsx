@@ -10,6 +10,7 @@ import { Maintenance } from './components/Maintenance'
 import { Search } from './components/Search'
 import { Highlight } from './components/Highlight'
 import { Logiciel } from './components/Logiciel'
+import { Nirsoft } from './components/Nirsoft'
 import { normalizeText } from './utils/text'
 
 function App() {
@@ -55,6 +56,13 @@ function App() {
           <h2 className='text-xl font-semibold text-rose-900 mb-2'><Highlight text="💿 Logiciels" query={query} /></h2>
           <p className="text-sm text-rose-700 mb-4"><Highlight text="Liens directs vers Chrome, VLC, SumatraPDF." query={query} /></p>
           <Logiciel query={query} />
+        </div>
+        )}
+        {visible('nirsoft utilitaires wifi licence cle bsod') && (
+        <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl shadow-lg border border-indigo-200 p-6">
+          <h2 className='text-xl font-semibold text-indigo-900 mb-2'><Highlight text="🧰 NirSoft" query={query} /></h2>
+          <p className="text-sm text-indigo-700 mb-4"><Highlight text="Utilitaires portables (ProduKey, WirelessKeyView, BlueScreenView)." query={query} /></p>
+          <Nirsoft query={query} />
         </div>
         )}
         {visible('reseau dns cloudflare configuration') && (
