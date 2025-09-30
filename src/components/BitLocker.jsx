@@ -28,14 +28,68 @@ export function Disks() {
   const openPsFormatAdmin = async () => { try { await psFormatDriveAdmin() } catch {} }
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-2">
-        <button onClick={handleList} disabled={loading} className="w-full px-3 py-1.5 rounded-md bg-gray-800 text-white text-sm disabled:opacity-60">📂 Lister les disques</button>
-        <button onClick={openPsCheckAdmin} className="w-full px-3 py-1.5 rounded-md bg-gray-800 text-white text-sm">🔒 Vérifier BitLocker (Admin)</button>
-        <button onClick={openPsOffAdmin} className="w-full px-3 py-1.5 rounded-md bg-gray-800 text-white text-sm">🛑 Désactiver BitLocker (Admin)</button>
-        <button onClick={openPsChkdsk} className="w-full px-3 py-1.5 rounded-md bg-gray-800 text-white text-sm">🧰 CHKDSK</button>
-        <button onClick={openPsDefrag} className="w-full px-3 py-1.5 rounded-md bg-gray-800 text-white text-sm">🧩 Défragmenter</button>
-        <button onClick={openPsFormatAdmin} className="w-full px-3 py-1.5 rounded-md bg-gray-800 text-white text-sm">💽 Formater disque/clé (Admin)</button>
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap gap-3">
+        <div
+          onClick={handleList}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleList() }}
+          className="flex-1 min-w-[220px] bg-white rounded-lg border border-gray-200 shadow-sm p-4 cursor-pointer hover:border-gray-400 hover:shadow transition"
+        >
+          <div className="text-sm font-medium text-gray-900">📂 Lister les disques</div>
+          <div className="text-xs text-gray-600 mt-1">Affiche les lecteurs détectés</div>
+        </div>
+        <div
+          onClick={openPsCheckAdmin}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsCheckAdmin() }}
+          className="flex-1 min-w-[220px] bg-white rounded-lg border border-gray-200 shadow-sm p-4 cursor-pointer hover:border-gray-400 hover:shadow transition"
+        >
+          <div className="text-sm font-medium text-gray-900">🔒 Vérifier BitLocker</div>
+          <div className="text-xs text-gray-600 mt-1">Ouvre la vérification (admin)</div>
+        </div>
+        <div
+          onClick={openPsOffAdmin}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsOffAdmin() }}
+          className="flex-1 min-w-[220px] bg-white rounded-lg border border-gray-200 shadow-sm p-4 cursor-pointer hover:border-gray-400 hover:shadow transition"
+        >
+          <div className="text-sm font-medium text-gray-900">🛑 Désactiver BitLocker</div>
+          <div className="text-xs text-gray-600 mt-1">Désactive sur un volume (admin)</div>
+        </div>
+        <div
+          onClick={openPsChkdsk}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsChkdsk() }}
+          className="flex-1 min-w-[220px] bg-white rounded-lg border border-gray-200 shadow-sm p-4 cursor-pointer hover:border-gray-400 hover:shadow transition"
+        >
+          <div className="text-sm font-medium text-gray-900">🧰 CHKDSK</div>
+          <div className="text-xs text-gray-600 mt-1">Analyse et réparation</div>
+        </div>
+        <div
+          onClick={openPsDefrag}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsDefrag() }}
+          className="flex-1 min-w-[220px] bg-white rounded-lg border border-gray-200 shadow-sm p-4 cursor-pointer hover:border-gray-400 hover:shadow transition"
+        >
+          <div className="text-sm font-medium text-gray-900">🧩 Défragmenter</div>
+          <div className="text-xs text-gray-600 mt-1">Optimise les disques</div>
+        </div>
+        <div
+          onClick={openPsFormatAdmin}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsFormatAdmin() }}
+          className="flex-1 min-w-[220px] bg-white rounded-lg border border-gray-200 shadow-sm p-4 cursor-pointer hover:border-gray-400 hover:shadow transition"
+        >
+          <div className="text-sm font-medium text-gray-900">💽 Formater (Admin)</div>
+          <div className="text-xs text-gray-600 mt-1">Outil de formatage disque</div>
+        </div>
       </div>
 
       {drives?.length > 0 && (
