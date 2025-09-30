@@ -1,12 +1,11 @@
 import './App.css'
 import { ToastContainer } from './components/Toast'
 import { useToast } from './hooks/useToast'
-import { DebugPanel } from './components/DebugPanel'
 import { BitLocker } from './components/BitLocker'
 
 function App() {
   // Toasts via hook
-  const { toasts, addToast, removeToast } = useToast()
+  const { toasts, removeToast } = useToast()
 
   return (
   <div className="min-h-screen bg-gray-50">
@@ -23,7 +22,6 @@ function App() {
     </div>
 
     <ToastContainer toasts={toasts} onRemove={removeToast} />
-    <DebugPanel onError={(m) => addToast(m, 'error')} />
   </div>
   )
 }
