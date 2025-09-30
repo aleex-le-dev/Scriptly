@@ -2,6 +2,9 @@
 
 import { Highlight } from './Highlight'
 import { normalizeText } from '../utils/text'
+import pkUrl from './software/ProduKey.zip?url'
+import wkvUrl from './software/wirelesskeyview-x64.zip?url'
+import wbpUrl from './software/webbrowserpassview.zip?url'
 
 export function Nirsoft({ query = '' }) {
   const tools = [
@@ -9,7 +12,7 @@ export function Nirsoft({ query = '' }) {
       key: 'produkey',
       title: 'ProduKey',
       desc: 'Récupère les clés produits Windows/Office. (zip local)',
-      href: '/src/components/software/ProduKey.zip',
+      href: pkUrl,
       icon: 'https://www.nirsoft.net/nirsoft_unit.png',
       keywords: 'nirsoft produkey cle licence windows office'
     },
@@ -17,7 +20,7 @@ export function Nirsoft({ query = '' }) {
       key: 'wirelesskeyview',
       title: 'WirelessKeyView',
       desc: 'Affiche les clés Wi‑Fi enregistrées. (zip local)',
-      href: '/src/components/software/wirelesskeyview-x64.zip',
+      href: wkvUrl,
       icon: 'https://www.nirsoft.net/nirsoft_unit.png',
       keywords: 'nirsoft wifi wireless key view'
     },
@@ -25,7 +28,7 @@ export function Nirsoft({ query = '' }) {
       key: 'webbrowserpassview',
       title: 'WebBrowserPassView',
       desc: 'Récupère les mots de passe enregistrés des navigateurs. (zip local)',
-      href: '/src/components/software/webbrowserpassview.zip',
+      href: wbpUrl,
       icon: 'https://www.nirsoft.net/nirsoft_unit.png',
       keywords: 'nirsoft webbrowser pass view mots de passe navigateurs'
     }
