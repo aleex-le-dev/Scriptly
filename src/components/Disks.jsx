@@ -3,8 +3,10 @@
 
 import { useState } from 'react'
 import { listDrives, psCheckBitlockerAdmin, psBitlockerOffAdmin, psChkdskUi, psDefragUi, psFormatDriveUi, psFormatDriveAdmin } from '../services/api'
+import { Highlight } from './Highlight'
+import { normalizeText } from '../utils/text'
 
-export function Disks() {
+export function Disks({ query = '' }) {
   const [loading, setLoading] = useState(false)
   const [drives, setDrives] = useState([])
 
@@ -27,9 +29,16 @@ export function Disks() {
   const openPsFormat = async () => { try { await psFormatDriveUi() } catch {} }
   const openPsFormatAdmin = async () => { try { await psFormatDriveAdmin() } catch {} }
 
+  const visible = (text) => {
+    const q = normalizeText(String(query || '').trim())
+    if (q.length < 3) return true
+    return normalizeText(text).includes(q)
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap gap-3">
+        {visible('lister disques drives list') && (
         <div
           onClick={handleList}
           role="button"
@@ -37,9 +46,11 @@ export function Disks() {
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleList() }}
           className="w-64 bg-white rounded-lg border border-gray-200 shadow-sm p-4 cursor-pointer hover:border-gray-400 hover:shadow transition"
         >
-          <div className="text-sm font-medium text-gray-900">📂 Lister les disques</div>
-          <div className="text-xs text-gray-600 mt-1">Affiche les lecteurs détectés</div>
+          <div className="text-sm font-medium text-gray-900"><Highlight text="📂 Lister les disques" query={query} /></div>
+          <div className="text-xs text-gray-600 mt-1"><Highlight text="Affiche les lecteurs détectés" query={query} /></div>
         </div>
+        )}
+        {visible('bitlocker verifier status manage-bde') && (
         <div
           onClick={openPsCheckAdmin}
           role="button"
@@ -47,9 +58,11 @@ export function Disks() {
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsCheckAdmin() }}
           className="w-64 bg-white rounded-lg border border-gray-200 shadow-sm p-4 cursor-pointer hover:border-gray-400 hover:shadow transition"
         >
-          <div className="text-sm font-medium text-gray-900">🔒 Vérifier BitLocker</div>
-          <div className="text-xs text-gray-600 mt-1">Ouvre la vérification (admin)</div>
+          <div className="text-sm font-medium text-gray-900"><Highlight text="🔒 Vérifier BitLocker" query={query} /></div>
+          <div className="text-xs text-gray-600 mt-1"><Highlight text="Ouvre la vérification (admin)" query={query} /></div>
         </div>
+        )}
+        {visible('bitlocker off desactiver disable') && (
         <div
           onClick={openPsOffAdmin}
           role="button"
@@ -57,9 +70,11 @@ export function Disks() {
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsOffAdmin() }}
           className="w-64 bg-white rounded-lg border border-gray-200 shadow-sm p-4 cursor-pointer hover:border-gray-400 hover:shadow transition"
         >
-          <div className="text-sm font-medium text-gray-900">🛑 Désactiver BitLocker</div>
-          <div className="text-xs text-gray-600 mt-1">Désactive sur un volume (admin)</div>
+          <div className="text-sm font-medium text-gray-900"><Highlight text="🛑 Désactiver BitLocker" query={query} /></div>
+          <div className="text-xs text-gray-600 mt-1"><Highlight text="Désactive sur un volume (admin)" query={query} /></div>
         </div>
+        )}
+        {visible('chkdsk verifier disque erreurs') && (
         <div
           onClick={openPsChkdsk}
           role="button"
@@ -67,9 +82,11 @@ export function Disks() {
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsChkdsk() }}
           className="w-64 bg-white rounded-lg border border-gray-200 shadow-sm p-4 cursor-pointer hover:border-gray-400 hover:shadow transition"
         >
-          <div className="text-sm font-medium text-gray-900">🧰 CHKDSK</div>
-          <div className="text-xs text-gray-600 mt-1">Analyse et réparation</div>
+          <div className="text-sm font-medium text-gray-900"><Highlight text="🧰 CHKDSK" query={query} /></div>
+          <div className="text-xs text-gray-600 mt-1"><Highlight text="Analyse et réparation" query={query} /></div>
         </div>
+        )}
+        {visible('defragmenter optimiser disque') && (
         <div
           onClick={openPsDefrag}
           role="button"
@@ -77,9 +94,11 @@ export function Disks() {
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsDefrag() }}
           className="w-64 bg-white rounded-lg border border-gray-200 shadow-sm p-4 cursor-pointer hover:border-gray-400 hover:shadow transition"
         >
-          <div className="text-sm font-medium text-gray-900">🧩 Défragmenter</div>
-          <div className="text-xs text-gray-600 mt-1">Optimise les disques</div>
+          <div className="text-sm font-medium text-gray-900"><Highlight text="🧩 Défragmenter" query={query} /></div>
+          <div className="text-xs text-gray-600 mt-1"><Highlight text="Optimise les disques" query={query} /></div>
         </div>
+        )}
+        {visible('formater format drive disque cle admin') && (
         <div
           onClick={openPsFormatAdmin}
           role="button"
@@ -87,9 +106,10 @@ export function Disks() {
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsFormatAdmin() }}
           className="w-64 bg-white rounded-lg border border-gray-200 shadow-sm p-4 cursor-pointer hover:border-gray-400 hover:shadow transition"
         >
-          <div className="text-sm font-medium text-gray-900">💽 Formater (Admin)</div>
-          <div className="text-xs text-gray-600 mt-1">Outil de formatage disque</div>
+          <div className="text-sm font-medium text-gray-900"><Highlight text="💽 Formater (Admin)" query={query} /></div>
+          <div className="text-xs text-gray-600 mt-1"><Highlight text="Outil de formatage disque" query={query} /></div>
         </div>
+        )}
       </div>
 
       {drives?.length > 0 && (
