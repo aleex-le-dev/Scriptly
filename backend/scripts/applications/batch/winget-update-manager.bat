@@ -17,8 +17,8 @@ echo ================================================
 echo     GESTIONNAIRE WINGET - MISES A JOUR
 echo ================================================
 echo.
-echo   1. winget update (liste et choix)
-echo   2. winget update --all (tout mettre a jour)
+echo   1. Mettre à jour une application (liste et choix)
+echo   2. Mettre à jour toutes les applications
 echo   3. Quitter
 echo.
 set /p choice="Choisissez une option (1-3): "

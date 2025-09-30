@@ -35,6 +35,13 @@ export async function networkCloudflareDnsAdmin() {
   return res.json()
 }
 
+// Applications: winget update
+export async function appsWingetUpdateAdmin() {
+  const res = await fetch(`${BASE_URL}/apps/winget-update-admin`)
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  return res.json()
+}
+
 // BitLocker API
 export async function bitlockerStatus() {
   const url = `${BASE_URL}/bitlocker/status`
