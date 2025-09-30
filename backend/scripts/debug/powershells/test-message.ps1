@@ -1,6 +1,6 @@
 <#
-  Affiche une boîte de dialogue Windows pour tester l'exécution PowerShell depuis l'app.
-  Usage: powershell -ExecutionPolicy Bypass -File .\backend\scripts\powershell\test-message.ps1
+  Affiche une boite de dialogue Windows pour tester l'execution PowerShell depuis l'app.
+  Usage: powershell -ExecutionPolicy Bypass -File .\backend\scripts\debug\powershells\test-message.ps1
 #>
 
 try {
@@ -12,4 +12,5 @@ catch {
   Write-Host "[test-message.ps1] Error: $($_.Exception.Message)"
   exit 0
 }
+
 

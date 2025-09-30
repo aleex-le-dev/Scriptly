@@ -1,4 +1,4 @@
-# Verifier les erreurs disque avec chkdsk (ASCII only)
+# Defragmenter un disque via Optimize-Volume (ASCII only)
 try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 | Out-Null } catch {}
 
 # Lister les volumes pour aider l'utilisateur
@@ -12,7 +12,9 @@ foreach ($v in $volumes) {
   Write-Host ("{0,-5} {1,-10} {2,10} {3,10} {4,15}" -f $v.DriveLetter, $v.FileSystem, $sizeGB, $freeGB, $v.HealthStatus)
 }
 
-$drive = Read-Host "Entrez la lettre du lecteur a verifier (chkdsk)"
-Write-Host ("`nVerification du disque {0}:" -f $drive)
-chkdsk ("{0}:" -f $drive)
+$drive = Read-Host "Entrez la lettre du lecteur a defragmenter"
+Write-Host ("`nDefragmentation de {0} ..." -f $drive)
+Optimize-Volume -DriveLetter $drive -Defrag -Verbose
 Read-Host "`nAppuyez sur Entree pour fermer"
+
+

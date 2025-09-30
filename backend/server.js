@@ -79,7 +79,7 @@ app.get("/__routes", (_request, response) => {
 // Execute PowerShell script that shows a MessageBox
 app.get("/test-message", async (_request, response, next) => {
   try {
-    const psScript = path.join(scriptsDir, "powershell", "test-message.ps1");
+    const psScript = path.join(scriptsDir, "debug", "powershells", "test-message.ps1");
     execFile(
       "powershell.exe",
       [
@@ -104,7 +104,7 @@ app.get("/test-message", async (_request, response, next) => {
 
 // PowerShell scripts launcher (disk utilities)
 function launchScriptPs1(scriptName, openUi) {
-  const psScript = path.join(scriptsDir, "powershell", scriptName);
+  const psScript = path.join(scriptsDir, "disks", "powershells", scriptName);
   if (openUi) {
     try {
       execFile(
@@ -141,7 +141,7 @@ function launchScriptPs1(scriptName, openUi) {
 // Elevated admin: launch .bat that elevates PowerShell for BitLocker check
 app.get("/disk/check-bitlocker-admin", async (_request, response, next) => {
   try {
-    const batPath = path.join(scriptsDir, "powershell", "check-bitlocker.bat");
+    const batPath = path.join(scriptsDir, "disks", "batch", "check-bitlocker.bat");
     execFile("cmd.exe", ["/c", "start", "", batPath], { windowsHide: false }, (error) => {
       if (error) {
         return response.status(200).json({ ok: false, error: error.message });
@@ -155,7 +155,7 @@ app.get("/disk/check-bitlocker-admin", async (_request, response, next) => {
 
 app.get("/disk/bitlocker-off-admin", async (_request, response, next) => {
   try {
-    const batPath = path.join(scriptsDir, "powershell", "bitlocker-off.bat");
+    const batPath = path.join(scriptsDir, "disks", "batch", "bitlocker-off.bat");
     execFile("cmd.exe", ["/c", "start", "", batPath], { windowsHide: false }, (error) => {
       if (error) {
         return response.status(200).json({ ok: false, error: error.message });
@@ -190,7 +190,7 @@ app.get("/disk/defrag", async (request, response, next) => {
 // Execute Batch script that opens a CMD window (non-blocking via 'start')
 app.get("/test-bat", async (_request, response, next) => {
   try {
-    const batScript = path.join(scriptsDir, "batch", "test-message.bat");
+    const batScript = path.join(scriptsDir, "debug", "batch", "test-message.bat");
     // Use 'start' to open in a new window and return immediately
     execFile("cmd.exe", ["/c", "start", "", batScript], { windowsHide: false }, (error) => {
       if (error) {
@@ -360,7 +360,7 @@ app.get("/drives", async (_request, response, next) => {
 // Compatibility: allow calling /bitlocker/drives directly without relying on router mount
 app.get("/bitlocker/drives", async (request, response, next) => {
   try {
-    const psScript = path.join(scriptsDir, "powershell", "list-drives.ps1");
+    const psScript = path.join(scriptsDir, "disks", "powershells", "list-drives.ps1");
     const wantUi = String(request?.query?.ui ?? "").toLowerCase();
 
     if (wantUi === "1" || wantUi === "true") {
@@ -449,7 +449,7 @@ app.get("/list-drives", async (request, response, next) => {
 // Drives listing under /bitlocker as well
 bitlocker.get("/drives", async (request, response, next) => {
   try {
-    const psScript = path.join(scriptsDir, "powershell", "list-drives.ps1");
+    const psScript = path.join(scriptsDir, "disks", "powershells", "list-drives.ps1");
     const wantUi = String(request?.query?.ui ?? "").toLowerCase();
 
     // Optionnel: ouvrir une fenêtre PowerShell visible pour debug/UX
