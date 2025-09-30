@@ -6,7 +6,7 @@ import { Highlight } from './Highlight'
 import { normalizeText } from '../utils/text'
 
 export function Reseau({ query = '' }) {
-  const openCloudflareDns = async () => { try { await networkCloudflareDnsAdmin() } catch {} }
+  const openCloudflareDns = async () => { try { await networkCloudflareDnsAdmin() } catch { /* noop */ } }
   const visible = (text) => {
     const q = normalizeText(String(query || '').trim())
     if (q.length < 3) return true

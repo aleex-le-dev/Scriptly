@@ -25,7 +25,7 @@ function App() {
   <div className="min-h-screen bg-gray-50">
     <div className="max-w-6xl mx-auto px-4 py-10">
       <div className="mb-8">
-        <Search value={query} onChange={setQuery} placeholder="Rechercher une action ou section... (min. 3 lettres)" />
+        <Search value={query} onChange={setQuery} placeholder="Rechercher un script..." />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {visible('maintenance outil tout en un mises a jour reseau nettoyage reparations') && (

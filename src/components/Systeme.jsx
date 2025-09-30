@@ -6,7 +6,7 @@ import { Highlight } from './Highlight'
 import { normalizeText } from '../utils/text'
 
 export function Systeme({ query = '' }) {
-  const openClassicMenuToggle = async () => { try { await systemContextMenuClassicAdmin() } catch {} }
+  const openClassicMenuToggle = async () => { try { await systemContextMenuClassicAdmin() } catch { /* noop */ } }
   const visible = (text) => {
     const q = normalizeText(String(query || '').trim())
     if (q.length < 3) return true

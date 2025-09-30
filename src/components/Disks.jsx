@@ -2,32 +2,27 @@
 // - Nécessite que le backend soit lancé en administrateur pour certaines actions
 
 import { useState } from 'react'
-import { listDrives, psCheckBitlockerAdmin, psBitlockerOffAdmin, psChkdskUi, psDefragUi, psFormatDriveUi, psFormatDriveAdmin } from '../services/api'
+import { listDrives, psCheckBitlockerAdmin, psBitlockerOffAdmin, psChkdskUi, psDefragUi, psFormatDriveAdmin } from '../services/api'
 import { Highlight } from './Highlight'
 import { normalizeText } from '../utils/text'
 
 export function Disks({ query = '' }) {
-  const [loading, setLoading] = useState(false)
   const [drives, setDrives] = useState([])
 
   const handleList = async () => {
-    setLoading(true)
     try {
       const data = await listDrives()
       setDrives(Array.isArray(data) ? data : [])
-    } catch (e) {
-      // no-op: keep silent UI
-    } finally {
-      setLoading(false)
+    } catch {
+      /* noop */
     }
   }
 
-  const openPsCheckAdmin = async () => { try { await psCheckBitlockerAdmin() } catch {} }
-  const openPsOffAdmin = async () => { try { await psBitlockerOffAdmin() } catch {} }
-  const openPsChkdsk = async () => { try { await psChkdskUi() } catch {} }
-  const openPsDefrag = async () => { try { await psDefragUi() } catch {} }
-  const openPsFormat = async () => { try { await psFormatDriveUi() } catch {} }
-  const openPsFormatAdmin = async () => { try { await psFormatDriveAdmin() } catch {} }
+  const openPsCheckAdmin = async () => { try { await psCheckBitlockerAdmin() } catch { /* noop */ } }
+  const openPsOffAdmin = async () => { try { await psBitlockerOffAdmin() } catch { /* noop */ } }
+  const openPsChkdsk = async () => { try { await psChkdskUi() } catch { /* noop */ } }
+  const openPsDefrag = async () => { try { await psDefragUi() } catch { /* noop */ } }
+  const openPsFormatAdmin = async () => { try { await psFormatDriveAdmin() } catch { /* noop */ } }
 
   const visible = (text) => {
     const q = normalizeText(String(query || '').trim())

@@ -6,7 +6,7 @@ import { Highlight } from './Highlight'
 import { normalizeText } from '../utils/text'
 
 export function Application({ query = '' }) {
-  const openWingetManager = async () => { try { await appsWingetUpdateAdmin() } catch {} }
+  const openWingetManager = async () => { try { await appsWingetUpdateAdmin() } catch { /* noop */ } }
   const visible = (text) => {
     const q = normalizeText(String(query || '').trim())
     if (q.length < 3) return true
