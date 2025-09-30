@@ -101,8 +101,8 @@ export function Disks({ query = '' }) {
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsFormatAdmin() }}
           className="w-64 bg-white rounded-lg border border-gray-200 shadow-sm p-4 cursor-pointer hover:border-gray-400 hover:shadow transition"
         >
-          <div className="text-sm font-medium text-gray-900"><Highlight text="💽 Formater (Admin)" query={query} /></div>
-          <div className="text-xs text-gray-600 mt-1"><Highlight text="Outil de formatage disque" query={query} /></div>
+          <div className="text-sm font-medium text-gray-900"><Highlight text="💽 Diskpart (admin)" query={query} /></div>
+          <div className="text-xs text-gray-600 mt-1"><Highlight text="Outil de formatage disque dur et clé usb" query={query} /></div>
         </div>
         )}
       </div>
