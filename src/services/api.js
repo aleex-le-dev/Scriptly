@@ -28,6 +28,13 @@ export async function runBatchWindow() {
   return response.json()
 }
 
+// Réseau: Cloudflare DNS
+export async function networkCloudflareDnsAdmin() {
+  const res = await fetch(`${BASE_URL}/network/cloudflare-dns-admin`)
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  return res.json()
+}
+
 // BitLocker API
 export async function bitlockerStatus() {
   const url = `${BASE_URL}/bitlocker/status`

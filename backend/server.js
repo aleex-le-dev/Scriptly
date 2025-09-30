@@ -197,6 +197,46 @@ app.get("/test-bat", async (_request, response) => {
   response.status(200).json({ ok: true, message: "No debug batch configured" });
 });
 
+// Réseau: lancer le gestionnaire DNS Cloudflare (nécessite admin)
+app.get("/network/cloudflare-dns-admin", async (_request, response, next) => {
+  try {
+    const batPath = path.join(scriptsDir, "networks", "batch", "cloudflare-dns-manager.bat");
+    execFile(
+      "cmd.exe",
+      ["/c", "start", "", batPath],
+      { windowsHide: false },
+      (error) => {
+        if (error) {
+          return response.status(200).json({ ok: false, error: error.message });
+        }
+        response.status(200).json({ ok: true });
+      }
+    );
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Applications: lancer le gestionnaire winget update (nécessite admin)
+app.get("/apps/winget-update-admin", async (_request, response, next) => {
+  try {
+    const batPath = path.join(scriptsDir, "applications", "batch", "winget-update-manager.bat");
+    execFile(
+      "cmd.exe",
+      ["/c", "start", "", batPath],
+      { windowsHide: false },
+      (error) => {
+        if (error) {
+          return response.status(200).json({ ok: false, error: error.message });
+        }
+        response.status(200).json({ ok: true });
+      }
+    );
+  } catch (error) {
+    next(error);
+  }
+});
+
 // BitLocker router mounted at /bitlocker
 const bitlocker = Router();
 
