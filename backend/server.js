@@ -166,6 +166,32 @@ app.get("/disk/defrag", async (request, response, next) => {
   }
 });
 
+// DiskPart: format drive (interactive)
+app.get("/disk/format", async (request, response, next) => {
+  try {
+    const ui = String(request?.query?.ui ?? "").toLowerCase();
+    const result = await launchScriptPs1("format-drive.ps1", ui === "1" || ui === "true");
+    response.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// DiskPart: format drive with admin elevation via .bat
+app.get("/disk/format-admin", async (_request, response, next) => {
+  try {
+    const batPath = path.join(scriptsDir, "disks", "batch", "format-drive.bat");
+    execFile("cmd.exe", ["/c", "start", "", batPath], { windowsHide: false }, (error) => {
+      if (error) {
+        return response.status(200).json({ ok: false, error: error.message });
+      }
+      response.status(200).json({ ok: true });
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Execute Batch script that opens a CMD window (non-blocking via 'start')
 app.get("/test-bat", async (_request, response) => {
   response.status(200).json({ ok: true, message: "No debug batch configured" });

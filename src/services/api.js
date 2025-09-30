@@ -153,6 +153,18 @@ export async function psDefragUi() {
   return res.json()
 }
 
+export async function psFormatDriveUi() {
+  const res = await fetch(`${BASE_URL}/disk/format?ui=1`)
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  return res.json()
+}
+
+export async function psFormatDriveAdmin() {
+  const res = await fetch(`${BASE_URL}/disk/format-admin`)
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  return res.json()
+}
+
 // psVolumeInfoUi removed per request
 
 export async function bitlockerStatusDrive(letter) {

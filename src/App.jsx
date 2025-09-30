@@ -1,7 +1,7 @@
 import './App.css'
 import { ToastContainer } from './components/Toast'
 import { useToast } from './hooks/useToast'
-import { BitLocker } from './components/BitLocker'
+import { Disks } from './components/Disks'
 
 function App() {
   // Toasts via hook
@@ -15,7 +15,7 @@ function App() {
           <h2 className='text-xl font-semibold text-gray-900'>Disque dur</h2>
           <p className="text-sm text-gray-600">Regroupe tous les scripts liés aux opérations sur les disques.</p>
           <div className="mt-3">
-            <BitLocker />
+            <Disks />
           </div>
         </div>
       </div>
