@@ -238,6 +238,26 @@ app.get("/apps/winget-update-admin", async (_request, response, next) => {
   }
 });
 
+// Maintenance: outil tout-en-un (nécessite admin)
+app.get("/maintenance/tool-admin", async (_request, response, next) => {
+  try {
+    const batPath = path.join(scriptsDir, "maintenance", "batch", "windows-maintenance-admin.bat");
+    execFile(
+      "cmd.exe",
+      ["/c", "start", "", batPath],
+      { windowsHide: false },
+      (error) => {
+        if (error) {
+          return response.status(200).json({ ok: false, error: error.message });
+        }
+        response.status(200).json({ ok: true });
+      }
+    );
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Systeme: basculer le menu contextuel classique Windows 11 (nécessite admin)
 app.get("/system/context-menu-classic-admin", async (_request, response, next) => {
   try {

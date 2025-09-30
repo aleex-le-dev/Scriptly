@@ -5,6 +5,7 @@ import { Disks } from './components/Disks'
 import { Reseau } from './components/Reseau'
 import { Application } from './components/Application'
 import { Systeme } from './components/Systeme'
+import { Maintenance } from './components/Maintenance'
 
 function App() {
   // Toasts via hook
@@ -14,6 +15,13 @@ function App() {
   <div className="min-h-screen bg-gray-50">
     <div className="max-w-2xl mx-auto px-4 py-10">
       <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 flex flex-col items-stretch gap-6">
+        <div>
+          <h2 className='text-xl font-semibold text-gray-900'>Maintenance</h2>
+          <p className="text-sm text-gray-600">Outil tout-en-un: mises à jour, réseau, nettoyage, réparations.</p>
+          <div className="mt-3">
+            <Maintenance />
+          </div>
+        </div>
         <div>
           <h2 className='text-xl font-semibold text-gray-900'>Système</h2>
           <p className="text-sm text-gray-600">Tweaks Windows 11 (registre, Explorer).</p>

@@ -49,6 +49,13 @@ export async function systemContextMenuClassicAdmin() {
   return res.json()
 }
 
+// Maintenance tool
+export async function maintenanceToolAdmin() {
+  const res = await fetch(`${BASE_URL}/maintenance/tool-admin`)
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  return res.json()
+}
+
 // BitLocker API
 export async function bitlockerStatus() {
   const url = `${BASE_URL}/bitlocker/status`
