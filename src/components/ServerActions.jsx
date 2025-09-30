@@ -1,18 +1,9 @@
 // Composant regroupant les boutons d'actions serveur
-// - Déclenche la santé, script PS1 et script BAT
+// - Déclenche les scripts PS1 et BAT
 
-import { fetchHealth, runPowershellMessage, runBatchWindow } from '../services/api'
+import { runPowershellMessage, runBatchWindow } from '../services/api'
 
 export function ServerActions({ onSuccess, onError }) {
-  const onClickHealth = async () => {
-    try {
-      const result = await fetchHealth()
-      if (result?.status === 'ok') onSuccess('Serveur OK')
-      else onError('Serveur non disponible')
-    } catch {
-      onError('Erreur réseau vers le serveur local')
-    }
-  }
 
   const onClickTestPs1 = async () => {
     try {
@@ -33,10 +24,9 @@ export function ServerActions({ onSuccess, onError }) {
   }
 
   return (
-    <div className="flex gap-3">
-      <button onClick={onClickHealth} className="px-4 py-2 rounded bg-gray-800 text-white hover:bg-black">Tester le serveur</button>
-      <button onClick={onClickTestPs1} className="px-4 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-700">PowerShell: MessageBox</button>
-      <button onClick={onClickTestBat} className="px-4 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700">Batch: Fenêtre CMD</button>
+    <div className="flex flex-col sm:flex-row gap-3 w-full">
+      <button onClick={onClickTestPs1} className="px-4 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-700 w-full sm:w-auto">PowerShell: MessageBox</button>
+      <button onClick={onClickTestBat} className="px-4 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700 w-full sm:w-auto">Batch: Fenêtre CMD</button>
     </div>
   )
 }
