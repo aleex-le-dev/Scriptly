@@ -1,10 +1,10 @@
 @echo off
-chcp 65001 >nul  REM Use UTF-8 encoding for better text display
+chcp 65001 >nul  REM Utiliser l'encodage UTF-8 pour un meilleur affichage
 
-REM Ensure the script runs with admin privileges
+REM S'assurer que le script s'exécute avec les privilèges administrateur
 if /i not "%~1"=="am_admin" (
-    echo(This script requires administrator privileges.
-    echo(Requesting elevation now ... 
+    echo(Ce script requiert des privilèges administrateur.
+    echo(Demande d'élévation en cours ... 
     powershell start -verb runas '%0' am_admin 
     exit /b
 )
@@ -14,51 +14,52 @@ cls
 color 07
 
 echo ======================================================
-echo           WINDOWS MAINTENANCE TOOL V2.9.7 - By Lil_Batti
+echo           OUTIL DE MAINTENANCE WINDOWS V2.9.7 - By Lil_Batti
 echo ======================================================
 echo.
 
-echo      === WINDOWS UPDATES ===
-echo   [1] Update Windows Apps / Programs (Winget upgrade)
+echo      === MISES A JOUR WINDOWS ===
+echo   [1] Mettre a jour les applications / programmes (Winget upgrade)
 
-echo      === SYSTEM HEALTH CHECKS ===
-echo   [2] Scan for corrupt files (SFC /scannow) [Admin]
-echo   [3] Windows CheckHealth (DISM) [Admin]
-echo   [4] Restore Windows Health (DISM /RestoreHealth) [Admin]
+echo      === VERIFICATIONS D'INTEGRITE SYSTEME ===
+echo   [2] Analyse et reparation des fichiers (SFC /scannow) [Admin]
+echo   [3] Verification de l'etat Windows (DISM /CheckHealth) [Admin]
+echo   [4] Restaurer l'etat Windows (DISM /RestoreHealth) [Admin]
 
-echo      === NETWORK TOOLS ===
-echo   [5] DNS Options (Flush/Set/Reset)
-echo   [6] Show network information (ipconfig /all)
-echo   [7] Restart Network Adapters
-echo   [8] Network Repair - Automatic Troubleshooter
+echo      === OUTILS RESEAU ===
+echo   [5] Options DNS (Flush/Set/Reset)
+echo   [6] Afficher les informations reseau (ipconfig /all)
+echo   [7] Redemarrer les cartes reseau
+echo   [8] Reparation reseau - Assistant automatique
 
-echo      === CLEANUP ^& OPTIMIZATION ===
-echo   [9] Disk Cleanup (cleanmgr)
-echo  [10] Run Advanced Error Scan (CHKDSK) [Admin]
-echo  [11] Perform System Optimization (Delete Temporary Files)
-echo  [12] Advanced Registry Cleanup-Optimization
+echo      === NETTOYAGE ^& OPTIMISATION ===
+echo   [9] Nettoyage de disque (cleanmgr)
+echo  [10] Analyse d'erreurs avancee (CHKDSK) [Admin]
+echo  [11] Optimisation systeme (suppression des fichiers temporaires)
+echo  [12] Nettoyage/optimisation avancee du Registre
 
 echo      === SUPPORT ===
-echo  [13] Contact and Support information (Discord)
+echo  [13] Informations de contact et support (Discord)
 
 echo.
-echo      === UTILITIES ^& EXTRAS ===
-echo  [20] Show installed drivers
-echo  [21] Windows Update Repair Tool
-echo  [22] Generate Full System Report
-echo  [23] Windows Update Utility ^& Service Reset
-echo  [24] View Network Routing Table [Advanced]
 
-echo  [14] === EXIT ===
+echo      === UTILITAIRES ^& EXTRAS ===
+echo  [20] Afficher les pilotes installes
+echo  [21] Outil de reparation Windows Update
+echo  [22] Generer un rapport systeme complet
+echo  [23] Utilitaire de reinitialisation Windows Update
+echo  [24] Afficher la table de routage [Avance]
+
+echo  [14] === QUITTER ===
 echo.
 echo ------------------------------------------------------
-set /p choice=Enter your choice: 
+set /p choice=Entrez votre choix: 
 if "%choice%"=="22" goto choice22
 if "%choice%"=="23" goto choice23
 
 if "%choice%"=="20" goto choice20
 if exist "%~f0" findstr /b /c:":choice%choice%" "%~f0" >nul || (
-    echo Invalid choice, please try again.
+    echo Choix invalide, veuillez recommencer.
     pause
     goto menu
 )
@@ -68,34 +69,34 @@ goto choice%choice%
 cls
 setlocal EnableDelayedExpansion
 
-REM Check winget
+REM Vérifier winget
 where winget >nul 2>nul || (
-    echo Winget is not installed. Please install it from Microsoft Store.
+    echo Winget n'est pas installe. Veuillez l'installer depuis le Microsoft Store.
     pause
     goto menu
 )
 
 echo ===============================================
-echo     Windows Update (via Winget)
+echo     Mise a jour Windows (via Winget)
 echo ===============================================
-echo Listing available upgrades...
+echo Liste des mises a jour disponibles...
 echo.
 
-REM Show upgradeable apps
+REM Afficher les applications pouvant etre mises a jour
 cmd /c "winget upgrade --include-unknown"
 echo.
 pause
 
 echo ===============================================
-echo Options:
-echo [1] Upgrade all packages
-echo [2] Upgrade selected packages
-echo [0] Cancel
+echo Options :
+echo [1] Mettre a jour tous les paquets
+echo [2] Mettre a jour des paquets selectionnes
+echo [0] Annuler
 echo.
-set /p upopt=Choose an option:
+set /p upopt=Choisissez une option: 
 
 if "%upopt%"=="1" (
-    echo Running full upgrade...
+    echo Mise a jour complete en cours...
     cmd /c "winget upgrade --all --include-unknown"
     pause
     goto menu
@@ -104,29 +105,29 @@ if "%upopt%"=="1" (
 if "%upopt%"=="2" (
     cls
     echo ===============================================
-    echo   Available Packages [Copy ID to upgrade]
+    echo   Paquets disponibles [Copiez l'ID a mettre a jour]
     echo ===============================================
     cmd /c "winget upgrade --include-unknown"
     echo.
 
-    echo Enter one or more package IDs to upgrade
-    echo (Example: Microsoft.Edge,Spotify.Spotify  use exact IDs from the list above)
+    echo Saisissez un ou plusieurs IDs de paquets a mettre a jour
+    echo (Exemple: Microsoft.Edge,Spotify.Spotify  utilisez les IDs exacts de la liste)
 
     echo.
     set /p packlist=IDs: 
 
-    REM Remove spaces
+    REM Supprimer les espaces
     set "packlist=!packlist: =!"
 
     if not defined packlist (
-        echo No package IDs entered.
+        echo Aucun ID de paquet saisi.
         pause
         goto menu
     )
 
     echo.
     for %%G in (!packlist!) do (
-        echo Upgrading %%G...
+        echo Mise a jour de %%G...
         cmd /c "winget upgrade --id %%G --include-unknown"
         echo.
     )
@@ -139,21 +140,21 @@ goto menu
 
 :choice2
 cls
-echo Scanning for corrupt files (SFC /scannow)...
+echo Analyse des fichiers systeme (SFC /scannow)...
 sfc /scannow
 pause
 goto menu
 
 :choice3
 cls
-echo Checking Windows health status (DISM /CheckHealth)...
+echo Verification de l'etat de Windows (DISM /CheckHealth)...
 dism /online /cleanup-image /checkhealth
 pause
 goto menu
 
 :choice4
 cls
-echo Restoring Windows health status (DISM /RestoreHealth)...
+echo Restauration de l'etat de Windows (DISM /RestoreHealth)...
 dism /online /cleanup-image /restorehealth
 pause
 goto menu
@@ -161,16 +162,16 @@ goto menu
 :choice5
 cls
 echo ======================================================
-echo Clearing DNS Cache...
+echo Vidage du cache DNS...
 ipconfig /flushdns
 echo ======================================================
-echo [1] Set DNS to Google (8.8.8.8 / 8.8.4.4)
-echo [2] Set DNS to Cloudflare (1.1.1.1 / 1.0.0.1)
-echo [3] Restore original DNS settings
-echo [4] Use your own DNS
-echo [5] Return to menu
+echo [1] Utiliser DNS Google (8.8.8.8 / 8.8.4.4)
+echo [2] Utiliser DNS Cloudflare (1.1.1.1 / 1.0.0.1)
+echo [3] Restaurer les DNS d'origine
+echo [4] Saisir vos DNS personnalisés
+echo [5] Retour au menu
 echo ======================================================
-set /p dns_choice=Enter your choice: 
+set /p dns_choice=Entrez votre choix: 
 
 if "%dns_choice%"=="1" goto set_google_dns
 if "%dns_choice%"=="2" goto set_cloudflare_dns
@@ -178,74 +179,74 @@ if "%dns_choice%"=="3" goto restore_dns
 if "%dns_choice%"=="4" goto custom_dns
 if "%dns_choice%"=="5" goto menu
 
-echo Invalid choice, please try again.
+echo Choix invalide, veuillez recommencer.
 pause
 goto choice5
 
-REM --- SET GOOGLE DNS ---
+REM --- CONFIGURER DNS GOOGLE ---
 :set_google_dns
-echo Saving current DNS settings...
+echo Sauvegarde des paramètres DNS actuels...
 
 netsh interface ip show config name="Wi-Fi" | findstr "Statically Configured DNS Servers" > %SystemRoot%\Temp\wifi_dns_backup.txt
 netsh interface ip show config name="Ethernet" | findstr "Statically Configured DNS Servers" > %SystemRoot%\Temp\ethernet_dns_backup.txt
 
-echo Applying Google DNS...
+echo Application des DNS Google...
 
 netsh interface ip set dns name="Wi-Fi" static 8.8.8.8 primary
 netsh interface ip add dns name="Wi-Fi" 8.8.4.4 index=2
 netsh interface ip set dns name="Ethernet" static 8.8.8.8 primary
 netsh interface ip add dns name="Ethernet" 8.8.4.4 index=2
 
-echo Google DNS applied successfully.
+echo DNS Google appliqués avec succès.
 pause
 goto menu
 
-REM --- SET CLOUDFLARE DNS ---
+REM --- CONFIGURER DNS CLOUDFLARE ---
 :set_cloudflare_dns
-echo Saving current DNS settings...
+echo Sauvegarde des paramètres DNS actuels...
 
 netsh interface ip show config name="Wi-Fi" | findstr "Statically Configured DNS Servers" > %SystemRoot%\Temp\wifi_dns_backup.txt
 netsh interface ip show config name="Ethernet" | findstr "Statically Configured DNS Servers" > %SystemRoot%\Temp\ethernet_dns_backup.txt
 
-echo Applying Cloudflare DNS...
+echo Application des DNS Cloudflare...
 
 netsh interface ip set dns name="Wi-Fi" static 1.1.1.1 primary
 netsh interface ip add dns name="Wi-Fi" 1.0.0.1 index=2
 netsh interface ip set dns name="Ethernet" static 1.1.1.1 primary
 netsh interface ip add dns name="Ethernet" 1.0.0.1 index=2
 
-echo Cloudflare DNS applied successfully.
+echo DNS Cloudflare appliqués avec succès.
 pause
 goto menu
 
-REM --- RESTORE ORIGINAL DNS SETTINGS ---
+REM --- RESTAURER LES DNS D'ORIGINE ---
 :restore_dns
 cls
 echo ======================================================
-echo        RESTORE ORIGINAL DNS SETTINGS
+echo        RESTAURATION DES PARAMETRES DNS D'ORIGINE
 echo ======================================================
 echo.
 
-echo [Step 1] Setting Wi-Fi DNS to automatic (DHCP)...
+echo [Etape 1] Configuration du DNS Wi‑Fi en automatique (DHCP)...
 netsh interface ip set dns name="Wi-Fi" source=dhcp >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [FAIL] Could not restore Wi-Fi DNS. Please check manually.
+    echo [ECHEC] Impossible de restaurer le DNS Wi‑Fi. Verifiez manuellement.
 ) else (
-    echo [OK] Wi-Fi DNS successfully restored.
+    echo [OK] DNS Wi‑Fi rétabli avec succès.
 )
 
 echo.
-echo [Step 2] Setting Ethernet DNS to automatic (DHCP)...
+echo [Etape 2] Configuration du DNS Ethernet en automatique (DHCP)...
 netsh interface ip set dns name="Ethernet" source=dhcp >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [FAIL] Could not restore Ethernet DNS. Please check manually.
+    echo [ECHEC] Impossible de restaurer le DNS Ethernet. Verifiez manuellement.
 ) else (
-    echo [OK] Ethernet DNS successfully restored.
+    echo [OK] DNS Ethernet rétabli avec succès.
 )
 
 echo.
 echo ------------------------------------------------------
-echo Done restoring DNS settings.
+echo Restauration des paramètres DNS terminee.
 echo ------------------------------------------------------
 pause
 goto menu
@@ -253,59 +254,61 @@ goto menu
 
 :choice6
 cls
-echo Displaying Network Information...
+echo Affichage des informations reseau...
 ipconfig /all
 pause
 goto menu
 
 :choice7
 cls
-echo Restarting network adapters...
+echo Redemarrage des cartes reseau...
 netsh interface set interface "Wi-Fi" admin=disable
 netsh interface set interface "Wi-Fi" admin=enable
-echo Network adapters restarted.
+echo Cartes reseau redemarrees.
 pause
 goto menu
 
 :choice8
-title Network Repair - Automatic Troubleshooter
+title Réparation réseau - Assistant automatique
 cls
 echo.
 echo ================================
-echo     Automatic Network Repair
+echo     Réparation réseau automatique
 echo ================================
 echo.
-echo Step 1: Renewing your IP address...
+echo Etape 1 : Renouvellement de l'adresse IP...
 ipconfig /release >nul
 ipconfig /renew >nul
 
-echo Step 2: Refreshing DNS settings...
+echo Etape 2 : Actualisation des paramètres DNS...
 ipconfig /flushdns >nul
 
-echo Step 3: Resetting network components...
+echo Etape 3 : Réinitialisation des composants réseau...
 netsh winsock reset >nul
 netsh int ip reset >nul
 
 echo.
-echo Your network settings have been refreshed.
-echo A system restart is recommended for full effect.
+echo Les paramètres réseau ont été actualisés.
+echo Un redémarrage est recommandé pour un effet complet.
 echo.
 
 :askRestart
-set /p restart=Would you like to restart now? (Y/N): 
+set /p restart=Souhaitez-vous redemarrer maintenant ? (O/N): 
 if /I "%restart%"=="Y" (
+    shutdown /r /t 5
+) else if /I "%restart%"=="O" (
     shutdown /r /t 5
 ) else if /I "%restart%"=="N" (
     goto menu
 ) else (
-    echo Invalid input. Please enter Y or N.
+    echo Saisie invalide. Veuillez entrer O ou N.
     goto askRestart
 )
 
 
 :choice9
 cls
-echo Running Disk Cleanup...
+echo Lancement du Nettoyage de disque...
 cleanmgr
 pause
 goto menu
@@ -313,20 +316,20 @@ goto menu
 :choice10
 cls
 echo ===============================================
-echo Running advanced error scan on all drives...
+echo Analyse avancee des erreurs sur tous les lecteurs...
 echo ===============================================
 
-REM Loop through all mounted drives with free space using PowerShell
+REM Boucle sur tous les lecteurs montés disposant d'espace libre via PowerShell
 for /f "delims=" %%d in ('powershell -NoProfile -Command ^
-  "Get-PSDrive -PSProvider FileSystem | Where-Object { $_.Free -ne $null } | ForEach-Object { $_.Name + ':' }"
+  "Get-PSDrive -PSProvider FileSystem | Where-Object { $_.Free -ne $null } | ForEach-Object { $_.Name + ':' }" 
 ) do (
     echo.
-    echo Scanning drive %%d ...
+    echo Analyse du lecteur %%d ...
     chkdsk %%d /f /r /x
 )
 
 echo.
-echo All drives scanned.
+echo Tous les lecteurs ont été analysés.
 pause
 goto menu
 
@@ -335,32 +338,34 @@ goto menu
 cls
 
 :confirm_loop
-echo Do you want to delete temporary files and system cache? (Y/N)
-set /p confirm=Type Y or N: 
+echo Voulez-vous supprimer les fichiers temporaires et le cache système ? (O/N)
+set /p confirm=Tapez O ou N: 
 
 IF /I "%confirm%"=="Y" (
     goto delete_temp
 ) ELSE IF /I "%confirm%"=="YES" (
     goto delete_temp
+) ELSE IF /I "%confirm%"=="O" (
+    goto delete_temp
 ) ELSE IF /I "%confirm%"=="N" (
-    echo Operation cancelled.
+    echo Operation annulee.
     pause
     goto menu
 ) ELSE IF /I "%confirm%"=="NO" (
-    echo Operation cancelled.
+    echo Operation annulee.
     pause
     goto menu
 ) ELSE (
-    echo Invalid input. Please type Y or N.
+    echo Saisie invalide. Veuillez taper O ou N.
     goto confirm_loop
 )
 
 :delete_temp
-echo Deleting temporary files and system cache...
+echo Suppression des fichiers temporaires et du cache système...
 del /s /f /q %temp%\*.*
 del /s /f /q C:\Windows\Temp\*.*
 del /s /f /q "C:\Users\%USERNAME%\AppData\Local\Temp\*.*"
-echo Temporary files deleted.
+echo Fichiers temporaires supprimés.
 pause
 goto menu
 
@@ -368,60 +373,60 @@ goto menu
 :choice12
 cls
 echo ======================================================
-echo Advanced Registry Cleanup ^& Optimization
+echo Nettoyage ^& optimisation avances du Registre
 echo ======================================================
 setlocal enabledelayedexpansion
 
-REM Create backup folder
+REM Créer le dossier de sauvegarde
 set backupFolder=%SystemRoot%\Temp\RegistryBackups
 if not exist "%backupFolder%" mkdir "%backupFolder%"
 
-REM Create log file
+REM Créer le fichier journal
 set logFile=%SystemRoot%\Temp\RegistryCleanupLog.txt
-echo Registry Cleanup Log - %date% %time% > "%logFile%"
+echo Journal de nettoyage du Registre - %date% %time% > "%logFile%"
 
-REM Initialize counter
+REM Compteurs
 set count=0
 set safe_count=0
 
-REM Advanced registry scan
-echo Analyzing Windows Registry for errors and performance issues...
+REM Analyse avancée du Registre
+echo Analyse du Registre Windows pour les erreurs et problèmes de performance...
 for /f "tokens=*" %%A in ('reg query HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall 2^>nul') do (
     set /a count+=1
     set entries[!count!]=%%A
     
-    REM Check if the key is safe to delete
+    REM Déterminer si la clé est sans risque à supprimer
     echo %%A | findstr /I "IE40 IE4Data DirectDrawEx DXM_Runtime SchedulingAgent" >nul && (
         set /a safe_count+=1
         set safe_entries[!safe_count!]=%%A
     )
 )
 
-REM If no entries are found, exit
+REM Si aucune entrée, sortie
 if %count%==0 (
-    echo No unnecessary registry entries found.
+    echo Aucune entrée superflue trouvée dans le Registre.
     pause
     goto menu
 )
 
-REM Show found registry entries to the user
-echo Found %count% registry issues:
+REM Afficher les entrées trouvées
+echo %count% problèmes potentiels détectés dans le Registre:
 for /L %%i in (1,1,%count%) do echo [%%i] !entries[%%i]!
 echo.
-echo Safe to delete (%safe_count% entries detected):
+echo Sans risque à supprimer (%safe_count% entrées détectées):
 for /L %%i in (1,1,%safe_count%) do echo [%%i] !safe_entries[%%i]!
 echo.
-echo [A] Delete only safe entries
-if %safe_count% GTR 0 echo [B] Review safe entries before deletion
-echo [C] Create Registry Backup
-echo [D] Restore Registry Backup
-echo [E] Scan for corrupt registry entries
-echo [0] Cancel
+echo [A] Supprimer uniquement les entrées sûres
+if %safe_count% GTR 0 echo [B] Revoir les entrées sûres avant suppression
+echo [C] Créer une sauvegarde du Registre
+echo [D] Restaurer une sauvegarde du Registre
+echo [E] Vérifier les corruptions du Registre
+echo [0] Annuler
 echo.
-echo Enter your choice:
+echo Votre choix:
 set /p user_choice=
 
-REM Convert input to uppercase for consistency
+REM Normaliser la saisie
 for %%A in (%user_choice%) do set user_choice=%%A
 if /I "%user_choice%"=="0" goto menu
 if /I "%user_choice%"=="A" goto delete_safe_entries
@@ -431,73 +436,74 @@ if /I "%user_choice%"=="D" goto restore_backup
 if /I "%user_choice%"=="E" goto scan_registry
 if "%user_choice%"=="" goto menu
 
-echo Invalid input, returning to menu.
+echo Saisie invalide, retour au menu.
 pause
 goto menu
 
-REM Only delete safe registry errors
+REM Supprimer uniquement les entrées sûres
 :delete_safe_entries
 if %safe_count%==0 (
-    echo No safe entries found for deletion.
+    echo Aucune entrée sûre à supprimer.
     pause
     goto menu
 )
-echo Deleting all detected safe registry entries...
+echo Suppression de toutes les entrées sûres détectées...
 for /L %%i in (1,1,%safe_count%) do (
-    echo Deleting !safe_entries[%%i]!...
+    echo Suppression de !safe_entries[%%i]!...
     reg delete "!safe_entries[%%i]!" /f
-    echo Deleted: !safe_entries[%%i]! >> "%logFile%"
+    echo Supprime: !safe_entries[%%i]! >> "%logFile%"
 )
-echo All selected registry entries have been deleted.
+echo Suppression terminée.
 pause
 goto menu
 
-REM Review secure entries before deletion
+REM Revue avant suppression
 :review_safe_entries
 cls
-echo Safe to delete registry entries:
+echo Entrées du Registre sûres à supprimer:
 for /L %%i in (1,1,%safe_count%) do echo [%%i] !safe_entries[%%i]!
 echo.
-echo Do you want to delete them all? (Y/N)
+echo Voulez-vous toutes les supprimer ? (O/N)
 set /p confirm=
 for %%A in (%confirm%) do set confirm=%%A
 if /I "%confirm%"=="Y" goto delete_safe_entries
-echo Operation cancelled.
+if /I "%confirm%"=="O" goto delete_safe_entries
+echo Opération annulée.
 pause
 goto menu
 
-REM Create a manual backup of the registry
+REM Créer une sauvegarde du Registre
 :create_backup
 set backupName=RegistryBackup_%date:~-4,4%-%date:~-7,2%-%date:~-10,2%_%time:~0,2%-%time:~3,2%.reg
-echo Creating registry backup: %backupFolder%\%backupName%...
+echo Création de la sauvegarde: %backupFolder%\%backupName%...
 reg export HKLM "%backupFolder%\%backupName%" /y
-echo Backup successfully created.
+echo Sauvegarde créée avec succès.
 pause
 goto menu
 
-REM Restore registry backup
+REM Restaurer une sauvegarde
 :restore_backup
-echo Available backups:
+echo Sauvegardes disponibles:
 dir /b "%backupFolder%\*.reg"
-echo Enter the name of the backup to restore:
+echo Entrez le nom de la sauvegarde à restaurer:
 set /p backupFile=
 if exist "%backupFolder%\%backupFile%" (
-    echo Restoring backup...
+    echo Restauration en cours...
     reg import "%backupFolder%\%backupFile%"
-    echo Backup successfully restored.
+    echo Restauration effectuée avec succès.
 ) else (
-    echo Backup file not found. Please check the name and try again.
+    echo Fichier de sauvegarde introuvable. Vérifiez le nom et réessayez.
 )
 pause
 goto menu
 
-REM Scan for corrupt registry entries
+REM Vérifier les corruptions du Registre
 :scan_registry
 cls
-echo Scanning for corrupt registry entries...
+echo Vérification des corruptions du Registre...
 sfc /scannow
 dism /online /cleanup-image /checkhealth
-echo Registry scan complete. If errors were found, restart your PC.
+echo Vérification terminée. Si des erreurs ont été trouvées, redémarrez votre PC.
 pause
 goto menu
 
@@ -506,43 +512,43 @@ goto menu
 cls
 echo.
 echo ==================================================
-echo                CONTACT AND SUPPORT
+echo                CONTACT ET SUPPORT
 echo ==================================================
-echo Do you have any questions or need help?
-echo You are always welcome to contact me.
+echo Des questions ou besoin d'aide ?
+echo Vous pouvez me contacter à tout moment.
 echo.
-echo Discord-Username: Lil_Batti
-echo Support-server: https://discord.gg/bCQqKHGxja
+echo Discord - Utilisateur: Lil_Batti
+echo Serveur de support: https://discord.gg/bCQqKHGxja
 echo.
-echo Press ENTER to return to the main menu.
+echo Appuyez sur ENTREE pour revenir au menu principal.
 pause >nul
 goto menu
 
 :choice14
 cls
-echo Exiting script...
+echo Fermeture du script...
 exit
 
 
 :custom_dns
 cls
 echo ===============================================
-echo           Enter your custom DNS
+echo           Saisir vos DNS personnalisés
 echo ===============================================
 
 :get_dns
 echo.
-set /p customDNS1=Enter primary DNS: 
-set /p customDNS2=Enter secondary DNS (optional): 
+set /p customDNS1=DNS primaire: 
+set /p customDNS2=DNS secondaire (optionnel): 
 
 cls
 echo ===============================================
-echo           Validating DNS addresses...
+echo           Validation des adresses DNS...
 echo ===============================================
 ping -n 1 %customDNS1% >nul
 if errorlevel 1 (
-    echo [!] ERROR: The primary DNS "%customDNS1%" is not reachable.
-    echo Please enter a valid DNS address.
+    echo [!] ERREUR: Le DNS primaire "%customDNS1%" est injoignable.
+    echo Veuillez saisir une adresse DNS valide.
     pause
     cls
     goto get_dns
@@ -551,8 +557,8 @@ if errorlevel 1 (
 if not "%customDNS2%"=="" (
     ping -n 1 %customDNS2% >nul
     if errorlevel 1 (
-        echo [!] ERROR: The secondary DNS "%customDNS2%" is not reachable.
-        echo It will be skipped.
+        echo [!] ERREUR: Le DNS secondaire "%customDNS2%" est injoignable.
+        echo Il sera ignore.
         set "customDNS2="
         pause
     )
@@ -560,10 +566,10 @@ if not "%customDNS2%"=="" (
 
 cls
 echo ===============================================
-echo     Setting DNS for Wi-Fi and Ethernet...
+echo     Application des DNS pour Wi‑Fi et Ethernet...
 echo ===============================================
 
-REM Wi-Fi
+REM Wi‑Fi
 netsh interface ip set dns name="Wi-Fi" static %customDNS1%
 if not "%customDNS2%"=="" netsh interface ip add dns name="Wi-Fi" %customDNS2% index=2
 
@@ -573,9 +579,9 @@ if not "%customDNS2%"=="" netsh interface ip add dns name="Ethernet" %customDNS2
 
 echo.
 echo ===============================================
-echo      DNS has been successfully updated:
-echo        Primary: %customDNS1%
-if not "%customDNS2%"=="" echo        Secondary: %customDNS2%
+echo      DNS mis a jour avec succes :
+echo        Primaire : %customDNS1%
+if not "%customDNS2%"=="" echo        Secondaire : %customDNS2%
 echo ===============================================
 pause
 goto choice5
@@ -584,22 +590,22 @@ goto choice5
 :choice20
 cls
 echo ===============================================
-echo     Saving Installed Driver Report to Desktop
+echo     Enregistrement de la liste des pilotes sur le Bureau
 echo ===============================================
-driverquery /v > "%USERPROFILE%\Desktop\Installed_Drivers.txt"
+driverquery /v > "%USERPROFILE%\Desktop\Pilotes_installes.txt"
 echo.
-echo Driver report has been saved to:
-echo %USERPROFILE%\Desktop\Installed_Drivers.txt
+echo Le rapport des pilotes a ete enregistre ici :
+echo %USERPROFILE%\Desktop\Pilotes_installes.txt
 pause
 goto menu
 
 :choice21
 cls
 echo ===============================================
-echo      Windows Update Repair Tool [Admin]
+echo      Outil de reparation Windows Update [Admin]
 echo ===============================================
 echo.
-echo [1/4] Stopping update-related services...
+echo [1/4] Arret des services lies aux mises a jour...
 
 call :stopIfExists wuauserv
 call :stopIfExists bits
@@ -609,7 +615,7 @@ call :stopIfExists usosvc
 call :stopIfExists trustedinstaller
 timeout /t 2 >nul
 
-echo [2/4] Renaming update cache folders...
+echo [2/4] Renommage des dossiers de cache des mises a jour...
 set "SUFFIX=.bak_%RANDOM%"
 set "SD=%windir%\SoftwareDistribution"
 set "CR=%windir%\System32\catroot2"
@@ -617,27 +623,27 @@ set "CR=%windir%\System32\catroot2"
 if exist "%SD%" (
     ren "%SD%" "SoftwareDistribution%SUFFIX%" 2>nul
     if exist "%windir%\SoftwareDistribution%SUFFIX%" (
-        echo Renamed: %windir%\SoftwareDistribution%SUFFIX%
+        echo Renomme : %windir%\SoftwareDistribution%SUFFIX%
     ) else (
-        echo Warning: Could not rename SoftwareDistribution.
+        echo Avertissement : impossible de renommer SoftwareDistribution.
     )
 ) else (
-    echo Info: SoftwareDistribution not found.
+    echo Info : SoftwareDistribution introuvable.
 )
 
 if exist "%CR%" (
     ren "%CR%" "catroot2%SUFFIX%" 2>nul
     if exist "%windir%\System32\catroot2%SUFFIX%" (
-        echo Renamed: %windir%\System32\catroot2%SUFFIX%
+        echo Renomme : %windir%\System32\catroot2%SUFFIX%
     ) else (
-        echo Warning: Could not rename catroot2.
+        echo Avertissement : impossible de renommer catroot2.
     )
 ) else (
-    echo Info: catroot2 not found.
+    echo Info : catroot2 introuvable.
 )
 
 echo.
-echo [3/4] Restarting services...
+echo [3/4] Redemarrage des services...
 call :startIfExists wuauserv
 call :startIfExists bits
 call :startIfExists cryptsvc
@@ -646,22 +652,22 @@ call :startIfExists usosvc
 call :startIfExists trustedinstaller
 
 echo.
-echo [4/4] Windows Update components have been reset.
+echo [4/4] Les composants de Windows Update ont ete reinitialises.
 echo.
-echo Renamed folders:
+echo Dossiers renommes :
 echo   - %windir%\SoftwareDistribution%SUFFIX%
 echo   - %windir%\System32\catroot2%SUFFIX%
-echo You may delete them manually after reboot if all is working.
+echo Vous pouvez les supprimer apres redemarrage si tout fonctionne.
 echo.
 pause
 goto menu
 
-REM === THESE MUST BE PLACED AT THE VERY BOTTOM OF YOUR SCRIPT ===
+REM === CES FONCTIONS DOIVENT RESTER EN BAS DU SCRIPT ===
 
 :stopIfExists
 sc query "%~1" | findstr /i "STATE" >nul
 if not errorlevel 1 (
-    echo Stopping %~1
+    echo Arrêt de %~1
     net stop "%~1" >nul 2>&1
 )
 goto :eof
@@ -669,7 +675,7 @@ goto :eof
 :startIfExists
 sc query "%~1" | findstr /i "STATE" >nul
 if not errorlevel 1 (
-    echo Starting %~1
+    echo Demarrage de %~1
     net start "%~1" >nul 2>&1
 )
 goto :eof
@@ -677,35 +683,35 @@ goto :eof
 :choice22
 cls
 echo ===============================================
-echo     Generating Separated System Reports...
+echo     Generation de rapports systeme separes...
 echo ===============================================
 echo.
 
-REM === Get Desktop path securely ===
+REM === Chemin du Bureau de maniere fiable ===
 for /f "usebackq delims=" %%d in (`powershell -NoProfile -Command "$env:USERPROFILE + '\Desktop'"`) do (
     set "DESKTOP=%%d"
 )
 
-REM === Generate timestamp ===
+REM === Generer un horodatage ===
 for /f "usebackq delims=" %%t in (`powershell -NoProfile -Command "Get-Date -Format yyyy-MM-dd"`) do (
     set "DATESTR=%%t"
 )
 
-set "SYS=%DESKTOP%\System_Info_%DATESTR%.txt"
-set "NET=%DESKTOP%\Network_Info_%DATESTR%.txt"
-set "DRV=%DESKTOP%\Driver_List_%DATESTR%.txt"
+set "SYS=%DESKTOP%\Infos_Systeme_%DATESTR%.txt"
+set "NET=%DESKTOP%\Infos_Reseau_%DATESTR%.txt"
+set "DRV=%DESKTOP%\Liste_Pilotes_%DATESTR%.txt"
 
-echo Writing system info to %SYS% ...
+echo Ecriture des informations systeme dans %SYS% ...
 systeminfo > "%SYS%" 2>nul
 
-echo Writing network info to %NET% ...
+echo Ecriture des informations reseau dans %NET% ...
 ipconfig /all > "%NET%" 2>nul
 
-echo Writing driver list to %DRV% ...
+echo Ecriture de la liste des pilotes dans %DRV% ...
 driverquery > "%DRV%" 2>nul
 
 echo.
-echo Reports have been saved to Desktop:
+echo Rapports enregistres sur le Bureau :
 echo  - %~nx1
 echo  - %~nx2
 echo  - %~nx3
@@ -716,48 +722,48 @@ goto menu
 :choice23
 cls
 echo ======================================================
-echo            Windows Update Utility ^& Service Reset
+echo            Utilitaire Windows Update ^& Reset Services
 echo ======================================================
-echo This tool will restart core Windows Update services.
-echo Make sure no Windows Updates are installing right now.
+echo Cet outil va redemarrer les services Windows Update principaux.
+echo Assurez-vous qu'aucune mise a jour n'est en cours d'installation.
 pause
 
 echo.
-echo [1] Reset Update Services (wuauserv, cryptsvc, appidsvc, bits)
-echo [2] Return to Main Menu
+echo [1] Reinitialiser les services (wuauserv, cryptsvc, appidsvc, bits)
+echo [2] Retour au menu principal
 echo.
-set /p fixchoice=Select an option: 
+set /p fixchoice=Choisissez une option: 
 
 if "%fixchoice%"=="1" goto reset_windows_update
 if "%fixchoice%"=="2" goto menu
 
-echo Invalid input. Try again.
+echo Saisie invalide. Reessayez.
 pause
 goto choice23
 
 :reset_windows_update
 cls
 echo ======================================================
-echo     Resetting Windows Update ^& Related Services
+echo     Redemarrage des services Windows Update
 echo ======================================================
 
-echo Stopping Windows Update service...
+echo Arret du service Windows Update...
 net stop wuauserv >nul
 
-echo Stopping Cryptographic service...
+echo Arret du service de Chiffrement...
 net stop cryptsvc >nul
 
-echo Starting Application Identity service...
+echo Demarrage du service Application Identity...
 net start appidsvc >nul
 
-echo Starting Windows Update service...
+echo Demarrage du service Windows Update...
 net start wuauserv >nul
 
-echo Starting Background Intelligent Transfer Service...
+echo Demarrage du service BITS...
 net start bits >nul
 
 echo.
-echo [OK] Update-related services have been restarted.
+echo [OK] Services lies aux mises a jour redemarres.
 pause
 goto menu
 
@@ -765,15 +771,15 @@ goto menu
 setlocal EnableDelayedExpansion
 cls
 echo ===============================================
-echo      View Network Routing Table  [Advanced]
+echo      Afficher la table de routage  [Avance]
 echo ===============================================
-echo This shows how your system handles network traffic.
+echo Cela montre comment votre systeme gere le trafic reseau.
 echo.
-echo [1] Display routing table in this window
-echo [2] Save routing table as a text file on Desktop
-echo [3] Return to Main Menu
+echo [1] Afficher la table de routage dans cette fenetre
+echo [2] Enregistrer la table de routage sur le Bureau
+echo [3] Retour au menu principal
 echo.
-set /p routeopt=Choose an option: 
+set /p routeopt=Choisissez une option: 
 
 if "%routeopt%"=="1" (
     cls
@@ -784,36 +790,36 @@ if "%routeopt%"=="1" (
 )
 
 if "%routeopt%"=="2" (
-    REM === Get Desktop path and verify it exists ===
+    REM === Chemin du Bureau et verif existence ===
     set "DESKTOP=%USERPROFILE%\Desktop"
     if not exist "!DESKTOP!" (
-        echo Desktop folder not found.
+        echo Dossier Bureau introuvable.
         pause
         goto menu
     )
 
-    REM === Generate timestamp using PowerShell ===
+    REM === Horodatage via PowerShell ===
     for /f "usebackq delims=" %%i in (`powershell -NoProfile -Command "Get-Date -Format yyyy-MM-dd_HH-mm-ss"`) do (
         set "dt=%%i"
     )
 
-    REM === Fallback if timestamp fails ===
+    REM === Secours si horodatage ko ===
     if not defined dt (
-        echo Failed to generate timestamp. Using fallback...
-        set "dt=manual_timestamp"
+        echo Echec de generation de l'horodatage. Valeur de secours...
+        set "dt=horodatage"
     )
 
-    REM === Save routing table to file ===
-    set "FILE=!DESKTOP!\routing_table_!dt!.txt"
+    REM === Enregistrer la table de routage ===
+    set "FILE=!DESKTOP!\table_routage_!dt!.txt"
     cls
-    echo Saving routing table to: "!FILE!"
+    echo Enregistrement de la table de routage dans: "!FILE!"
     echo.
     route print > "!FILE!"
 
     if exist "!FILE!" (
-        echo [OK] Routing table saved successfully.
+        echo [OK] Table de routage enregistree avec succes.
     ) else (
-        echo [ERROR] Failed to save routing table to file.
+        echo [ERREUR] Echec de l'enregistrement de la table de routage.
     )
     echo.
     pause
@@ -824,7 +830,7 @@ if "%routeopt%"=="3" (
     goto menu
 )
 
-echo Invalid input. Please enter 1, 2 or 3.
+echo Saisie invalide. Veuillez entrer 1, 2 ou 3.
 pause
 goto choice24
 
