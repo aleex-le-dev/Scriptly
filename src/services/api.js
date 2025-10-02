@@ -1,8 +1,14 @@
 // Service d'accès API backend
 // Fournit des fonctions isolant les URLs et la gestion des erreurs
 
-const BASE_URL = 'http://127.0.0.1:3001'
-const ALT_BASE_URLS = ['http://127.0.0.1:3001', 'http://localhost:3001']
+// URL du backend - adapte automatiquement selon l'environnement
+const isProduction = import.meta.env.PROD
+const BASE_URL = isProduction 
+  ? 'https://votre-app-backend.onrender.com'  // Remplacez par votre URL Render
+  : 'http://127.0.0.1:3001'
+const ALT_BASE_URLS = isProduction 
+  ? ['https://votre-app-backend.onrender.com']  // Remplacez par votre URL Render
+  : ['http://127.0.0.1:3001', 'http://localhost:3001']
 
 export async function fetchHealth() {
   const response = await fetch(`${BASE_URL}/health`)
