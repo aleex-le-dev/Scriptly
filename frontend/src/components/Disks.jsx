@@ -34,22 +34,22 @@ export function Disks({ query = '' }) {
   return (
     <>
       {visible('lister disques drives list') && (
-        <ScriptItem title={<Highlight text="Lister les disques" query={query} />} icon="📂" desc="Affiche les lecteurs détectés" onClick={handleList} accent="gray" />
+        <ScriptItem title={<Highlight text="Lister les disques" query={query} />} label="disques lister drives" icon="📂" desc="Affiche les lecteurs détectés" onClick={handleList} accent="gray" />
       )}
       {visible('bitlocker verifier status manage-bde') && (
-        <ScriptItem title={<Highlight text="Vérifier BitLocker" query={query} />} icon="🔒" desc="Ouvre la vérification (admin)" onClick={openPsCheckAdmin} accent="gray" />
+        <ScriptItem title={<Highlight text="Vérifier BitLocker" query={query} />} label="bitlocker" icon="🔒" desc="Ouvre la vérification (admin)" onClick={openPsCheckAdmin} accent="gray" />
       )}
       {visible('bitlocker off desactiver disable') && (
-        <ScriptItem title={<Highlight text="Désactiver BitLocker" query={query} />} icon="🛑" desc="Désactive sur un volume (admin)" onClick={openPsOffAdmin} accent="gray" />
+        <ScriptItem title={<Highlight text="Désactiver BitLocker" query={query} />} label="bitlocker off" icon="🛑" desc="Désactive sur un volume (admin)" onClick={openPsOffAdmin} accent="gray" />
       )}
       {visible('chkdsk verifier disque erreurs') && (
-        <ScriptItem title={<Highlight text="CHKDSK" query={query} />} icon="🧰" desc="Analyse et réparation" onClick={openPsChkdsk} accent="gray" />
+        <ScriptItem title={<Highlight text="CHKDSK" query={query} />} label="chkdsk" icon="🧰" desc="Analyse et réparation" onClick={openPsChkdsk} accent="gray" />
       )}
       {visible('defragmenter optimiser disque') && (
-        <ScriptItem title={<Highlight text="Défragmenter" query={query} />} icon="🧩" desc="Optimise les disques" onClick={openPsDefrag} accent="gray" />
+        <ScriptItem title={<Highlight text="Défragmenter" query={query} />} label="defrag défragmenter" icon="🧩" desc="Optimise les disques" onClick={openPsDefrag} accent="gray" />
       )}
       {visible('formater format drive disque cle admin') && (
-        <ScriptItem title={<Highlight text="Diskpart (admin)" query={query} />} icon="💽" desc="Outil de formatage disque dur et clé usb" onClick={openPsFormatAdmin} accent="gray" />
+        <ScriptItem title={<Highlight text="Diskpart (admin)" query={query} />} label="diskpart format drive" icon="💽" desc="Outil de formatage disque dur et clé usb" onClick={openPsFormatAdmin} accent="gray" />
       )}
 
       {drives?.length > 0 && (

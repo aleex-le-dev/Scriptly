@@ -41,10 +41,14 @@ export function Logiciel({ query = '' }) {
   return (
     <>
       {apps.filter(a => isVisible(a.title + ' ' + a.desc + ' ' + a.keywords + ' google')).map(app => (
-        <ScriptItem key={app.key} title={<>
-          {app.icon && (<img src={app.icon} alt="" className="h-4 w-4 inline-block mr-2 rounded-sm" loading="lazy" />)}
-          <Highlight text={app.title} query={query} />
-        </>} desc={app.desc} href={app.href} accent="rose" />
+        <ScriptItem
+          key={app.key}
+          title={<Highlight text={app.title} query={query} />}
+          desc={app.desc}
+          href={app.href}
+          accent="rose"
+          icon={app.icon ? <img src={app.icon} alt="" className="h-5 w-5 rounded-sm" loading="lazy" /> : null}
+        />
       ))}
     </>
   )

@@ -18,10 +18,12 @@ export function Systeme({ query = '' }) {
     <>
       {visible('systeme menu contextuel classique explorer windows 11') && (
         <ScriptItem
-          title={<Highlight text="🗂️ Menu contextuel classique" query={query} />}
+          title={<Highlight text="Menu contextuel classique" query={query} />}
+          label="menu contextuel classique"
           desc="Active/restaure le menu classique (Win11)"
           onClick={openClassicMenuToggle}
           accent="amber"
+          icon="🗂️"
         />
       )}
     </>

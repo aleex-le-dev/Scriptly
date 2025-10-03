@@ -44,10 +44,14 @@ export function Nirsoft({ query = '' }) {
   return (
     <>
       {tools.filter(t => isVisible(t.title + ' ' + t.desc + ' ' + t.keywords + ' web webbrowser pass view mots de passe produkey pro product key')).map(t => (
-        <ScriptItem key={t.key} title={<>
-          {t.icon && (<img src={t.icon} alt="" className="h-4 w-4 inline-block mr-2 rounded-sm" loading="lazy" />)}
-          <Highlight text={t.title} query={query} />
-        </>} desc={t.desc} href={t.href} accent="indigo" />
+        <ScriptItem
+          key={t.key}
+          title={<Highlight text={t.title} query={query} />}
+          desc={t.desc}
+          href={t.href}
+          accent="indigo"
+          icon={t.icon ? <img src={t.icon} alt="" className="h-5 w-5 rounded-sm" loading="lazy" /> : null}
+        />
       ))}
     </>
   )

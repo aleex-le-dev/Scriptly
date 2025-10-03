@@ -18,10 +18,12 @@ export function Application({ query = '' }) {
     <>
       {visible('applications mise a jour winget upgrade') && (
         <ScriptItem
-          title={<Highlight text="📦 Mises à jour (winget)" query={query} />}
+          title={<Highlight text="Mises à jour (winget)" query={query} />}
+          label="mises à jour winget update"
           desc="Gestionnaire de mises à jour des applications"
           onClick={openWingetManager}
           accent="purple"
+          icon="📦"
         />
       )}
     </>

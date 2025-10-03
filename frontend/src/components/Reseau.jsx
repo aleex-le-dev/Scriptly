@@ -18,10 +18,12 @@ export function Reseau({ query = '' }) {
     <>
       {visible('reseau dns cloudflare') && (
         <ScriptItem
-          title={<Highlight text="🌐 DNS Cloudflare" query={query} />}
+          title={<Highlight text="DNS Cloudflare" query={query} />}
+          label="dns cloudflare"
           desc="Remplace les DNS par Cloudflare (admin)"
           onClick={openCloudflareDns}
           accent="blue"
+          icon="🌐"
         />
       )}
     </>

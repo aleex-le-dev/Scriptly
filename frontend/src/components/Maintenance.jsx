@@ -17,10 +17,12 @@ export function Maintenance({ query = '' }) {
     <>
       {visible('maintenance outil tout en un nettoyeur reparation maj updates') && (
         <ScriptItem
-          title={<Highlight text="🛠️ Outil de maintenance" query={query} />}
+          title={<Highlight text="Outil de maintenance" query={query} />}
+          label="maintenance"
           desc="Suite complète: mises à jour, réseau, nettoyage"
           onClick={openTool}
           accent="teal"
+          icon="🛠️"
         />
       )}
     </>
