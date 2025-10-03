@@ -8,7 +8,7 @@ export function DarkModeProvider({ children }) {
     // Vérifier le thème préféré du système ou localStorage
     const saved = localStorage.getItem('darkMode')
     if (saved !== null) return JSON.parse(saved)
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
+    return false // Par défaut en mode clair
   })
 
   useEffect(() => {

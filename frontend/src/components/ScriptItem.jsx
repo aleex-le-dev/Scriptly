@@ -3,7 +3,7 @@
 // - title (string | ReactNode), desc (string), accent (tailwind color name)
 
 export function ScriptItem({ title, label = '', desc, onClick, href, accent = 'teal', icon = null }) {
-  const base = `w-full group relative overflow-hidden rounded-xl border border-white/30 bg-white/40 backdrop-blur-xl backdrop-saturate-150 shadow-lg transition hover:bg-white/55 cursor-pointer`
+  const base = `w-full group relative overflow-hidden rounded-xl border border-white/30 dark:border-white/20 bg-white/40 dark:bg-black/40 backdrop-blur-xl backdrop-saturate-150 shadow-lg transition hover:bg-white/55 dark:hover:bg-black/55 cursor-pointer`
 
   // Détection d'icône automatique basée sur des mots-clés si aucune icône n'est fournie
   const pickAutoIcon = (text) => {
@@ -27,8 +27,8 @@ export function ScriptItem({ title, label = '', desc, onClick, href, accent = 't
       <div className="flex items-center gap-3">
         <span className={`inline-flex h-8 w-8 items-center justify-center rounded-lg bg-${accent}-100 text-${accent}-700 text-base shadow`}>{resolvedIcon}</span>
         <div className="min-w-0">
-          <div className="text-sm font-medium text-gray-900 truncate">{title}</div>
-          {desc && <div className="text-xs text-gray-700/80 truncate">{desc}</div>}
+          <div className="text-sm font-medium text-gray-900 dark:text-white truncate">{title}</div>
+          {desc && <div className="text-xs text-gray-700/80 dark:text-gray-200/80 truncate">{desc}</div>}
         </div>
       </div>
     </div>

@@ -8,4 +8,65 @@ body {
   /* Force scrollbar to avoid layout shift when content height changes */
   overflow-y: scroll;
 }
+
+.dark body {
+  background: #ffffff !important;
+}
+
+.dark {
+  color-scheme: light;
+}
+
+.dark * {
+  color: #000000 !important;
+}
+
+.dark .bg-gray-50 {
+  background-color: #ffffff !important;
+}
+
+.dark .bg-white\/30 {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.dark .bg-white\/40 {
+  background-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.dark .bg-white\/50 {
+  background-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.dark .border-white\/30 {
+  border-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+.dark .border-white\/20 {
+  border-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Force dark mode styles */
+.dark .min-h-screen {
+  background-color: #ffffff !important;
+}
+
+.dark .rounded-2xl {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+  border-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+.dark .glass {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
+}
+
+.dark .rounded-xl {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+  border-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+.dark .rounded-lg {
+  background-color: rgba(255, 255, 255, 0.4) !important;
+  border-color: rgba(0, 0, 0, 0.2) !important;
+}
 .glass { background: rgba(255,255,255,0.35); border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 8px 24px rgba(0,0,0,0.08); -webkit-backdrop-filter: blur(16px) saturate(1.5); backdrop-filter: blur(16px) saturate(1.5); border-radius: 16px; }

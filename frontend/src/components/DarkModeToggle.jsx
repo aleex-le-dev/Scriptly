@@ -7,7 +7,7 @@ export function DarkModeToggle() {
   return (
     <button
       onClick={toggleDarkMode}
-      className="p-2 rounded-xl bg-white/30 backdrop-blur-xl border border-white/30 hover:bg-white/40 transition-all duration-200 cursor-pointer shadow-lg"
+      className="p-2 rounded-xl bg-white/30 dark:bg-black/30 backdrop-blur-xl border border-white/30 dark:border-white/20 hover:bg-white/40 dark:hover:bg-black/40 transition-all duration-200 cursor-pointer shadow-lg"
       aria-label={isDark ? 'Activer le mode clair' : 'Activer le mode sombre'}
     >
       {isDark ? (

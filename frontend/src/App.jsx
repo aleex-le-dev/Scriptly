@@ -4,6 +4,8 @@ import { ToastContainer } from './components/Toast'
 import { useToast } from './hooks/useToast'
 import { Catalog } from './components/Catalog'
 import { Search } from './components/Search'
+import { DarkModeToggle } from './components/DarkModeToggle'
+import { DarkModeProvider } from './contexts/DarkModeContext'
 import { Highlight } from './components/Highlight'
 import { Logiciel } from './components/Logiciel'
 import { Nirsoft } from './components/Nirsoft'
@@ -34,13 +36,17 @@ function App() {
   }, [q, cardKeywords])
 
   return (
-  <div className="min-h-screen bg-gray-50" onClick={closeAll}>
-    {/* Barre de recherche fixe avec effet verre (transparence + blur) */}
-    <div className="fixed top-0 left-0 right-0 z-50 bg-transparent">
-      <div className="max-w-6xl mx-auto py-4">
-        <Search value={query} onChange={setQuery} placeholder="Rechercher un script..." />
+  <DarkModeProvider>
+    <div className="min-h-screen bg-gray-50 dark:bg-black" onClick={closeAll}>
+      {/* Barre de recherche fixe avec effet verre (transparence + blur) */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-transparent">
+        <div className="max-w-6xl mx-auto py-4 flex items-center relative">
+          <Search value={query} onChange={setQuery} placeholder="Rechercher un script..." />
+          <div className="absolute right-0">
+            <DarkModeToggle />
+          </div>
+        </div>
       </div>
-    </div>
 
     {/* Contenu avec offset */}
     <div className="w-full pt-24 pb-10" onClick={(e) => e.stopPropagation()}>
@@ -49,8 +55,9 @@ function App() {
       </div>
     </div>
 
-    <ToastContainer toasts={toasts} onRemove={removeToast} />
-  </div>
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
+    </div>
+  </DarkModeProvider>
   )
 }
 

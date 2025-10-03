@@ -32,9 +32,9 @@ export function Catalog({ query = '' }) {
   const SidebarItem = ({ id, label, count }) => (
     <button
       onClick={() => setActive(id)}
-      className={`w-full text-left px-3 py-2 rounded-xl transition border cursor-pointer ${active === id ? 'bg-white/50 border-white/40 shadow-md' : 'bg-white/30 border-white/20 hover:bg-white/40'} backdrop-blur-xl`}
+      className={`w-full text-left px-3 py-2 rounded-xl transition border cursor-pointer ${active === id ? 'bg-white/50 dark:bg-black/50 border-white/40 dark:border-white/30 shadow-md' : 'bg-white/30 dark:bg-black/30 border-white/20 dark:border-white/20 hover:bg-white/40 dark:hover:bg-black/40'} backdrop-blur-xl`}
     >
-      <span className="inline-flex items-center gap-2">
+      <span className="inline-flex items-center gap-2 text-gray-900 dark:text-white">
         <span>{label}</span>
         {typeof count === 'number' && (
           <span className="text-xs px-2 py-0.5 rounded-full bg-black/10 border border-white/30">{count}</span>
@@ -46,8 +46,8 @@ export function Catalog({ query = '' }) {
   return (
     <div className="w-full grid grid-cols-1 md:grid-cols-[260px_minmax(0,1fr)] gap-4">
       <aside className="md:sticky md:top-24 md:self-start">
-        <div className="rounded-2xl border border-white/30 bg-white/30 backdrop-blur-xl p-3 shadow-lg">
-          <div className="mb-2 font-semibold text-gray-900">Catégories</div>
+        <div className="rounded-2xl border border-white/30 dark:border-white/20 bg-white/30 dark:bg-black/30 backdrop-blur-xl p-3 shadow-lg">
+          <div className="mb-2 font-semibold text-gray-900 dark:text-white">Catégories</div>
           <div className="flex md:block gap-2 md:gap-0 overflow-auto">
             <div className="grid grid-cols-2 md:block gap-2 md:gap-0">
               <SidebarItem id="all" label={<Highlight text="📚 Tout" query={query} />} />
@@ -62,14 +62,14 @@ export function Catalog({ query = '' }) {
       </aside>
 
       <section>
-        <div className="rounded-2xl border border-white/30 bg-white/30 backdrop-blur-xl p-4 shadow-lg">
+        <div className="rounded-2xl border border-white/30 dark:border-white/20 bg-white/30 dark:bg-black/30 backdrop-blur-xl p-4 shadow-lg">
           {active === 'all' ? (
             <div className="space-y-6">
               {categories.map(cat => {
                 const Comp = cat.component
                 return (
                   <div key={cat.key}>
-                    <div className="text-sm font-semibold text-gray-900 mb-2">{cat.label}</div>
+                    <div className="text-sm font-semibold text-gray-900 dark:text-white mb-2">{cat.label}</div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <Comp query={query} />
                     </div>
