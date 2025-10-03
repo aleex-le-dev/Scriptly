@@ -8,7 +8,7 @@ export function Search({ value = '', onChange, placeholder = 'Rechercher…' }) 
 
   return (
     // Conteneur centré, largeur maximale et responsive
-    <div className="w-full max-w-3xl mx-auto px-4">
+    <div className="w-full max-w-3xl mx-auto">
       <div className="relative">
         <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400">🔎</span>
         <input
