@@ -4,6 +4,7 @@
 import { useState } from 'react'
 import { listDrives, psCheckBitlockerAdmin, psBitlockerOffAdmin, psChkdskUi, psDefragUi, psFormatDriveAdmin } from '../services/api'
 import { Highlight } from './Highlight'
+import { ScriptItem } from './ScriptItem'
 import { normalizeText } from '../utils/text'
 
 export function Disks({ query = '' }) {
@@ -32,80 +33,26 @@ export function Disks({ query = '' }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap gap-3">
+      <>
         {visible('lister disques drives list') && (
-        <div
-          onClick={handleList}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleList() }}
-          className="w-64 bg-white/40 backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/30 shadow-lg p-4 cursor-pointer hover:bg-white/50 hover:shadow-xl transition"
-        >
-          <div className="text-sm font-medium text-gray-900"><Highlight text="📂 Lister les disques" query={query} /></div>
-          <div className="text-xs text-gray-600 mt-1"><Highlight text="Affiche les lecteurs détectés" query={query} /></div>
-        </div>
+          <ScriptItem title={<Highlight text="Lister les disques" query={query} />} icon="📂" desc="Affiche les lecteurs détectés" onClick={handleList} accent="gray" />
         )}
         {visible('bitlocker verifier status manage-bde') && (
-        <div
-          onClick={openPsCheckAdmin}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsCheckAdmin() }}
-          className="w-64 bg-white/40 backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/30 shadow-lg p-4 cursor-pointer hover:bg-white/50 hover:shadow-xl transition"
-        >
-          <div className="text-sm font-medium text-gray-900"><Highlight text="🔒 Vérifier BitLocker" query={query} /></div>
-          <div className="text-xs text-gray-600 mt-1"><Highlight text="Ouvre la vérification (admin)" query={query} /></div>
-        </div>
+          <ScriptItem title={<Highlight text="Vérifier BitLocker" query={query} />} icon="🔒" desc="Ouvre la vérification (admin)" onClick={openPsCheckAdmin} accent="gray" />
         )}
         {visible('bitlocker off desactiver disable') && (
-        <div
-          onClick={openPsOffAdmin}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsOffAdmin() }}
-          className="w-64 bg-white/40 backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/30 shadow-lg p-4 cursor-pointer hover:bg-white/50 hover:shadow-xl transition"
-        >
-          <div className="text-sm font-medium text-gray-900"><Highlight text="🛑 Désactiver BitLocker" query={query} /></div>
-          <div className="text-xs text-gray-600 mt-1"><Highlight text="Désactive sur un volume (admin)" query={query} /></div>
-        </div>
+          <ScriptItem title={<Highlight text="Désactiver BitLocker" query={query} />} icon="🛑" desc="Désactive sur un volume (admin)" onClick={openPsOffAdmin} accent="gray" />
         )}
         {visible('chkdsk verifier disque erreurs') && (
-        <div
-          onClick={openPsChkdsk}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsChkdsk() }}
-          className="w-64 bg-white/40 backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/30 shadow-lg p-4 cursor-pointer hover:bg-white/50 hover:shadow-xl transition"
-        >
-          <div className="text-sm font-medium text-gray-900"><Highlight text="🧰 CHKDSK" query={query} /></div>
-          <div className="text-xs text-gray-600 mt-1"><Highlight text="Analyse et réparation" query={query} /></div>
-        </div>
+          <ScriptItem title={<Highlight text="CHKDSK" query={query} />} icon="🧰" desc="Analyse et réparation" onClick={openPsChkdsk} accent="gray" />
         )}
         {visible('defragmenter optimiser disque') && (
-        <div
-          onClick={openPsDefrag}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsDefrag() }}
-          className="w-64 bg-white/40 backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/30 shadow-lg p-4 cursor-pointer hover:bg-white/50 hover:shadow-xl transition"
-        >
-          <div className="text-sm font-medium text-gray-900"><Highlight text="🧩 Défragmenter" query={query} /></div>
-          <div className="text-xs text-gray-600 mt-1"><Highlight text="Optimise les disques" query={query} /></div>
-        </div>
+          <ScriptItem title={<Highlight text="Défragmenter" query={query} />} icon="🧩" desc="Optimise les disques" onClick={openPsDefrag} accent="gray" />
         )}
         {visible('formater format drive disque cle admin') && (
-        <div
-          onClick={openPsFormatAdmin}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsFormatAdmin() }}
-          className="w-64 bg-white/40 backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/30 shadow-lg p-4 cursor-pointer hover:bg-white/50 hover:shadow-xl transition"
-        >
-          <div className="text-sm font-medium text-gray-900"><Highlight text="💽 Diskpart (admin)" query={query} /></div>
-          <div className="text-xs text-gray-600 mt-1"><Highlight text="Outil de formatage disque dur et clé usb" query={query} /></div>
-        </div>
+          <ScriptItem title={<Highlight text="Diskpart (admin)" query={query} />} icon="💽" desc="Outil de formatage disque dur et clé usb" onClick={openPsFormatAdmin} accent="gray" />
         )}
-      </div>
+      </>
 
       {drives?.length > 0 && (
         <div className="text-xs text-gray-700">

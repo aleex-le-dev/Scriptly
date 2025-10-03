@@ -1,6 +1,7 @@
 // Composant Logiciel: liens directs vers des logiciels (installateurs officiels)
 
 import { Highlight } from './Highlight'
+import { ScriptItem } from './ScriptItem'
 import { normalizeText } from '../utils/text'
 
 export function Logiciel({ query = '' }) {
@@ -38,25 +39,14 @@ export function Logiciel({ query = '' }) {
   }
 
   return (
-    <div className="flex flex-wrap gap-3">
+    <>
       {apps.filter(a => isVisible(a.title + ' ' + a.desc + ' ' + a.keywords + ' google')).map(app => (
-        <a
-          key={app.key}
-          href={app.href}
-          target="_blank"
-          rel="noreferrer noopener"
-          className="w-64 bg-white/40 backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/30 shadow-lg p-4 cursor-pointer hover:bg-white/50 hover:shadow-xl transition block"
-        >
-          <div className="text-sm font-medium text-gray-900 flex items-center gap-2">
-            {app.icon && (
-              <img src={app.icon} alt="" className="h-5 w-5 rounded-sm" loading="lazy" />
-            )}
-            <span><Highlight text={app.title} query={query} /></span>
-          </div>
-          <div className="text-xs text-gray-600 mt-1"><Highlight text={app.desc} query={query} /></div>
-        </a>
+        <ScriptItem key={app.key} title={<>
+          {app.icon && (<img src={app.icon} alt="" className="h-4 w-4 inline-block mr-2 rounded-sm" loading="lazy" />)}
+          <Highlight text={app.title} query={query} />
+        </>} desc={app.desc} href={app.href} accent="rose" />
       ))}
-    </div>
+    </>
   )
 }
 

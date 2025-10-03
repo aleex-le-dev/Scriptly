@@ -3,6 +3,7 @@
 
 import { appsWingetUpdateAdmin } from '../services/api'
 import { Highlight } from './Highlight'
+import { ScriptItem } from './ScriptItem'
 import { normalizeText } from '../utils/text'
 
 export function Application({ query = '' }) {
@@ -14,20 +15,16 @@ export function Application({ query = '' }) {
   }
 
   return (
-    <div className="flex flex-wrap gap-3">
+    <>
       {visible('applications mise a jour winget upgrade') && (
-      <div
-        onClick={openWingetManager}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openWingetManager() }}
-        className="w-64 bg-white/40 backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/30 shadow-lg p-4 cursor-pointer hover:bg-white/50 hover:shadow-xl transition"
-      >
-        <div className="text-sm font-medium text-gray-900"><Highlight text="📦 Mises à jour (winget)" query={query} /></div>
-        <div className="text-xs text-gray-600 mt-1">Gestionnaire de mises à jour des applications</div>
-      </div>
+        <ScriptItem
+          title={<Highlight text="📦 Mises à jour (winget)" query={query} />}
+          desc="Gestionnaire de mises à jour des applications"
+          onClick={openWingetManager}
+          accent="purple"
+        />
       )}
-    </div>
+    </>
   )
 }
 

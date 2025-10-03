@@ -3,6 +3,7 @@
 
 import { systemContextMenuClassicAdmin } from '../services/api'
 import { Highlight } from './Highlight'
+import { ScriptItem } from './ScriptItem'
 import { normalizeText } from '../utils/text'
 
 export function Systeme({ query = '' }) {
@@ -14,20 +15,16 @@ export function Systeme({ query = '' }) {
   }
 
   return (
-    <div className="flex flex-wrap gap-3">
+    <>
       {visible('systeme menu contextuel classique explorer windows 11') && (
-      <div
-        onClick={openClassicMenuToggle}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openClassicMenuToggle() }}
-        className="w-64 bg-white/40 backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/30 shadow-lg p-4 cursor-pointer hover:bg-white/50 hover:shadow-xl transition"
-      >
-        <div className="text-sm font-medium text-gray-900"><Highlight text="🗂️ Menu contextuel classique" query={query} /></div>
-        <div className="text-xs text-gray-600 mt-1">Active/restaure le menu classique (Win11)</div>
-      </div>
+        <ScriptItem
+          title={<Highlight text="🗂️ Menu contextuel classique" query={query} />}
+          desc="Active/restaure le menu classique (Win11)"
+          onClick={openClassicMenuToggle}
+          accent="amber"
+        />
       )}
-    </div>
+    </>
   )
 }
 

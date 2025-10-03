@@ -1,6 +1,7 @@
 // Composant Nirsoft: liens directs vers utilitaires NirSoft (x64)
 
 import { Highlight } from './Highlight'
+import { ScriptItem } from './ScriptItem'
 import { normalizeText } from '../utils/text'
 import pkUrl from './software/ProduKey.zip?url'
 import wkvUrl from './software/wirelesskeyview-x64.zip?url'
@@ -41,23 +42,14 @@ export function Nirsoft({ query = '' }) {
   }
 
   return (
-    <div className="flex flex-wrap gap-3">
+    <>
       {tools.filter(t => isVisible(t.title + ' ' + t.desc + ' ' + t.keywords + ' web webbrowser pass view mots de passe produkey pro product key')).map(t => (
-        <a
-          key={t.key}
-          href={t.href}
-          target="_blank"
-          rel="noreferrer noopener"
-          className="w-64 bg-white/40 backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/30 shadow-lg p-4 cursor-pointer hover:bg-white/50 hover:shadow-xl transition block"
-        >
-          <div className="text-sm font-medium text-gray-900 flex items-center gap-2">
-            {t.icon && <img src={t.icon} alt="" className="h-5 w-5 rounded-sm" loading="lazy" />}
-            <span><Highlight text={t.title} query={query} /></span>
-          </div>
-          <div className="text-xs text-gray-600 mt-1"><Highlight text={t.desc} query={query} /></div>
-        </a>
+        <ScriptItem key={t.key} title={<>
+          {t.icon && (<img src={t.icon} alt="" className="h-4 w-4 inline-block mr-2 rounded-sm" loading="lazy" />)}
+          <Highlight text={t.title} query={query} />
+        </>} desc={t.desc} href={t.href} accent="indigo" />
       ))}
-    </div>
+    </>
   )
 }
 
