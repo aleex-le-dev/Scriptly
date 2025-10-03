@@ -32,7 +32,7 @@ export function Catalog({ query = '' }) {
   const SidebarItem = ({ id, label, count }) => (
     <button
       onClick={() => setActive(id)}
-      className={`w-full text-left px-3 py-2 rounded-xl transition border ${active === id ? 'bg-white/50 border-white/40 shadow-md' : 'bg-white/30 border-white/20 hover:bg-white/40'} backdrop-blur-xl`}
+      className={`w-full text-left px-3 py-2 rounded-xl transition border cursor-pointer ${active === id ? 'bg-white/50 border-white/40 shadow-md' : 'bg-white/30 border-white/20 hover:bg-white/40'} backdrop-blur-xl`}
     >
       <span className="inline-flex items-center gap-2">
         <span>{label}</span>
@@ -45,7 +45,7 @@ export function Catalog({ query = '' }) {
 
   return (
     <div className="w-full grid grid-cols-1 md:grid-cols-[260px_minmax(0,1fr)] gap-4">
-      <aside className="md:sticky md:top-20 md:self-start">
+      <aside className="md:sticky md:top-24 md:self-start">
         <div className="rounded-2xl border border-white/30 bg-white/30 backdrop-blur-xl p-3 shadow-lg">
           <div className="mb-2 font-semibold text-gray-900">Catégories</div>
           <div className="flex md:block gap-2 md:gap-0 overflow-auto">

@@ -3,7 +3,7 @@
 // - title (string | ReactNode), desc (string), accent (tailwind color name)
 
 export function ScriptItem({ title, label = '', desc, onClick, href, accent = 'teal', icon = null }) {
-  const base = `w-full group relative overflow-hidden rounded-xl border border-white/30 bg-white/40 backdrop-blur-xl backdrop-saturate-150 shadow-lg transition hover:bg-white/55`
+  const base = `w-full group relative overflow-hidden rounded-xl border border-white/30 bg-white/40 backdrop-blur-xl backdrop-saturate-150 shadow-lg transition hover:bg-white/55 cursor-pointer`
 
   // Détection d'icône automatique basée sur des mots-clés si aucune icône n'est fournie
   const pickAutoIcon = (text) => {
