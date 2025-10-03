@@ -15,6 +15,31 @@
     <meta property="og:locale" content="fr_FR" />
     <meta name="twitter:card" content="summary" />
     <meta name="theme-color" content="#0ea5e9" />
+    
+    <style>
+      /* Styles par défaut pour éviter le flash blanc */
+      html {
+        background-color: #f8fafc;
+      }
+      html.dark {
+        background-color: #000000;
+      }
+      body {
+        background-color: #f8fafc;
+      }
+      html.dark body {
+        background-color: #000000;
+      }
+    </style>
+    <script>
+      /* Script inline pour éviter le flash blanc */
+      (function() {
+        const saved = localStorage.getItem('darkMode');
+        if (saved === 'true') {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

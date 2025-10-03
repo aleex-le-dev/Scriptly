@@ -7,7 +7,16 @@ export function DarkModeProvider({ children }) {
   const [isDark, setIsDark] = useState(() => {
     // Vérifier le thème préféré du système ou localStorage
     const saved = localStorage.getItem('darkMode')
-    if (saved !== null) return JSON.parse(saved)
+    if (saved !== null) {
+      const darkMode = JSON.parse(saved)
+      // Appliquer immédiatement la classe pour éviter le flash
+      if (darkMode) {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
+      return darkMode
+    }
     return false // Par défaut en mode clair
   })
 
@@ -15,7 +24,7 @@ export function DarkModeProvider({ children }) {
     // Sauvegarder dans localStorage
     localStorage.setItem('darkMode', JSON.stringify(isDark))
     
-    // Appliquer la classe au document
+    // Appliquer la classe à l'élément html
     if (isDark) {
       document.documentElement.classList.add('dark')
     } else {

@@ -1,13 +1,50 @@
 @import "tailwindcss";
 /* Glassmorphic background with CSS variable */
 :root { --site-bg-image: url('https://images.unsplash.com/photo-1567309258733-9bbe3672f827?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); }
+
+/* Style par défaut pour éviter le flash blanc - appliqué immédiatement */
+* {
+  background-color: #f8fafc !important;
+}
+
+html.dark * {
+  background-color: #000000 !important;
+}
+
+/* Force le fond sur tous les éléments de base */
+html, body, #root, #root > * {
+  background-color: #f8fafc !important;
+}
+
+html.dark, html.dark body, html.dark #root, html.dark #root > * {
+  background-color: #000000 !important;
+}
+
+html {
+  background-color: #f8fafc !important;
+}
+
+html.dark {
+  background-color: #000000 !important;
+}
+
+body {
+  background-color: #f8fafc !important;
+}
+
+html.dark body {
+  background-color: #000000 !important;
+}
+
 /* Force scrollbar to avoid layout shift when content height changes */
 body {
   overflow-y: scroll;
+  background-color: #f8fafc !important;
 }
 
 .dark body {
   background: #000000 !important;
+  background-color: #000000 !important;
 }
 
 .dark {
@@ -24,9 +61,7 @@ body {
 
 /* Mode clair - styles normaux */
 body:not(.dark) {
-  background:
-    linear-gradient(135deg, rgba(248,250,252,0.85), rgba(238,242,255,0.85)),
-    var(--site-bg-image) center / cover no-repeat fixed;
+  background: #f8fafc;
   color: #000000;
 }
 
