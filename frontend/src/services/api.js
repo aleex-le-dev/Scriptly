@@ -4,10 +4,10 @@
 // URL du backend - adapte automatiquement selon l'environnement
 const isProduction = import.meta.env.PROD
 const BASE_URL = isProduction 
-  ? 'https://scriptly-i60u.onrender.com'
+  ? '/api'  // Chemin relatif sur O2Switch
   : 'http://127.0.0.1:3000'
 const ALT_BASE_URLS = isProduction 
-  ? ['https://scriptly-i60u.onrender.com']
+  ? ['/api']
   : ['http://127.0.0.1:3000', 'http://localhost:3000']
 
 export async function fetchHealth() {

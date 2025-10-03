@@ -75,40 +75,65 @@ app.get("/test-message", async (_request, response) => {
   response.status(200).json({ ok: true, message: "Server ping ok" });
 });
 
-// PowerShell scripts launcher (disk utilities)
-function launchScriptPs1(scriptName, openUi) {
-  const psScript = path.join(scriptsDir, "disks", "powershells", scriptName);
-  if (openUi) {
-    try {
+// Scripts launcher (Windows PowerShell + Linux Bash)
+function launchScript(scriptName, openUi, isLinux = false) {
+  if (isLinux) {
+    const scriptPath = path.join(scriptsDir, "linux", "disks", scriptName);
+    if (openUi) {
+      try {
+        execFile(
+          "xterm",
+          ["-e", "bash", scriptPath],
+          { windowsHide: false },
+          () => { /* started */ }
+        );
+      } catch { /* ignore UI start failures */ }
+    }
+    return new Promise((resolve) => {
       execFile(
-        "cmd.exe",
-        [
-          "/c",
-          "start",
-          "",
-          "powershell.exe",
-          "-NoProfile",
-          "-ExecutionPolicy",
-          "Bypass",
-          "-NoExit",
-          "-File",
-          psScript,
-        ],
-        { windowsHide: false },
-        () => { /* started */ }
+        "bash",
+        [scriptPath],
+        { windowsHide: true },
+        (_error, stdout) => {
+          resolve({ ok: true, stdout: stdout?.toString() || "" });
+        }
       );
-    } catch { /* ignore UI start failures */ }
+    });
+  } else {
+    // Windows PowerShell
+    const psScript = path.join(scriptsDir, "disks", "powershells", scriptName);
+    if (openUi) {
+      try {
+        execFile(
+          "cmd.exe",
+          [
+            "/c",
+            "start",
+            "",
+            "powershell.exe",
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-NoExit",
+            "-File",
+            psScript,
+          ],
+          { windowsHide: false },
+          () => { /* started */ }
+        );
+      } catch { /* ignore UI start failures */ }
+    }
+    return new Promise((resolve) => {
+      execFile(
+        "powershell.exe",
+        ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", psScript],
+        { windowsHide: true },
+        (_error, stdout) => {
+          resolve({ ok: true, stdout: stdout?.toString() || "" });
+        }
+      );
+    });
   }
-  return new Promise((resolve) => {
-    execFile(
-      "powershell.exe",
-      ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", psScript],
-      { windowsHide: true },
-      (_error, stdout) => {
-        resolve({ ok: true, stdout: stdout?.toString() || "" });
-      }
-    );
-  });
 }
 
 // Elevated admin: launch .bat that elevates PowerShell for BitLocker check
@@ -143,7 +168,9 @@ app.get("/disk/bitlocker-off-admin", async (_request, response, next) => {
 app.get("/disk/chkdsk", async (request, response, next) => {
   try {
     const ui = String(request?.query?.ui ?? "").toLowerCase();
-    const result = await launchScriptPs1("chkdsk-drive.ps1", ui === "1" || ui === "true");
+    const isLinux = process.platform === "linux";
+    const scriptName = isLinux ? "check-bitlocker.sh" : "chkdsk-drive.ps1";
+    const result = await launchScript(scriptName, ui === "1" || ui === "true", isLinux);
     response.status(200).json(result);
   } catch (error) {
     next(error);
@@ -153,7 +180,9 @@ app.get("/disk/chkdsk", async (request, response, next) => {
 app.get("/disk/defrag", async (request, response, next) => {
   try {
     const ui = String(request?.query?.ui ?? "").toLowerCase();
-    const result = await launchScriptPs1("defrag-drive.ps1", ui === "1" || ui === "true");
+    const isLinux = process.platform === "linux";
+    const scriptName = isLinux ? "list-drives.sh" : "defrag-drive.ps1";
+    const result = await launchScript(scriptName, ui === "1" || ui === "true", isLinux);
     response.status(200).json(result);
   } catch (error) {
     next(error);
@@ -164,7 +193,9 @@ app.get("/disk/defrag", async (request, response, next) => {
 app.get("/disk/format", async (request, response, next) => {
   try {
     const ui = String(request?.query?.ui ?? "").toLowerCase();
-    const result = await launchScriptPs1("format-drive.ps1", ui === "1" || ui === "true");
+    const isLinux = process.platform === "linux";
+    const scriptName = isLinux ? "list-drives.sh" : "format-drive.ps1";
+    const result = await launchScript(scriptName, ui === "1" || ui === "true", isLinux);
     response.status(200).json(result);
   } catch (error) {
     next(error);
@@ -211,42 +242,79 @@ app.get("/network/cloudflare-dns-admin", async (_request, response, next) => {
   }
 });
 
-// Applications: lancer le gestionnaire winget update (nécessite admin)
+// Applications: lancer le gestionnaire de paquets (Windows winget + Linux package manager)
 app.get("/apps/winget-update-admin", async (_request, response, next) => {
   try {
-    // Utiliser un lanceur dédié qui force l'élévation UAC puis exécute le manager
-    const batPath = path.join(scriptsDir, "applications", "batch", "winget-update-admin.bat");
-    execFile(
-      "cmd.exe",
-      ["/c", "start", "", batPath],
-      { windowsHide: false },
-      (error) => {
-        if (error) {
-          return response.status(200).json({ ok: false, error: error.message });
+    const isLinux = process.platform === "linux";
+    
+    if (isLinux) {
+      // Linux: lancer le gestionnaire de paquets
+      const scriptPath = path.join(scriptsDir, "linux", "applications", "package-update-manager.sh");
+      execFile(
+        "xterm",
+        ["-e", "bash", scriptPath],
+        { windowsHide: false },
+        (error) => {
+          if (error) {
+            return response.status(200).json({ ok: false, error: error.message });
+          }
+          response.status(200).json({ ok: true });
         }
-        response.status(200).json({ ok: true });
-      }
-    );
+      );
+    } else {
+      // Windows: utiliser le lanceur winget
+      const batPath = path.join(scriptsDir, "applications", "batch", "winget-update-admin.bat");
+      execFile(
+        "cmd.exe",
+        ["/c", "start", "", batPath],
+        { windowsHide: false },
+        (error) => {
+          if (error) {
+            return response.status(200).json({ ok: false, error: error.message });
+          }
+          response.status(200).json({ ok: true });
+        }
+      );
+    }
   } catch (error) {
     next(error);
   }
 });
 
-// Maintenance: outil tout-en-un (nécessite admin)
+// Maintenance: outil tout-en-un (Windows + Linux)
 app.get("/maintenance/tool-admin", async (_request, response, next) => {
   try {
-    const batPath = path.join(scriptsDir, "maintenance", "batch", "windows-maintenance-admin.bat");
-    execFile(
-      "cmd.exe",
-      ["/c", "start", "", batPath],
-      { windowsHide: false },
-      (error) => {
-        if (error) {
-          return response.status(200).json({ ok: false, error: error.message });
+    const isLinux = process.platform === "linux";
+    
+    if (isLinux) {
+      // Linux: lancer l'outil de maintenance système
+      const scriptPath = path.join(scriptsDir, "linux", "maintenance", "system-maintenance.sh");
+      execFile(
+        "xterm",
+        ["-e", "bash", scriptPath],
+        { windowsHide: false },
+        (error) => {
+          if (error) {
+            return response.status(200).json({ ok: false, error: error.message });
+          }
+          response.status(200).json({ ok: true });
         }
-        response.status(200).json({ ok: true });
-      }
-    );
+      );
+    } else {
+      // Windows: utiliser l'outil de maintenance Windows
+      const batPath = path.join(scriptsDir, "maintenance", "batch", "windows-maintenance-admin.bat");
+      execFile(
+        "cmd.exe",
+        ["/c", "start", "", batPath],
+        { windowsHide: false },
+        (error) => {
+          if (error) {
+            return response.status(200).json({ ok: false, error: error.message });
+          }
+          response.status(200).json({ ok: true });
+        }
+      );
+    }
   } catch (error) {
     next(error);
   }
@@ -593,9 +661,11 @@ app.use((error, _request, response, _next) => {
 // Start the HTTP server with automatic port fallback when busy
 // - Tries env.PORT (or 3000) then increments until a free port is found
 // - Adds graceful shutdown handlers
+// - Special handling for O2Switch/Passenger
 const HOST = env.HOST || "0.0.0.0";
 const BASE_PORT = Number(env.PORT) || 3000;
 const PORT_STRICT = String(env.PORT_STRICT || "1") === "1";
+const IS_PASSENGER = env.PORT === "passenger" || env.PASSENGER_APP_ENV;
 
 async function isPortFree(host, port) {
   // Lightweight port check using a temporary server
@@ -630,7 +700,11 @@ async function listenWithRetry(host, startPort, maxAttempts = 20) {
 let httpServer;
 (async () => {
   try {
-    if (PORT_STRICT) {
+    if (IS_PASSENGER) {
+      // Mode O2Switch/Passenger: pas de listen() nécessaire
+      httpServer = app;
+      console.log("Serveur configuré pour O2Switch/Passenger");
+    } else if (PORT_STRICT) {
       // Mode strict: utilise exactement BASE_PORT, échoue si occupé
       httpServer = await new Promise((resolve, reject) => {
         const server = app
