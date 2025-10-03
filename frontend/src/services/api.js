@@ -5,10 +5,10 @@
 const isProduction = import.meta.env.PROD
 const BASE_URL = isProduction 
   ? 'https://scriptly-i60u.onrender.com'
-  : 'http://127.0.0.1:3001'
+  : 'http://127.0.0.1:3000'
 const ALT_BASE_URLS = isProduction 
   ? ['https://scriptly-i60u.onrender.com']
-  : ['http://127.0.0.1:3001', 'http://localhost:3001']
+  : ['http://127.0.0.1:3000', 'http://localhost:3000']
 
 export async function fetchHealth() {
   const response = await fetch(`${BASE_URL}/health`)

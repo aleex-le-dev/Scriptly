@@ -1,15 +1,9 @@
 // Minimal Express server for the backend API
-// Usage:
-//   - Dev:  npm run server  (or from backend: npm run dev)
-//   - Env:  set PORT and HOST if needed; defaults are 3001 and 0.0.0.0
-// Endpoints:
-//   - GET /          → simple text to confirm API is running
-//   - GET /health    → JSON health check
-//   - 404 handler    → JSON for unknown routes
-//   - 500 handler    → JSON for unhandled errors
+
 
 import express from "express";
 import cors from "cors";
+import net from "node:net";
 import { env } from "node:process";
 import { execFile } from "node:child_process";
 import { exec } from "node:child_process";
@@ -596,12 +590,86 @@ app.use((error, _request, response, _next) => {
   response.status(500).json({ error: message });
 });
 
-// Start the HTTP server
-const PORT = Number(env.PORT) || 3001;
+// Start the HTTP server with automatic port fallback when busy
+// - Tries env.PORT (or 3000) then increments until a free port is found
+// - Adds graceful shutdown handlers
 const HOST = env.HOST || "0.0.0.0";
+const BASE_PORT = Number(env.PORT) || 3000;
+const PORT_STRICT = String(env.PORT_STRICT || "1") === "1";
 
-app.listen(PORT, HOST, () => {
-  console.log(`Serveur démarré sur http://${HOST}:${PORT}`);
-});
+async function isPortFree(host, port) {
+  // Lightweight port check using a temporary server
+  return new Promise((resolve) => {
+    const tester = net
+      .createServer()
+      .once("error", () => resolve(false))
+      .once("listening", () => tester.close(() => resolve(true)))
+      .listen(port, host);
+  });
+}
+
+async function listenWithRetry(host, startPort, maxAttempts = 20) {
+  let port = startPort;
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    const free = await isPortFree(host, port);
+    if (free) {
+      return new Promise((resolve, reject) => {
+        const server = app.listen(port, host, () => {
+          console.log(`Serveur démarré sur http://${host}:${port}`);
+          resolve(server);
+        });
+        server.on("error", reject);
+      });
+    }
+    port += 1;
+  }
+  throw new Error(`Aucun port libre trouvé à partir de ${startPort}`);
+}
+
+let httpServer;
+(async () => {
+  try {
+    if (PORT_STRICT) {
+      // Mode strict: utilise exactement BASE_PORT, échoue si occupé
+      httpServer = await new Promise((resolve, reject) => {
+        const server = app
+          .listen(BASE_PORT, HOST, () => {
+            console.log(`Serveur démarré sur http://${HOST}:${BASE_PORT}`);
+            resolve(server);
+          })
+          .on("error", reject);
+      });
+    } else {
+      // Mode fallback: cherche un port libre à partir de BASE_PORT
+      httpServer = await listenWithRetry(HOST, BASE_PORT);
+    }
+  } catch (error) {
+    console.error("[BOOT] Échec démarrage:", error?.message || error);
+    process.exit(1);
+  }
+})();
+
+// Graceful shutdown
+function shutdown(signal) {
+  console.log(`[SHUTDOWN] Signal ${signal} reçu, arrêt en cours...`);
+  if (httpServer && httpServer.close) {
+    try {
+      httpServer.close(() => {
+        console.log("[SHUTDOWN] Serveur arrêté proprement.");
+        process.exit(0);
+      });
+      // Force exit si bloqué
+      setTimeout(() => process.exit(0), 3000).unref();
+    } catch {
+      process.exit(0);
+    }
+  } else {
+    process.exit(0);
+  }
+}
+
+process.on("SIGINT", () => shutdown("SIGINT"));
+process.on("SIGTERM", () => shutdown("SIGTERM"));
 
 

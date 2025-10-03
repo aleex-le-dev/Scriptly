@@ -25,10 +25,15 @@ function App() {
 
   return (
   <div className="min-h-screen bg-gray-50">
-    <div className="max-w-6xl mx-auto px-4 py-10">
-      <div className="mb-8">
+    {/* Barre de recherche fixe centrée en haut */}
+    <div className="fixed top-0 left-0 right-0 z-50 bg-gray-50/95 backdrop-blur border-b border-gray-200">
+      <div className="w-full py-4">
         <Search value={query} onChange={setQuery} placeholder="Rechercher un script..." />
       </div>
+    </div>
+
+    {/* Contenu avec offset pour la barre fixe et largeur pleine sans marges latérales */}
+    <div className="w-full px-0 pt-24 pb-10">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {visible('maintenance outil tout en un mises a jour reseau nettoyage reparations') && (
         <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl shadow-lg border border-teal-200 p-6">
