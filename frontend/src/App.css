@@ -1,86 +1,110 @@
 @import "tailwindcss";
 /* Glassmorphic background with CSS variable */
 :root { --site-bg-image: url('https://images.unsplash.com/photo-1567309258733-9bbe3672f827?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); }
+/* Force scrollbar to avoid layout shift when content height changes */
 body {
-  background:
-    linear-gradient(135deg, rgba(248,250,252,0.85), rgba(238,242,255,0.85)),
-    var(--site-bg-image) center / cover no-repeat fixed;
-  /* Force scrollbar to avoid layout shift when content height changes */
   overflow-y: scroll;
 }
 
 .dark body {
-  background: #ffffff !important;
+  background: #000000 !important;
 }
 
 .dark {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 .dark * {
-  color: #000000 !important;
+  color: #00ff88 !important;
 }
 
 .dark input {
-  color: white !important;
+  color: #00ff88 !important;
+}
+
+/* Mode clair - styles normaux */
+body:not(.dark) {
+  background:
+    linear-gradient(135deg, rgba(248,250,252,0.85), rgba(238,242,255,0.85)),
+    var(--site-bg-image) center / cover no-repeat fixed;
+  color: #000000;
 }
 
 .dark .bg-gray-50 {
-  background-color: #ffffff !important;
+  background-color: #000000 !important;
 }
 
 .dark .bg-white\/30 {
-  background-color: rgba(255, 255, 255, 0.3) !important;
+  background-color: rgba(0, 0, 0, 0.8) !important;
 }
 
 .dark .bg-white\/40 {
-  background-color: rgba(255, 255, 255, 0.4) !important;
+  background-color: rgba(0, 0, 0, 0.8) !important;
 }
 
 .dark .bg-white\/50 {
-  background-color: rgba(255, 255, 255, 0.5) !important;
+  background-color: rgba(0, 0, 0, 0.8) !important;
 }
 
 .dark .border-white\/30 {
-  border-color: rgba(0, 0, 0, 0.2) !important;
+  border-color: #00ff88 !important;
 }
 
 .dark .border-white\/20 {
-  border-color: rgba(0, 0, 0, 0.2) !important;
+  border-color: #00ff88 !important;
 }
 
 /* Force dark mode styles */
 .dark .min-h-screen {
-  background-color: #ffffff !important;
+  background-color: #000000 !important;
 }
 
 .dark .rounded-2xl {
-  background-color: rgba(255, 255, 255, 0.3) !important;
-  border-color: rgba(0, 0, 0, 0.2) !important;
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
 .dark .glass {
-  background: rgba(255, 255, 255, 0.3) !important;
-  border: 1px solid rgba(0, 0, 0, 0.2) !important;
+  background: rgba(0, 0, 0, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 .dark input {
-  background-color: rgba(255, 255, 255, 0.3) !important;
-  color: #000000 !important;
-  border-color: rgba(0, 0, 0, 0.2) !important;
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  color: #00ff88 !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark input:focus {
+  box-shadow: 0 0 25px rgba(0, 255, 136, 0.5) !important;
+  border-color: #00ff88 !important;
 }
 
 .dark input::placeholder {
-  color: rgba(0, 0, 0, 0.6) !important;
+  color: rgba(0, 255, 136, 0.6) !important;
+}
+
+.dark input:hover {
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
 }
 
 .dark .rounded-xl {
-  background-color: rgba(255, 255, 255, 0.3) !important;
-  border-color: rgba(0, 0, 0, 0.2) !important;
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
 .dark .rounded-lg {
-  background-color: rgba(255, 255, 255, 0.4) !important;
-  border-color: rgba(0, 0, 0, 0.2) !important;
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark .rounded-xl:hover {
+  box-shadow: 0 0 25px rgba(0, 255, 136, 0.4) !important;
+  border-color: #00ff88 !important;
+}
+
+.dark .rounded-lg:hover {
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.3) !important;
+  border-color: #00ff88 !important;
 }
 .glass { background: rgba(255,255,255,0.35); border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 8px 24px rgba(0,0,0,0.08); -webkit-backdrop-filter: blur(16px) saturate(1.5); backdrop-filter: blur(16px) saturate(1.5); border-radius: 16px; }
