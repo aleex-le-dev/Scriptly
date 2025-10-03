@@ -1,5 +1,5 @@
 import './App.css'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { ToastContainer } from './components/Toast'
 import { useToast } from './hooks/useToast'
 import { Disks } from './components/Disks'
@@ -43,40 +43,40 @@ function App() {
     return { ...allClosed, [key]: !wasOpen }
   })
   const q = normalizeText((query || '').trim())
-  const visible = (text) => {
+  const cardKeywords = useMemo(() => ({
+    maintenance: 'maintenance outil tout en un mises a jour reseau nettoyage reparations update updates',
+    systeme: 'systeme tweaks windows registre explorer menu contextuel classique toggle',
+    applications: 'applications winget update upgrade mises a jour',
+    logiciels: 'logiciels telechargement chrome google vlc sumatra pdf navigateur browser download',
+    nirsoft: 'nirsoft produkey pro product key wirelesskeyview wifi webbrowserpassview web browser pass view mots de passe password',
+    reseau: 'reseau dns cloudflare configuration network',
+    disques: 'disque disques operations chkdsk defragmenter defrag formater format bitlocker lister drives diskpart',
+  }), [])
+  const visible = (keyOrText) => {
+    const text = cardKeywords[keyOrText] || keyOrText
     if (q.length < 3) return true
     return normalizeText(text).includes(q)
   }
 
-  // Ouvre automatiquement toutes les cartes correspondant à la recherche (>= 3 caractères)
+  // Ouvre automatiquement la carte correspondant à la recherche (>= 3 caractères)
   useEffect(() => {
     // Si pas de recherche, ne force pas l'ouverture
     if (q.length < 3) return
 
-    const candidates = [
-      ['maintenance', 'maintenance outil tout en un mises a jour reseau nettoyage reparations'],
-      ['systeme', 'systeme tweaks windows registre explorer menu contextuel'],
-      ['applications', 'applications mises a jour winget upgrade'],
-      ['logiciels', 'logiciels telechargement chrome google vlc sumatra pdf navigateur lecteur'],
-      ['nirsoft', 'nirsoft utilitaires wifi licence cle bsod web webbrowser pass view mots de passe'],
-      ['reseau', 'reseau dns cloudflare configuration'],
-      ['disques', 'disque dur operations chkdsk defragmenter formater bitlocker'],
-    ]
+    const candidates = Object.entries(cardKeywords)
 
-    const opened = candidates
-      .filter((pair) => normalizeText(pair[1]).includes(q))
-      .map((pair) => pair[0])
-
-    if (opened.length > 0) {
+    const match = candidates.find((pair) => normalizeText(pair[1]).includes(q))
+    if (match) {
+      const key = match[0]
       setOpen((prev) => {
-        const next = Object.keys(prev).reduce((acc, k) => ({ ...acc, [k]: opened.includes(k) }), {})
-        return next
+        const allClosed = Object.keys(prev).reduce((acc, k) => ({ ...acc, [k]: false }), {})
+        return { ...allClosed, [key]: true }
       })
     }
-  }, [q])
+  }, [q, cardKeywords])
 
   return (
-  <div className="min-h-screen bg-transparent" onClick={closeAll}>
+  <div className="min-h-screen bg-gray-50" onClick={closeAll}>
     {/* Barre de recherche fixe avec effet verre (transparence + blur) */}
     <div className="fixed top-0 left-0 right-0 z-50 bg-transparent">
       <div className="max-w-6xl mx-auto py-4">
@@ -88,7 +88,7 @@ function App() {
     <div className="w-full pt-24 pb-10">
       <div className="w-full px-2 md:px-3">
         <div className="flex flex-wrap justify-start gap-6" onClick={(e) => e.stopPropagation()}>
-        {visible('maintenance outil tout en un mises a jour reseau nettoyage reparations') && (
+        {visible('maintenance') && (
         <Card
           title={<Highlight text="🛠️ Maintenance" query={query} />}
           description={<Highlight text="Outil tout-en-un: mises à jour, réseau, nettoyage, réparations." query={query} />}
@@ -102,7 +102,7 @@ function App() {
           <Maintenance query={query} />
         </Card>
         )}
-        {visible('systeme tweaks windows registre explorer menu contextuel') && (
+        {visible('systeme') && (
         <Card
           title={<Highlight text="⚙️ Système" query={query} />}
           description={<Highlight text="Tweaks Windows 11 (registre, Explorer)." query={query} />}
@@ -116,7 +116,7 @@ function App() {
           <Systeme query={query} />
         </Card>
         )}
-        {visible('applications mises a jour winget upgrade') && (
+        {visible('applications') && (
         <Card
           title={<Highlight text="📦 Applications" query={query} />}
           description={<Highlight text="Mises à jour système et applications via winget." query={query} />}
@@ -130,7 +130,7 @@ function App() {
           <Application query={query} />
         </Card>
         )}
-        {visible('logiciels telechargement chrome google vlc sumatra pdf navigateur lecteur') && (
+        {visible('logiciels') && (
         <Card
           title={<Highlight text="💿 Logiciels" query={query} />}
           description={<Highlight text="Liens directs vers Chrome, VLC, SumatraPDF." query={query} />}
@@ -144,7 +144,7 @@ function App() {
           <Logiciel query={query} />
         </Card>
         )}
-        {visible('nirsoft utilitaires wifi licence cle bsod web webbrowser pass view mots de passe') && (
+        {visible('nirsoft') && (
         <Card
           title={<Highlight text="🧰 NirSoft" query={query} />}
           description={<Highlight text="Utilitaires portables (ProduKey, WirelessKeyView, BlueScreenView)." query={query} />}
@@ -158,7 +158,7 @@ function App() {
           <Nirsoft query={query} />
         </Card>
         )}
-        {visible('reseau dns cloudflare configuration') && (
+        {visible('reseau') && (
         <Card
           title={<Highlight text="🌐 Réseau" query={query} />}
           description={<Highlight text="Scripts liés à la configuration réseau (DNS Cloudflare)." query={query} />}
@@ -172,7 +172,7 @@ function App() {
           <Reseau query={query} />
         </Card>
         )}
-        {visible('disque dur operations chkdsk defragmenter formater bitlocker') && (
+        {visible('disques') && (
         <Card
           title={<Highlight text="💾 Disque dur" query={query} />}
           description={<Highlight text="Regroupe tous les scripts liés aux opérations sur les disques." query={query} />}
