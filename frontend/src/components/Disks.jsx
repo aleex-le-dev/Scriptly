@@ -39,7 +39,7 @@ export function Disks({ query = '' }) {
           role="button"
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleList() }}
-          className="w-64 bg-white rounded-lg border border-gray-200 shadow-sm p-4 cursor-pointer hover:border-gray-400 hover:shadow transition"
+          className="w-64 bg-white/40 backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/30 shadow-lg p-4 cursor-pointer hover:bg-white/50 hover:shadow-xl transition"
         >
           <div className="text-sm font-medium text-gray-900"><Highlight text="📂 Lister les disques" query={query} /></div>
           <div className="text-xs text-gray-600 mt-1"><Highlight text="Affiche les lecteurs détectés" query={query} /></div>
@@ -51,7 +51,7 @@ export function Disks({ query = '' }) {
           role="button"
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsCheckAdmin() }}
-          className="w-64 bg-white rounded-lg border border-gray-200 shadow-sm p-4 cursor-pointer hover:border-gray-400 hover:shadow transition"
+          className="w-64 bg-white/40 backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/30 shadow-lg p-4 cursor-pointer hover:bg-white/50 hover:shadow-xl transition"
         >
           <div className="text-sm font-medium text-gray-900"><Highlight text="🔒 Vérifier BitLocker" query={query} /></div>
           <div className="text-xs text-gray-600 mt-1"><Highlight text="Ouvre la vérification (admin)" query={query} /></div>
@@ -63,7 +63,7 @@ export function Disks({ query = '' }) {
           role="button"
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsOffAdmin() }}
-          className="w-64 bg-white rounded-lg border border-gray-200 shadow-sm p-4 cursor-pointer hover:border-gray-400 hover:shadow transition"
+          className="w-64 bg-white/40 backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/30 shadow-lg p-4 cursor-pointer hover:bg-white/50 hover:shadow-xl transition"
         >
           <div className="text-sm font-medium text-gray-900"><Highlight text="🛑 Désactiver BitLocker" query={query} /></div>
           <div className="text-xs text-gray-600 mt-1"><Highlight text="Désactive sur un volume (admin)" query={query} /></div>
@@ -75,7 +75,7 @@ export function Disks({ query = '' }) {
           role="button"
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsChkdsk() }}
-          className="w-64 bg-white rounded-lg border border-gray-200 shadow-sm p-4 cursor-pointer hover:border-gray-400 hover:shadow transition"
+          className="w-64 bg-white/40 backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/30 shadow-lg p-4 cursor-pointer hover:bg-white/50 hover:shadow-xl transition"
         >
           <div className="text-sm font-medium text-gray-900"><Highlight text="🧰 CHKDSK" query={query} /></div>
           <div className="text-xs text-gray-600 mt-1"><Highlight text="Analyse et réparation" query={query} /></div>
@@ -87,7 +87,7 @@ export function Disks({ query = '' }) {
           role="button"
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsDefrag() }}
-          className="w-64 bg-white rounded-lg border border-gray-200 shadow-sm p-4 cursor-pointer hover:border-gray-400 hover:shadow transition"
+          className="w-64 bg-white/40 backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/30 shadow-lg p-4 cursor-pointer hover:bg-white/50 hover:shadow-xl transition"
         >
           <div className="text-sm font-medium text-gray-900"><Highlight text="🧩 Défragmenter" query={query} /></div>
           <div className="text-xs text-gray-600 mt-1"><Highlight text="Optimise les disques" query={query} /></div>
@@ -99,7 +99,7 @@ export function Disks({ query = '' }) {
           role="button"
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openPsFormatAdmin() }}
-          className="w-64 bg-white rounded-lg border border-gray-200 shadow-sm p-4 cursor-pointer hover:border-gray-400 hover:shadow transition"
+          className="w-64 bg-white/40 backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/30 shadow-lg p-4 cursor-pointer hover:bg-white/50 hover:shadow-xl transition"
         >
           <div className="text-sm font-medium text-gray-900"><Highlight text="💽 Diskpart (admin)" query={query} /></div>
           <div className="text-xs text-gray-600 mt-1"><Highlight text="Outil de formatage disque dur et clé usb" query={query} /></div>

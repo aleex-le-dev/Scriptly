@@ -19,7 +19,7 @@
   }
   return (
     <div
-      className={`w-[360px] rounded-xl shadow-lg border ${border} p-6 cursor-pointer select-none bg-gradient-to-br ${gradient} backdrop-blur-md`}
+      className={`w-[360px] rounded-2xl shadow-2xl border ${border} border-white/30 p-6 cursor-pointer select-none bg-gradient-to-br ${gradient} bg-white/30 backdrop-blur-xl backdrop-saturate-150`}
       onClick={onToggle}
       role="button"
       tabIndex={0}

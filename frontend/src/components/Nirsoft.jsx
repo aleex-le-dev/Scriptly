@@ -48,7 +48,7 @@ export function Nirsoft({ query = '' }) {
           href={t.href}
           target="_blank"
           rel="noreferrer noopener"
-          className="w-64 bg-white rounded-lg border border-gray-200 shadow-sm p-4 cursor-pointer hover:border-indigo-400 hover:shadow transition block"
+          className="w-64 bg-white/40 backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/30 shadow-lg p-4 cursor-pointer hover:bg-white/50 hover:shadow-xl transition block"
         >
           <div className="text-sm font-medium text-gray-900 flex items-center gap-2">
             {t.icon && <img src={t.icon} alt="" className="h-5 w-5 rounded-sm" loading="lazy" />}

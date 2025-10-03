@@ -26,7 +26,7 @@ export function Search({ value = '', onChange, placeholder = 'Rechercher…' }) 
           placeholder={placeholder}
           ref={inputRef}
           autoFocus
-          className="w-full pl-9 pr-3 py-3 rounded-2xl border border-white/30 bg-white/60 backdrop-blur-xl backdrop-saturate-150 shadow-md text-sm text-gray-900 placeholder-gray-700/70 focus:outline-none focus:ring-2 focus:ring-teal-300/60 focus:border-teal-400/60 hover:bg-white/70"
+          className="w-full pl-9 pr-3 py-3 rounded-2xl glass bg-white/50 text-sm text-gray-900 placeholder-gray-700/70 border border-white/30 shadow-2xl transition focus:outline-none focus:ring-2 focus:ring-teal-300/70 focus:border-teal-400/70 hover:bg-white/60"
         />
       </div>
     </div>
