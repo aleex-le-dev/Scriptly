@@ -42,7 +42,7 @@ export function Nirsoft({ query = '' }) {
 
   return (
     <div className="flex flex-wrap gap-3">
-      {tools.filter(t => isVisible(t.title + ' ' + t.desc + ' ' + t.keywords)).map(t => (
+      {tools.filter(t => isVisible(t.title + ' ' + t.desc + ' ' + t.keywords + ' web webbrowser pass view mots de passe')).map(t => (
         <a
           key={t.key}
           href={t.href}

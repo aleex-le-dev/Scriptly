@@ -39,7 +39,7 @@ export function Logiciel({ query = '' }) {
 
   return (
     <div className="flex flex-wrap gap-3">
-      {apps.filter(a => isVisible(a.title + ' ' + a.desc + ' ' + a.keywords)).map(app => (
+      {apps.filter(a => isVisible(a.title + ' ' + a.desc + ' ' + a.keywords + ' google')).map(app => (
         <a
           key={app.key}
           href={app.href}

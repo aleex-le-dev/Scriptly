@@ -3,7 +3,7 @@
 // - Largeur fixe, styles unifiés
 // - Replié par défaut; s'ouvre au clic (ou Enter/Espace)
 
-export function Card({
+ export function Card({
   title,
   description,
   gradient = 'from-gray-100/60 to-gray-50/60',
@@ -28,7 +28,11 @@ export function Card({
     >
       <h2 className={`text-xl font-semibold ${text} mb-2`}>{title}</h2>
       {description && <p className={`text-sm ${textMuted} mb-2`}>{description}</p>}
-      {isOpen && <div className="pt-2">{children}</div>}
+      {isOpen && (
+        <div className="pt-2" onClick={(e) => e.stopPropagation()}>
+          {children}
+        </div>
+      )}
     </div>
   )
 }

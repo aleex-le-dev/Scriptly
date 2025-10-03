@@ -1,5 +1,5 @@
 import './App.css'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ToastContainer } from './components/Toast'
 import { useToast } from './hooks/useToast'
 import { Disks } from './components/Disks'
@@ -28,17 +28,57 @@ function App() {
     reseau: false,
     disques: false,
   })
-  const toggle = (key) => setOpen((prev) => ({ ...prev, [key]: !prev[key] }))
+  const closeAll = () => setOpen({
+    maintenance: false,
+    systeme: false,
+    applications: false,
+    logiciels: false,
+    nirsoft: false,
+    reseau: false,
+    disques: false,
+  })
+  const toggle = (key) => setOpen((prev) => {
+    const wasOpen = !!prev[key]
+    const allClosed = Object.keys(prev).reduce((acc, k) => ({ ...acc, [k]: false }), {})
+    return { ...allClosed, [key]: !wasOpen }
+  })
   const q = normalizeText((query || '').trim())
   const visible = (text) => {
     if (q.length < 3) return true
     return normalizeText(text).includes(q)
   }
 
+  // Ouvre automatiquement toutes les cartes correspondant à la recherche (>= 3 caractères)
+  useEffect(() => {
+    // Si pas de recherche, ne force pas l'ouverture
+    if (q.length < 3) return
+
+    const candidates = [
+      ['maintenance', 'maintenance outil tout en un mises a jour reseau nettoyage reparations'],
+      ['systeme', 'systeme tweaks windows registre explorer menu contextuel'],
+      ['applications', 'applications mises a jour winget upgrade'],
+      ['logiciels', 'logiciels telechargement chrome google vlc sumatra pdf navigateur lecteur'],
+      ['nirsoft', 'nirsoft utilitaires wifi licence cle bsod web webbrowser pass view mots de passe'],
+      ['reseau', 'reseau dns cloudflare configuration'],
+      ['disques', 'disque dur operations chkdsk defragmenter formater bitlocker'],
+    ]
+
+    const opened = candidates
+      .filter((pair) => normalizeText(pair[1]).includes(q))
+      .map((pair) => pair[0])
+
+    if (opened.length > 0) {
+      setOpen((prev) => {
+        const next = Object.keys(prev).reduce((acc, k) => ({ ...acc, [k]: opened.includes(k) }), {})
+        return next
+      })
+    }
+  }, [q])
+
   return (
-  <div className="min-h-screen bg-gray-50">
+  <div className="min-h-screen bg-transparent" onClick={closeAll}>
     {/* Barre de recherche fixe avec effet verre (transparence + blur) */}
-    <div className="fixed top-0 left-0 right-0 z-50 bg-white/30 backdrop-blur-md border-b border-white/20 shadow-sm">
+    <div className="fixed top-0 left-0 right-0 z-50 bg-transparent">
       <div className="max-w-6xl mx-auto py-4">
         <Search value={query} onChange={setQuery} placeholder="Rechercher un script..." />
       </div>
@@ -47,7 +87,7 @@ function App() {
     {/* Contenu avec offset, largeur contenue et marges latérales */}
     <div className="w-full pt-24 pb-10">
       <div className="w-full px-2 md:px-3">
-        <div className="flex flex-wrap justify-start gap-6">
+        <div className="flex flex-wrap justify-start gap-6" onClick={(e) => e.stopPropagation()}>
         {visible('maintenance outil tout en un mises a jour reseau nettoyage reparations') && (
         <Card
           title={<Highlight text="🛠️ Maintenance" query={query} />}
@@ -90,7 +130,7 @@ function App() {
           <Application query={query} />
         </Card>
         )}
-        {visible('logiciels telechargement chrome vlc sumatra pdf navigateur lecteur') && (
+        {visible('logiciels telechargement chrome google vlc sumatra pdf navigateur lecteur') && (
         <Card
           title={<Highlight text="💿 Logiciels" query={query} />}
           description={<Highlight text="Liens directs vers Chrome, VLC, SumatraPDF." query={query} />}
@@ -104,7 +144,7 @@ function App() {
           <Logiciel query={query} />
         </Card>
         )}
-        {visible('nirsoft utilitaires wifi licence cle bsod') && (
+        {visible('nirsoft utilitaires wifi licence cle bsod web webbrowser pass view mots de passe') && (
         <Card
           title={<Highlight text="🧰 NirSoft" query={query} />}
           description={<Highlight text="Utilitaires portables (ProduKey, WirelessKeyView, BlueScreenView)." query={query} />}
