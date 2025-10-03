@@ -133,22 +133,18 @@ function App() {
         </Card>
         )}
         {visible('disque dur operations chkdsk defragmenter formater bitlocker') && (
-        <div
-          className="w-full bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl shadow-lg border border-gray-200 p-6 cursor-pointer select-none"
-          onClick={() => toggle('disques')}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggle('disques') }}
-          aria-expanded={open.disques}
+        <Card
+          title={<Highlight text="💾 Disque dur" query={query} />}
+          description={<Highlight text="Regroupe tous les scripts liés aux opérations sur les disques." query={query} />}
+          gradient="from-gray-100/60 to-gray-50/60"
+          border="border-gray-300/50"
+          text="text-gray-900"
+          textMuted="text-gray-700"
+          isOpen={open.disques}
+          onToggle={() => toggle('disques')}
         >
-          <h2 className='text-xl font-semibold text-gray-900 mb-2'><Highlight text="💾 Disque dur" query={query} /></h2>
-          <p className="text-sm text-gray-700 mb-4"><Highlight text="Regroupe tous les scripts liés aux opérations sur les disques." query={query} /></p>
-          {open.disques && (
-            <div className="pt-2">
-              <Disks query={query} />
-            </div>
-          )}
-        </div>
+          <Disks query={query} />
+        </Card>
         )}
         </div>
       </div>
