@@ -78,7 +78,7 @@ app.get("/logs", (_request, response) => {
     if (fs.existsSync(logPath)) {
       logs = fs.readFileSync(logPath, 'utf8');
     } else {
-      logs = "Fichier de log non trouvé";
+      logs = "Fichier de log non trouvé - Render ne permet pas l'écriture de fichiers";
     }
     
     response.setHeader('Content-Type', 'text/plain');
@@ -855,11 +855,11 @@ app.use((error, _request, response, _next) => {
 // - Adds graceful shutdown handlers
 // - Special handling for O2Switch/Passenger
 const HOST = env.HOST || "0.0.0.0";
-const BASE_PORT = Number(env.PORT) || 10000;
+const BASE_PORT = Number(env.PORT) || 3000;
 const PORT_STRICT = String(env.PORT_STRICT || "1") === "1";
 const IS_PASSENGER = env.PORT === "passenger" || env.PASSENGER_APP_ENV;
 
-// Fonction de log personnalisée pour O2Switch
+// Fonction de log personnalisée
 function logToFile(message) {
   const timestamp = new Date().toISOString();
   const logMessage = `[${timestamp}] ${message}\n`;
@@ -867,11 +867,12 @@ function logToFile(message) {
   // Log dans la console
   console.log(message);
   
-  // Log dans un fichier pour O2Switch
+  // Log dans un fichier (si possible)
   try {
     fs.appendFileSync(path.join(__dirname, "app.log"), logMessage);
   } catch (error) {
-    console.error("Erreur écriture log:", error);
+    // Ignore les erreurs d'écriture de fichier sur Render
+    console.error("Erreur écriture log:", error.message);
   }
 }
 
@@ -924,19 +925,17 @@ let httpServer;
       httpServer = app;
       console.log("[BOOT] Serveur configuré pour O2Switch/Passenger");
       console.log("[BOOT] Application Express prête à recevoir les requêtes");
-    } else if (PORT_STRICT) {
-      // Mode strict: utilise exactement BASE_PORT, échoue si occupé
+    } else {
+      // Mode Render: utilise le port défini par Render
+      const port = env.PORT || 3000;
       httpServer = await new Promise((resolve, reject) => {
         const server = app
-          .listen(BASE_PORT, HOST, () => {
-            console.log(`Serveur démarré sur http://${HOST}:${BASE_PORT}`);
+          .listen(port, HOST, () => {
+            console.log(`[BOOT] Serveur démarré sur http://${HOST}:${port}`);
             resolve(server);
           })
           .on("error", reject);
       });
-    } else {
-      // Mode fallback: cherche un port libre à partir de BASE_PORT
-      httpServer = await listenWithRetry(HOST, BASE_PORT);
     }
     
     console.log("[BOOT] Serveur backend démarré avec succès");

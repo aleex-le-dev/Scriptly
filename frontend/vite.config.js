@@ -22,9 +22,9 @@ export default defineConfig({
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Redirection vers le backend Node.js
+# Redirection vers le backend Render
 RewriteCond %{REQUEST_URI} ^/api/(.*)$
-RewriteRule ^api/(.*)$ /backend/$1 [L]
+RewriteRule ^api/(.*)$ https://scriptly-i60u.onrender.com/$1 [P,L]
 
 # Servir les fichiers statiques du frontend
 RewriteCond %{REQUEST_FILENAME} !-f
