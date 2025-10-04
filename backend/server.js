@@ -855,7 +855,7 @@ app.use((error, _request, response, _next) => {
 // - Adds graceful shutdown handlers
 // - Special handling for O2Switch/Passenger
 const HOST = env.HOST || "0.0.0.0";
-const BASE_PORT = Number(env.PORT) || 3001;
+const BASE_PORT = Number(env.PORT) || 10000;
 const PORT_STRICT = String(env.PORT_STRICT || "1") === "1";
 const IS_PASSENGER = env.PORT === "passenger" || env.PASSENGER_APP_ENV;
 

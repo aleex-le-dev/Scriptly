@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/vite'
-import { copyFileSync } from 'fs'
+import { copyFileSync, writeFileSync } from 'fs'
 import { resolve } from 'path'
 
 // https://vite.dev/config/
@@ -11,16 +11,58 @@ export default defineConfig({
     tailwindcss({
       config: './tailwind.config.js'
     }),
-    // Plugin pour copier .htaccess automatiquement
+    // Plugin pour créer .htaccess automatiquement
     {
-      name: 'copy-htaccess',
+      name: 'create-htaccess',
       writeBundle() {
         try {
-          // Copier le .htaccess du frontend vers dist/
-          copyFileSync('./dist/.htaccess', 'dist/.htaccess')
-          console.log('✓ .htaccess copié dans dist/')
+          const htaccessContent = `RewriteEngine On
+
+# Redirection HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Redirection vers le backend Node.js
+RewriteCond %{REQUEST_URI} ^/api/(.*)$
+RewriteRule ^api/(.*)$ /backend/$1 [L]
+
+# Servir les fichiers statiques du frontend
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/api/
+RewriteRule ^(.*)$ /index.html [L]
+
+# Headers de sécurité
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options DENY
+Header always set X-XSS-Protection "1; mode=block"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+# Cache pour les assets statiques
+<FilesMatch "\\.(css|js|png|jpg|jpeg|gif|ico|svg)$">
+    ExpiresActive On
+    ExpiresDefault "access plus 1 month"
+    Header set Cache-Control "public, immutable"
+</FilesMatch>
+
+# Compression gzip
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE application/json
+</IfModule>`;
+          
+          writeFileSync('dist/.htaccess', htaccessContent);
+          console.log('✓ .htaccess créé dans dist/')
         } catch (error) {
-          console.warn('⚠ Impossible de copier .htaccess:', error.message)
+          console.warn('⚠ Impossible de créer .htaccess:', error.message)
         }
       }
     }

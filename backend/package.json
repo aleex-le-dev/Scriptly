@@ -8,7 +8,8 @@
   "scripts": {
     "dev": "node --watch server.js",
     "start": "node server.js",
-    "postinstall": "echo 'Postinstall completed'"
+    "postinstall": "echo 'Postinstall completed'",
+    "passenger": "node server.js"
   },
   "dependencies": {
     "express": "^4.18.2",

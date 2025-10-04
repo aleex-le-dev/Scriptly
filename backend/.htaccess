@@ -5,9 +5,5 @@ PassengerAppType node
 PassengerStartupFile server.js
 PassengerNodejs /usr/bin/node
 
-# Redirection des requêtes API vers le backend
-RewriteEngine On
-RewriteRule ^api/(.*)$ /backend/$1 [L]
-
 # Désactiver l'affichage des dossiers
 Options -Indexes

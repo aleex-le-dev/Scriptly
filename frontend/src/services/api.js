@@ -4,10 +4,10 @@
 // URL du backend - adapte automatiquement selon l'environnement
 const isProduction = import.meta.env.PROD
 const BASE_URL = isProduction 
-  ? '/api'  // Chemin relatif sur O2Switch
+  ? 'https://script-backend.onrender.com'  // URL Render
   : 'http://127.0.0.1:3001'
 const ALT_BASE_URLS = isProduction 
-  ? ['/api']
+  ? ['https://script-backend.onrender.com']
   : ['http://127.0.0.1:3001', 'http://localhost:3001']
 
 export async function fetchHealth() {
