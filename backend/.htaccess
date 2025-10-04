@@ -1,0 +1,13 @@
+# Configuration O2Switch pour Node.js/Passenger
+PassengerEnabled On
+PassengerAppRoot /home/script/public_html/backend
+PassengerAppType node
+PassengerStartupFile server.js
+PassengerNodejs /usr/bin/node
+
+# Redirection des requêtes API vers le backend
+RewriteEngine On
+RewriteRule ^api/(.*)$ /backend/$1 [L]
+
+# Désactiver l'affichage des dossiers
+Options -Indexes

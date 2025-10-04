@@ -10,6 +10,7 @@ import { exec } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { Router } from "express";
+import fs from "fs";
 
 // Create and configure the application instance
 const app = express();
@@ -19,10 +20,23 @@ app.use(express.json());
 // Simple request logger (method, path, status)
 app.use((request, response, next) => {
   const start = Date.now();
-  const { method, url } = request;
+  const { method, url, query, body } = request;
+  
+  const logMessage = `[HTTP] ${method} ${url} - Query: ${JSON.stringify(query)}`;
+  console.log(logMessage);
+  logToFile(logMessage);
+  
+  if (body && Object.keys(body).length > 0) {
+    const bodyLog = `[HTTP] ${method} ${url} - Body: ${JSON.stringify(body)}`;
+    console.log(bodyLog);
+    logToFile(bodyLog);
+  }
+  
   response.on("finish", () => {
     const ms = Date.now() - start;
-    console.log(`[HTTP] ${method} ${url} → ${response.statusCode} (${ms}ms)`);
+    const finishLog = `[HTTP] ${method} ${url} → ${response.statusCode} (${ms}ms)`;
+    console.log(finishLog);
+    logToFile(finishLog);
   });
   next();
 });
@@ -35,6 +49,43 @@ const scriptsDir = path.join(__dirname, "scripts");
 // Root endpoint to quickly verify the server is up
 app.get("/", (_request, response) => {
   response.type("text/plain").send("API is running");
+});
+
+// Debug endpoint pour O2Switch
+app.get("/debug", (_request, response) => {
+  const debugInfo = {
+    timestamp: new Date().toISOString(),
+    nodeEnv: env.NODE_ENV,
+    port: env.PORT,
+    host: env.HOST,
+    passengerAppEnv: env.PASSENGER_APP_ENV,
+    isPassenger: IS_PASSENGER,
+    platform: process.platform,
+    scriptsDir: path.join(__dirname, "scripts"),
+    allEnvVars: Object.keys(env).filter(key => key.includes('PASSENGER') || key.includes('NODE'))
+  };
+  
+  console.log("[DEBUG] Endpoint /debug appelé:", debugInfo);
+  response.json(debugInfo);
+});
+
+// Endpoint pour afficher les logs dans la console du navigateur
+app.get("/logs", (_request, response) => {
+  try {
+    const logPath = path.join(__dirname, "app.log");
+    let logs = "";
+    
+    if (fs.existsSync(logPath)) {
+      logs = fs.readFileSync(logPath, 'utf8');
+    } else {
+      logs = "Fichier de log non trouvé";
+    }
+    
+    response.setHeader('Content-Type', 'text/plain');
+    response.send(logs);
+  } catch (error) {
+    response.status(500).json({ error: error.message });
+  }
 });
 
 // Health check endpoint for uptime and probes
@@ -77,18 +128,33 @@ app.get("/test-message", async (_request, response) => {
 
 // Scripts launcher (Windows PowerShell + Linux Bash)
 function launchScript(scriptName, openUi, isLinux = false) {
+  console.log(`[SCRIPT] Lancement script: ${scriptName}, UI: ${openUi}, Linux: ${isLinux}`);
+  
   if (isLinux) {
     const scriptPath = path.join(scriptsDir, "linux", "disks", scriptName);
+    console.log(`[SCRIPT] Chemin Linux: ${scriptPath}`);
+    
     if (openUi) {
+      console.log(`[SCRIPT] Ouverture UI Linux avec xterm`);
       try {
         execFile(
           "xterm",
           ["-e", "bash", scriptPath],
           { windowsHide: false },
-          () => { /* started */ }
+          (error) => {
+            if (error) {
+              console.error(`[SCRIPT] Erreur UI Linux:`, error);
+            } else {
+              console.log(`[SCRIPT] UI Linux démarrée avec succès`);
+            }
+          }
         );
-      } catch { /* ignore UI start failures */ }
+      } catch (error) {
+        console.error(`[SCRIPT] Exception UI Linux:`, error);
+      }
     }
+    
+    console.log(`[SCRIPT] Exécution script Linux en arrière-plan`);
     return new Promise((resolve) => {
       execFile(
         "bash",
@@ -96,8 +162,12 @@ function launchScript(scriptName, openUi, isLinux = false) {
         { windowsHide: true },
         (error, stdout, stderr) => {
           if (error) {
+            console.error(`[SCRIPT] Erreur exécution Linux:`, error);
+            console.error(`[SCRIPT] Stderr Linux:`, stderr?.toString());
             resolve({ ok: false, error: error.message, stderr: stderr?.toString() || "" });
           } else {
+            console.log(`[SCRIPT] Script Linux exécuté avec succès`);
+            console.log(`[SCRIPT] Stdout Linux:`, stdout?.toString());
             resolve({ ok: true, stdout: stdout?.toString() || "" });
           }
         }
@@ -106,7 +176,10 @@ function launchScript(scriptName, openUi, isLinux = false) {
   } else {
     // Windows PowerShell
     const psScript = path.join(scriptsDir, "disks", "powershells", scriptName);
+    console.log(`[SCRIPT] Chemin Windows: ${psScript}`);
+    
     if (openUi) {
+      console.log(`[SCRIPT] Ouverture UI Windows avec PowerShell`);
       try {
         execFile(
           "cmd.exe",
@@ -123,10 +196,20 @@ function launchScript(scriptName, openUi, isLinux = false) {
             psScript,
           ],
           { windowsHide: false },
-          () => { /* started */ }
+          (error) => {
+            if (error) {
+              console.error(`[SCRIPT] Erreur UI Windows:`, error);
+            } else {
+              console.log(`[SCRIPT] UI Windows démarrée avec succès`);
+            }
+          }
         );
-      } catch { /* ignore UI start failures */ }
+      } catch (error) {
+        console.error(`[SCRIPT] Exception UI Windows:`, error);
+      }
     }
+    
+    console.log(`[SCRIPT] Exécution script Windows en arrière-plan`);
     return new Promise((resolve) => {
       execFile(
         "powershell.exe",
@@ -134,8 +217,12 @@ function launchScript(scriptName, openUi, isLinux = false) {
         { windowsHide: true },
         (error, stdout, stderr) => {
           if (error) {
+            console.error(`[SCRIPT] Erreur exécution Windows:`, error);
+            console.error(`[SCRIPT] Stderr Windows:`, stderr?.toString());
             resolve({ ok: false, error: error.message, stderr: stderr?.toString() || "" });
           } else {
+            console.log(`[SCRIPT] Script Windows exécuté avec succès`);
+            console.log(`[SCRIPT] Stdout Windows:`, stdout?.toString());
             resolve({ ok: true, stdout: stdout?.toString() || "" });
           }
         }
@@ -178,9 +265,15 @@ app.get("/disk/chkdsk", async (request, response, next) => {
     const ui = String(request?.query?.ui ?? "").toLowerCase();
     const isLinux = process.platform === "linux";
     const scriptName = isLinux ? "check-bitlocker.sh" : "chkdsk-drive.ps1";
+    
+    console.log(`[API] /disk/chkdsk - UI: ${ui}, Linux: ${isLinux}, Script: ${scriptName}`);
+    
     const result = await launchScript(scriptName, ui === "1" || ui === "true", isLinux);
     
+    console.log(`[API] /disk/chkdsk - Résultat:`, result);
+    
     if (!result.ok) {
+      console.error(`[API] /disk/chkdsk - Erreur:`, result.error);
       return response.status(500).json({ 
         ok: false, 
         error: result.error || "Script execution failed",
@@ -190,6 +283,7 @@ app.get("/disk/chkdsk", async (request, response, next) => {
     
     response.status(200).json(result);
   } catch (error) {
+    console.error(`[API] /disk/chkdsk - Exception:`, error);
     next(error);
   }
 });
@@ -199,9 +293,15 @@ app.get("/disk/defrag", async (request, response, next) => {
     const ui = String(request?.query?.ui ?? "").toLowerCase();
     const isLinux = process.platform === "linux";
     const scriptName = isLinux ? "list-drives.sh" : "defrag-drive.ps1";
+    
+    console.log(`[API] /disk/defrag - UI: ${ui}, Linux: ${isLinux}, Script: ${scriptName}`);
+    
     const result = await launchScript(scriptName, ui === "1" || ui === "true", isLinux);
     
+    console.log(`[API] /disk/defrag - Résultat:`, result);
+    
     if (!result.ok) {
+      console.error(`[API] /disk/defrag - Erreur:`, result.error);
       return response.status(500).json({ 
         ok: false, 
         error: result.error || "Script execution failed",
@@ -211,6 +311,7 @@ app.get("/disk/defrag", async (request, response, next) => {
     
     response.status(200).json(result);
   } catch (error) {
+    console.error(`[API] /disk/defrag - Exception:`, error);
     next(error);
   }
 });
@@ -221,9 +322,15 @@ app.get("/disk/format", async (request, response, next) => {
     const ui = String(request?.query?.ui ?? "").toLowerCase();
     const isLinux = process.platform === "linux";
     const scriptName = isLinux ? "list-drives.sh" : "format-drive.ps1";
+    
+    console.log(`[API] /disk/format - UI: ${ui}, Linux: ${isLinux}, Script: ${scriptName}`);
+    
     const result = await launchScript(scriptName, ui === "1" || ui === "true", isLinux);
     
+    console.log(`[API] /disk/format - Résultat:`, result);
+    
     if (!result.ok) {
+      console.error(`[API] /disk/format - Erreur:`, result.error);
       return response.status(500).json({ 
         ok: false, 
         error: result.error || "Script execution failed",
@@ -233,6 +340,7 @@ app.get("/disk/format", async (request, response, next) => {
     
     response.status(200).json(result);
   } catch (error) {
+    console.error(`[API] /disk/format - Exception:`, error);
     next(error);
   }
 });
@@ -260,6 +368,15 @@ app.get("/test-bat", async (_request, response) => {
 // Réseau: lancer le gestionnaire DNS Cloudflare (nécessite admin)
 app.get("/network/cloudflare-dns-admin", async (_request, response, next) => {
   try {
+    // En production O2Switch/Passenger, les scripts système ne peuvent pas s'exécuter
+    if (IS_PASSENGER) {
+      return response.status(200).json({ 
+        ok: true, 
+        message: "Scripts système non disponibles en production O2Switch/Passenger",
+        note: "Les scripts de modification DNS nécessitent un accès administrateur"
+      });
+    }
+
     const batPath = path.join(scriptsDir, "networks", "batch", "cloudflare-dns-manager.bat");
     execFile(
       "cmd.exe",
@@ -280,6 +397,15 @@ app.get("/network/cloudflare-dns-admin", async (_request, response, next) => {
 // Applications: lancer le gestionnaire de paquets (Windows winget + Linux package manager)
 app.get("/apps/winget-update-admin", async (_request, response, next) => {
   try {
+    // En production O2Switch/Passenger, les scripts système ne peuvent pas s'exécuter
+    if (IS_PASSENGER) {
+      return response.status(200).json({ 
+        ok: true, 
+        message: "Scripts système non disponibles en production O2Switch/Passenger",
+        note: "Les scripts de gestion de paquets nécessitent un accès système complet"
+      });
+    }
+
     const isLinux = process.platform === "linux";
     
     if (isLinux) {
@@ -319,38 +445,60 @@ app.get("/apps/winget-update-admin", async (_request, response, next) => {
 // Maintenance: outil tout-en-un (Windows + Linux)
 app.get("/maintenance/tool-admin", async (_request, response, next) => {
   try {
+    console.log(`[API] /maintenance/tool-admin - IS_PASSENGER: ${IS_PASSENGER}`);
+    
+    // En production O2Switch/Passenger, les scripts système ne peuvent pas s'exécuter
+    if (IS_PASSENGER) {
+      console.log(`[API] /maintenance/tool-admin - Mode production, scripts non disponibles`);
+      return response.status(200).json({ 
+        ok: true, 
+        message: "Scripts système non disponibles en production O2Switch/Passenger",
+        note: "Les scripts de maintenance nécessitent un accès système complet"
+      });
+    }
+
     const isLinux = process.platform === "linux";
+    console.log(`[API] /maintenance/tool-admin - Linux: ${isLinux}`);
     
     if (isLinux) {
       // Linux: lancer l'outil de maintenance système
       const scriptPath = path.join(scriptsDir, "linux", "maintenance", "system-maintenance.sh");
+      console.log(`[API] /maintenance/tool-admin - Chemin Linux: ${scriptPath}`);
+      
       execFile(
         "xterm",
         ["-e", "bash", scriptPath],
         { windowsHide: false },
         (error) => {
           if (error) {
+            console.error(`[API] /maintenance/tool-admin - Erreur Linux:`, error);
             return response.status(500).json({ ok: false, error: error.message });
           }
+          console.log(`[API] /maintenance/tool-admin - Script Linux lancé avec succès`);
           response.status(200).json({ ok: true });
         }
       );
     } else {
       // Windows: utiliser l'outil de maintenance Windows
       const batPath = path.join(scriptsDir, "maintenance", "batch", "windows-maintenance-admin.bat");
+      console.log(`[API] /maintenance/tool-admin - Chemin Windows: ${batPath}`);
+      
       execFile(
         "cmd.exe",
         ["/c", "start", "", batPath],
         { windowsHide: false },
         (error) => {
           if (error) {
+            console.error(`[API] /maintenance/tool-admin - Erreur Windows:`, error);
             return response.status(200).json({ ok: false, error: error.message });
           }
+          console.log(`[API] /maintenance/tool-admin - Script Windows lancé avec succès`);
           response.status(200).json({ ok: true });
         }
       );
     }
   } catch (error) {
+    console.error(`[API] /maintenance/tool-admin - Exception:`, error);
     next(error);
   }
 });
@@ -358,6 +506,15 @@ app.get("/maintenance/tool-admin", async (_request, response, next) => {
 // Systeme: basculer le menu contextuel classique Windows 11 (nécessite admin)
 app.get("/system/context-menu-classic-admin", async (_request, response, next) => {
   try {
+    // En production O2Switch/Passenger, les scripts système ne peuvent pas s'exécuter
+    if (IS_PASSENGER) {
+      return response.status(200).json({ 
+        ok: true, 
+        message: "Scripts système non disponibles en production O2Switch/Passenger",
+        note: "Les scripts de modification du système nécessitent un accès administrateur"
+      });
+    }
+
     // Utilise le lanceur qui force l'UAC puis exécute le toggle
     const batPath = path.join(scriptsDir, "systeme", "batch", "context-menu-classic-admin.bat");
     execFile(
@@ -702,6 +859,33 @@ const BASE_PORT = Number(env.PORT) || 3001;
 const PORT_STRICT = String(env.PORT_STRICT || "1") === "1";
 const IS_PASSENGER = env.PORT === "passenger" || env.PASSENGER_APP_ENV;
 
+// Fonction de log personnalisée pour O2Switch
+function logToFile(message) {
+  const timestamp = new Date().toISOString();
+  const logMessage = `[${timestamp}] ${message}\n`;
+  
+  // Log dans la console
+  console.log(message);
+  
+  // Log dans un fichier pour O2Switch
+  try {
+    fs.appendFileSync(path.join(__dirname, "app.log"), logMessage);
+  } catch (error) {
+    console.error("Erreur écriture log:", error);
+  }
+}
+
+// Debug: Afficher toutes les variables d'environnement pour O2Switch
+logToFile("[DEBUG] Variables d'environnement:");
+logToFile(`[DEBUG] NODE_ENV: ${env.NODE_ENV}`);
+logToFile(`[DEBUG] PORT: ${env.PORT}`);
+logToFile(`[DEBUG] HOST: ${env.HOST}`);
+logToFile(`[DEBUG] PASSENGER_APP_ENV: ${env.PASSENGER_APP_ENV}`);
+logToFile(`[DEBUG] IS_PASSENGER: ${IS_PASSENGER}`);
+logToFile(`[DEBUG] process.platform: ${process.platform}`);
+logToFile(`[DEBUG] __dirname: ${__dirname}`);
+logToFile(`[DEBUG] scriptsDir: ${path.join(__dirname, "scripts")}`);
+
 async function isPortFree(host, port) {
   // Lightweight port check using a temporary server
   return new Promise((resolve) => {
@@ -738,7 +922,8 @@ let httpServer;
     if (IS_PASSENGER) {
       // Mode O2Switch/Passenger: pas de listen() nécessaire
       httpServer = app;
-      console.log("Serveur configuré pour O2Switch/Passenger");
+      console.log("[BOOT] Serveur configuré pour O2Switch/Passenger");
+      console.log("[BOOT] Application Express prête à recevoir les requêtes");
     } else if (PORT_STRICT) {
       // Mode strict: utilise exactement BASE_PORT, échoue si occupé
       httpServer = await new Promise((resolve, reject) => {
@@ -753,6 +938,8 @@ let httpServer;
       // Mode fallback: cherche un port libre à partir de BASE_PORT
       httpServer = await listenWithRetry(HOST, BASE_PORT);
     }
+    
+    console.log("[BOOT] Serveur backend démarré avec succès");
   } catch (error) {
     console.error("[BOOT] Échec démarrage:", error?.message || error);
     process.exit(1);

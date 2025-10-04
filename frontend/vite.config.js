@@ -16,7 +16,8 @@ export default defineConfig({
       name: 'copy-htaccess',
       writeBundle() {
         try {
-          copyFileSync('../.htaccess', 'dist/.htaccess')
+          // Copier le .htaccess du frontend vers dist/
+          copyFileSync('./dist/.htaccess', 'dist/.htaccess')
           console.log('✓ .htaccess copié dans dist/')
         } catch (error) {
           console.warn('⚠ Impossible de copier .htaccess:', error.message)
