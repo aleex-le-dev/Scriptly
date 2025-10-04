@@ -368,11 +368,11 @@ app.get("/test-bat", async (_request, response) => {
 // Réseau: lancer le gestionnaire DNS Cloudflare (nécessite admin)
 app.get("/network/cloudflare-dns-admin", async (_request, response, next) => {
   try {
-    // En production O2Switch/Passenger, les scripts système ne peuvent pas s'exécuter
-    if (IS_PASSENGER) {
+    // En production (O2Switch/Passenger ou Render), les scripts système ne peuvent pas s'exécuter
+    if (IS_PASSENGER || IS_RENDER) {
       return response.status(200).json({ 
         ok: true, 
-        message: "Scripts système non disponibles en production O2Switch/Passenger",
+        message: "Scripts système non disponibles en production",
         note: "Les scripts de modification DNS nécessitent un accès administrateur"
       });
     }
@@ -397,11 +397,11 @@ app.get("/network/cloudflare-dns-admin", async (_request, response, next) => {
 // Applications: lancer le gestionnaire de paquets (Windows winget + Linux package manager)
 app.get("/apps/winget-update-admin", async (_request, response, next) => {
   try {
-    // En production O2Switch/Passenger, les scripts système ne peuvent pas s'exécuter
-    if (IS_PASSENGER) {
+    // En production (O2Switch/Passenger ou Render), les scripts système ne peuvent pas s'exécuter
+    if (IS_PASSENGER || IS_RENDER) {
       return response.status(200).json({ 
         ok: true, 
-        message: "Scripts système non disponibles en production O2Switch/Passenger",
+        message: "Scripts système non disponibles en production",
         note: "Les scripts de gestion de paquets nécessitent un accès système complet"
       });
     }
@@ -445,14 +445,14 @@ app.get("/apps/winget-update-admin", async (_request, response, next) => {
 // Maintenance: outil tout-en-un (Windows + Linux)
 app.get("/maintenance/tool-admin", async (_request, response, next) => {
   try {
-    console.log(`[API] /maintenance/tool-admin - IS_PASSENGER: ${IS_PASSENGER}`);
+    console.log(`[API] /maintenance/tool-admin - IS_PASSENGER: ${IS_PASSENGER}, IS_RENDER: ${IS_RENDER}`);
     
-    // En production O2Switch/Passenger, les scripts système ne peuvent pas s'exécuter
-    if (IS_PASSENGER) {
+    // En production (O2Switch/Passenger ou Render), les scripts système ne peuvent pas s'exécuter
+    if (IS_PASSENGER || IS_RENDER) {
       console.log(`[API] /maintenance/tool-admin - Mode production, scripts non disponibles`);
       return response.status(200).json({ 
         ok: true, 
-        message: "Scripts système non disponibles en production O2Switch/Passenger",
+        message: "Scripts système non disponibles en production",
         note: "Les scripts de maintenance nécessitent un accès système complet"
       });
     }
@@ -506,11 +506,11 @@ app.get("/maintenance/tool-admin", async (_request, response, next) => {
 // Systeme: basculer le menu contextuel classique Windows 11 (nécessite admin)
 app.get("/system/context-menu-classic-admin", async (_request, response, next) => {
   try {
-    // En production O2Switch/Passenger, les scripts système ne peuvent pas s'exécuter
-    if (IS_PASSENGER) {
+    // En production (O2Switch/Passenger ou Render), les scripts système ne peuvent pas s'exécuter
+    if (IS_PASSENGER || IS_RENDER) {
       return response.status(200).json({ 
         ok: true, 
-        message: "Scripts système non disponibles en production O2Switch/Passenger",
+        message: "Scripts système non disponibles en production",
         note: "Les scripts de modification du système nécessitent un accès administrateur"
       });
     }
@@ -858,6 +858,7 @@ const HOST = env.HOST || "0.0.0.0";
 const BASE_PORT = Number(env.PORT) || 3000;
 const PORT_STRICT = String(env.PORT_STRICT || "1") === "1";
 const IS_PASSENGER = env.PORT === "passenger" || env.PASSENGER_APP_ENV;
+const IS_RENDER = env.RENDER || env.NODE_ENV === "production";
 
 // Fonction de log personnalisée
 function logToFile(message) {
