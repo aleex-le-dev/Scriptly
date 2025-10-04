@@ -25,10 +25,10 @@ export function ScriptItem({ title, label = '', desc, onClick, href, accent = 't
   const content = (
     <div className="p-3">
       <div className="flex items-center gap-3">
-        <span className={`inline-flex h-8 w-8 items-center justify-center rounded-lg bg-${accent}-100 text-${accent}-700 text-base shadow`}>{resolvedIcon}</span>
+        <span className={`inline-flex h-8 w-8 items-center justify-center rounded-lg bg-${accent}-100 dark:bg-${accent}-800 text-${accent}-700 dark:text-${accent}-200 text-base shadow`}>{resolvedIcon}</span>
         <div className="min-w-0">
-          <div className="text-sm font-medium text-gray-900 dark:text-white truncate">{title}</div>
-          {desc && <div className="text-xs text-gray-700/80 dark:text-gray-200/80 truncate">{desc}</div>}
+          <div className="text-sm font-medium text-black dark:text-white truncate">{title}</div>
+          {desc && <div className="text-xs text-black dark:text-gray-200/80 truncate">{desc}</div>}
         </div>
       </div>
     </div>

@@ -30,7 +30,7 @@ export function Highlight({ text = '', query = '' }) {
   ranges.forEach(([a, b], i) => {
     if (a > lastEnd) nodes.push(<span key={`t${i}_pre`}>{source.slice(lastEnd, a)}</span>)
     nodes.push(
-      <mark key={`m${i}`} className="bg-yellow-200 rounded px-0.5">
+      <mark key={`m${i}`} className="bg-yellow-200 dark:bg-yellow-800 rounded px-0.5">
         {source.slice(a, b)}
       </mark>
     )

@@ -94,8 +94,12 @@ function launchScript(scriptName, openUi, isLinux = false) {
         "bash",
         [scriptPath],
         { windowsHide: true },
-        (_error, stdout) => {
-          resolve({ ok: true, stdout: stdout?.toString() || "" });
+        (error, stdout, stderr) => {
+          if (error) {
+            resolve({ ok: false, error: error.message, stderr: stderr?.toString() || "" });
+          } else {
+            resolve({ ok: true, stdout: stdout?.toString() || "" });
+          }
         }
       );
     });
@@ -128,8 +132,12 @@ function launchScript(scriptName, openUi, isLinux = false) {
         "powershell.exe",
         ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", psScript],
         { windowsHide: true },
-        (_error, stdout) => {
-          resolve({ ok: true, stdout: stdout?.toString() || "" });
+        (error, stdout, stderr) => {
+          if (error) {
+            resolve({ ok: false, error: error.message, stderr: stderr?.toString() || "" });
+          } else {
+            resolve({ ok: true, stdout: stdout?.toString() || "" });
+          }
         }
       );
     });
@@ -171,6 +179,15 @@ app.get("/disk/chkdsk", async (request, response, next) => {
     const isLinux = process.platform === "linux";
     const scriptName = isLinux ? "check-bitlocker.sh" : "chkdsk-drive.ps1";
     const result = await launchScript(scriptName, ui === "1" || ui === "true", isLinux);
+    
+    if (!result.ok) {
+      return response.status(500).json({ 
+        ok: false, 
+        error: result.error || "Script execution failed",
+        stderr: result.stderr || ""
+      });
+    }
+    
     response.status(200).json(result);
   } catch (error) {
     next(error);
@@ -183,6 +200,15 @@ app.get("/disk/defrag", async (request, response, next) => {
     const isLinux = process.platform === "linux";
     const scriptName = isLinux ? "list-drives.sh" : "defrag-drive.ps1";
     const result = await launchScript(scriptName, ui === "1" || ui === "true", isLinux);
+    
+    if (!result.ok) {
+      return response.status(500).json({ 
+        ok: false, 
+        error: result.error || "Script execution failed",
+        stderr: result.stderr || ""
+      });
+    }
+    
     response.status(200).json(result);
   } catch (error) {
     next(error);
@@ -196,6 +222,15 @@ app.get("/disk/format", async (request, response, next) => {
     const isLinux = process.platform === "linux";
     const scriptName = isLinux ? "list-drives.sh" : "format-drive.ps1";
     const result = await launchScript(scriptName, ui === "1" || ui === "true", isLinux);
+    
+    if (!result.ok) {
+      return response.status(500).json({ 
+        ok: false, 
+        error: result.error || "Script execution failed",
+        stderr: result.stderr || ""
+      });
+    }
+    
     response.status(200).json(result);
   } catch (error) {
     next(error);
@@ -256,7 +291,7 @@ app.get("/apps/winget-update-admin", async (_request, response, next) => {
         { windowsHide: false },
         (error) => {
           if (error) {
-            return response.status(200).json({ ok: false, error: error.message });
+            return response.status(500).json({ ok: false, error: error.message });
           }
           response.status(200).json({ ok: true });
         }
@@ -295,7 +330,7 @@ app.get("/maintenance/tool-admin", async (_request, response, next) => {
         { windowsHide: false },
         (error) => {
           if (error) {
-            return response.status(200).json({ ok: false, error: error.message });
+            return response.status(500).json({ ok: false, error: error.message });
           }
           response.status(200).json({ ok: true });
         }
@@ -663,7 +698,7 @@ app.use((error, _request, response, _next) => {
 // - Adds graceful shutdown handlers
 // - Special handling for O2Switch/Passenger
 const HOST = env.HOST || "0.0.0.0";
-const BASE_PORT = Number(env.PORT) || 3000;
+const BASE_PORT = Number(env.PORT) || 3001;
 const PORT_STRICT = String(env.PORT_STRICT || "1") === "1";
 const IS_PASSENGER = env.PORT === "passenger" || env.PASSENGER_APP_ENV;
 

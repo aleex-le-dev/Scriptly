@@ -65,6 +65,24 @@ body:not(.dark) {
   color: #000000;
 }
 
+/* Force text color in light mode with maximum specificity */
+html:not(.dark) * {
+  color: #000000 !important;
+}
+
+html:not(.dark) h1,
+html:not(.dark) h2,
+html:not(.dark) h3,
+html:not(.dark) h4,
+html:not(.dark) h5,
+html:not(.dark) h6,
+html:not(.dark) p,
+html:not(.dark) span,
+html:not(.dark) div,
+html:not(.dark) button {
+  color: #000000 !important;
+}
+
 .dark .bg-gray-50 {
   background-color: #000000 !important;
 }
