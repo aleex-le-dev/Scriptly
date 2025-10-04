@@ -234,6 +234,15 @@ function launchScript(scriptName, openUi, isLinux = false) {
 // Elevated admin: launch .bat that elevates PowerShell for BitLocker check
 app.get("/disk/check-bitlocker-admin", async (_request, response, next) => {
   try {
+    // En production (O2Switch/Passenger ou Render), les scripts système ne peuvent pas s'exécuter
+    if ((IS_PASSENGER || IS_RENDER) && !ALLOW_SCRIPTS_IN_PRODUCTION) {
+      return response.status(200).json({ 
+        ok: true, 
+        message: "Scripts système non disponibles en production",
+        note: "Les scripts de vérification BitLocker nécessitent un accès administrateur"
+      });
+    }
+
     const batPath = path.join(scriptsDir, "disks", "batch", "check-bitlocker.bat");
     execFile("cmd.exe", ["/c", "start", "", batPath], { windowsHide: false }, (error) => {
       if (error) {
@@ -248,6 +257,15 @@ app.get("/disk/check-bitlocker-admin", async (_request, response, next) => {
 
 app.get("/disk/bitlocker-off-admin", async (_request, response, next) => {
   try {
+    // En production (O2Switch/Passenger ou Render), les scripts système ne peuvent pas s'exécuter
+    if ((IS_PASSENGER || IS_RENDER) && !ALLOW_SCRIPTS_IN_PRODUCTION) {
+      return response.status(200).json({ 
+        ok: true, 
+        message: "Scripts système non disponibles en production",
+        note: "Les scripts de désactivation BitLocker nécessitent un accès administrateur"
+      });
+    }
+
     const batPath = path.join(scriptsDir, "disks", "batch", "bitlocker-off.bat");
     execFile("cmd.exe", ["/c", "start", "", batPath], { windowsHide: false }, (error) => {
       if (error) {
@@ -262,6 +280,15 @@ app.get("/disk/bitlocker-off-admin", async (_request, response, next) => {
 
 app.get("/disk/chkdsk", async (request, response, next) => {
   try {
+    // En production (O2Switch/Passenger ou Render), les scripts système ne peuvent pas s'exécuter
+    if ((IS_PASSENGER || IS_RENDER) && !ALLOW_SCRIPTS_IN_PRODUCTION) {
+      return response.status(200).json({ 
+        ok: true, 
+        message: "Scripts système non disponibles en production",
+        note: "Les scripts de vérification de disque nécessitent un accès système"
+      });
+    }
+
     const ui = String(request?.query?.ui ?? "").toLowerCase();
     const isLinux = process.platform === "linux";
     const scriptName = isLinux ? "check-bitlocker.sh" : "chkdsk-drive.ps1";
@@ -290,6 +317,15 @@ app.get("/disk/chkdsk", async (request, response, next) => {
 
 app.get("/disk/defrag", async (request, response, next) => {
   try {
+    // En production (O2Switch/Passenger ou Render), les scripts système ne peuvent pas s'exécuter
+    if ((IS_PASSENGER || IS_RENDER) && !ALLOW_SCRIPTS_IN_PRODUCTION) {
+      return response.status(200).json({ 
+        ok: true, 
+        message: "Scripts système non disponibles en production",
+        note: "Les scripts de défragmentation nécessitent un accès système"
+      });
+    }
+
     const ui = String(request?.query?.ui ?? "").toLowerCase();
     const isLinux = process.platform === "linux";
     const scriptName = isLinux ? "list-drives.sh" : "defrag-drive.ps1";
@@ -319,6 +355,15 @@ app.get("/disk/defrag", async (request, response, next) => {
 // DiskPart: format drive (interactive)
 app.get("/disk/format", async (request, response, next) => {
   try {
+    // En production (O2Switch/Passenger ou Render), les scripts système ne peuvent pas s'exécuter
+    if ((IS_PASSENGER || IS_RENDER) && !ALLOW_SCRIPTS_IN_PRODUCTION) {
+      return response.status(200).json({ 
+        ok: true, 
+        message: "Scripts système non disponibles en production",
+        note: "Les scripts de formatage nécessitent un accès système"
+      });
+    }
+
     const ui = String(request?.query?.ui ?? "").toLowerCase();
     const isLinux = process.platform === "linux";
     const scriptName = isLinux ? "list-drives.sh" : "format-drive.ps1";
@@ -348,6 +393,15 @@ app.get("/disk/format", async (request, response, next) => {
 // DiskPart: format drive with admin elevation via .bat
 app.get("/disk/format-admin", async (_request, response, next) => {
   try {
+    // En production (O2Switch/Passenger ou Render), les scripts système ne peuvent pas s'exécuter
+    if ((IS_PASSENGER || IS_RENDER) && !ALLOW_SCRIPTS_IN_PRODUCTION) {
+      return response.status(200).json({ 
+        ok: true, 
+        message: "Scripts système non disponibles en production",
+        note: "Les scripts de formatage administrateur nécessitent un accès système"
+      });
+    }
+
     const batPath = path.join(scriptsDir, "disks", "batch", "format-drive.bat");
     execFile("cmd.exe", ["/c", "start", "", batPath], { windowsHide: false }, (error) => {
       if (error) {
@@ -369,7 +423,7 @@ app.get("/test-bat", async (_request, response) => {
 app.get("/network/cloudflare-dns-admin", async (_request, response, next) => {
   try {
     // En production (O2Switch/Passenger ou Render), les scripts système ne peuvent pas s'exécuter
-    if (IS_PASSENGER || IS_RENDER) {
+    if ((IS_PASSENGER || IS_RENDER) && !ALLOW_SCRIPTS_IN_PRODUCTION) {
       return response.status(200).json({ 
         ok: true, 
         message: "Scripts système non disponibles en production",
@@ -398,7 +452,7 @@ app.get("/network/cloudflare-dns-admin", async (_request, response, next) => {
 app.get("/apps/winget-update-admin", async (_request, response, next) => {
   try {
     // En production (O2Switch/Passenger ou Render), les scripts système ne peuvent pas s'exécuter
-    if (IS_PASSENGER || IS_RENDER) {
+    if ((IS_PASSENGER || IS_RENDER) && !ALLOW_SCRIPTS_IN_PRODUCTION) {
       return response.status(200).json({ 
         ok: true, 
         message: "Scripts système non disponibles en production",
@@ -448,7 +502,7 @@ app.get("/maintenance/tool-admin", async (_request, response, next) => {
     console.log(`[API] /maintenance/tool-admin - IS_PASSENGER: ${IS_PASSENGER}, IS_RENDER: ${IS_RENDER}`);
     
     // En production (O2Switch/Passenger ou Render), les scripts système ne peuvent pas s'exécuter
-    if (IS_PASSENGER || IS_RENDER) {
+    if ((IS_PASSENGER || IS_RENDER) && !ALLOW_SCRIPTS_IN_PRODUCTION) {
       console.log(`[API] /maintenance/tool-admin - Mode production, scripts non disponibles`);
       return response.status(200).json({ 
         ok: true, 
@@ -507,7 +561,7 @@ app.get("/maintenance/tool-admin", async (_request, response, next) => {
 app.get("/system/context-menu-classic-admin", async (_request, response, next) => {
   try {
     // En production (O2Switch/Passenger ou Render), les scripts système ne peuvent pas s'exécuter
-    if (IS_PASSENGER || IS_RENDER) {
+    if ((IS_PASSENGER || IS_RENDER) && !ALLOW_SCRIPTS_IN_PRODUCTION) {
       return response.status(200).json({ 
         ok: true, 
         message: "Scripts système non disponibles en production",
@@ -859,6 +913,7 @@ const BASE_PORT = Number(env.PORT) || 3000;
 const PORT_STRICT = String(env.PORT_STRICT || "1") === "1";
 const IS_PASSENGER = env.PORT === "passenger" || env.PASSENGER_APP_ENV;
 const IS_RENDER = env.RENDER || env.NODE_ENV === "production";
+const ALLOW_SCRIPTS_IN_PRODUCTION = env.ALLOW_SCRIPTS_IN_PRODUCTION === "true";
 
 // Fonction de log personnalisée
 function logToFile(message) {

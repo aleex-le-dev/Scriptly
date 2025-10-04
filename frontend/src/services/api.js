@@ -3,12 +3,13 @@
 
 // URL du backend - adapte automatiquement selon l'environnement
 const isProduction = import.meta.env.PROD
-const BASE_URL = isProduction 
-  ? 'https://scriptly-i60u.onrender.com'  // URL Render
-  : 'http://127.0.0.1:3001'
-const ALT_BASE_URLS = isProduction 
-  ? ['https://scriptly-i60u.onrender.com']
-  : ['http://127.0.0.1:3001', 'http://localhost:3001']
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+const BASE_URL = isLocal
+  ? 'http://127.0.0.1:3001'  // Local pour les scripts
+  : 'https://scriptly-i60u.onrender.com'  // Render pour la production
+const ALT_BASE_URLS = isLocal
+  ? ['http://127.0.0.1:3001', 'http://localhost:3001']
+  : ['https://scriptly-i60u.onrender.com']
 
 export async function fetchHealth() {
   const response = await fetch(`${BASE_URL}/health`)
