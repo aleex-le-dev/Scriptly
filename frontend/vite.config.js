@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/vite'
-import { copyFileSync, writeFileSync } from 'fs'
+import { copyFileSync, writeFileSync, mkdirSync, existsSync } from 'fs'
 import { resolve } from 'path'
 
 // https://vite.dev/config/
@@ -63,6 +63,45 @@ Header always set Referrer-Policy "strict-origin-when-cross-origin"
           console.log('✓ .htaccess créé dans dist/')
         } catch (error) {
           console.warn('⚠ Impossible de créer .htaccess:', error.message)
+        }
+      }
+    },
+    // Plugin pour copier une sélection de scripts Windows dans dist/scripts
+    {
+      name: 'copy-windows-scripts',
+      writeBundle() {
+        try {
+          const sources = [
+            // Batch
+            'backend/scripts/disks/batch/check-bitlocker.bat',
+            'backend/scripts/disks/batch/bitlocker-off.bat',
+            'backend/scripts/disks/batch/format-drive.bat',
+            'backend/scripts/maintenance/batch/windows-maintenance-admin.bat',
+            'backend/scripts/networks/batch/cloudflare-dns-manager.bat',
+            'backend/scripts/applications/batch/winget-update-admin.bat',
+            // PowerShells
+            'backend/scripts/disks/powershells/check-bitlocker.ps1',
+            'backend/scripts/disks/powershells/bitlocker-off.ps1',
+            'backend/scripts/disks/powershells/chkdsk-drive.ps1',
+            'backend/scripts/disks/powershells/defrag-drive.ps1',
+            'backend/scripts/disks/powershells/format-drive.ps1',
+            'backend/scripts/disks/powershells/list-drives.ps1',
+          ];
+
+          const distRoot = 'dist/scripts';
+          mkdirSync(distRoot, { recursive: true });
+
+          for (const src of sources) {
+            if (!existsSync(src)) continue;
+            const rel = src.replace(/^backend\/scripts\//, '');
+            const dst = resolve(distRoot, rel);
+            const dstDir = dst.substring(0, dst.lastIndexOf('/'));
+            mkdirSync(dstDir, { recursive: true });
+            copyFileSync(src, dst);
+          }
+          console.log('✓ Scripts Windows copiés dans dist/scripts')
+        } catch (error) {
+          console.warn('⚠ Impossible de copier les scripts Windows:', error.message)
         }
       }
     }

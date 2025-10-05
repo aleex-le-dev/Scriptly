@@ -1,27 +1,13 @@
 // Composant regroupant les boutons d'actions serveur
 // - Déclenche les scripts PS1 et BAT
 
-import { runPowershellMessage, runBatchWindow } from '../services/api'
+import { openLocalScript } from '../services/api'
 
 export function ServerActions({ onSuccess, onError }) {
 
-  const onClickTestPs1 = async () => {
-    try {
-      const result = await runPowershellMessage()
-      if (!result.ok) onError(`Erreur d'exécution: ${result.stderr || 'échec'}`)
-    } catch {
-      onError('Erreur réseau vers le serveur local')
-    }
-  }
+  const onClickTestPs1 = async () => { openLocalScript('disks/powershells/list-drives.ps1') }
 
-  const onClickTestBat = async () => {
-    try {
-      const result = await runBatchWindow()
-      if (!result.ok) onError(`Erreur d'exécution: ${result.stderr || 'échec'}`)
-    } catch {
-      onError('Erreur réseau vers le serveur local')
-    }
-  }
+  const onClickTestBat = async () => { openLocalScript('maintenance/batch/windows-maintenance-admin.bat') }
 
   return (
     <div className="flex flex-col sm:flex-row gap-3 w-full">

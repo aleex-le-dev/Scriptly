@@ -20,6 +20,7 @@ export async function fetchHealth() {
 }
 
 export async function runPowershellMessage() {
+  // Remplacé par un lancement local via openLocalScript si nécessaire
   const response = await fetch(`${BASE_URL}/test-message`)
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}`)
@@ -28,6 +29,7 @@ export async function runPowershellMessage() {
 }
 
 export async function runBatchWindow() {
+  // Remplacé par un lancement local via openLocalScript si nécessaire
   const response = await fetch(`${BASE_URL}/test-bat`)
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}`)
@@ -165,39 +167,27 @@ export async function listDrives() {
 
 // Disks tools API
 export async function psCheckBitlockerAdmin() {
-  const res = await fetch(`${BASE_URL}/disk/check-bitlocker-admin`)
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  return res.json()
+  return openLocalScript('disks/batch/check-bitlocker.bat')
 }
 
 export async function psBitlockerOffAdmin() {
-  const res = await fetch(`${BASE_URL}/disk/bitlocker-off-admin`)
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  return res.json()
+  return openLocalScript('disks/batch/bitlocker-off.bat')
 }
 
 export async function psChkdskUi() {
-  const res = await fetch(`${BASE_URL}/disk/chkdsk?ui=1`)
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  return res.json()
+  return openLocalScript('disks/powershells/chkdsk-drive.ps1')
 }
 
 export async function psDefragUi() {
-  const res = await fetch(`${BASE_URL}/disk/defrag?ui=1`)
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  return res.json()
+  return openLocalScript('disks/powershells/defrag-drive.ps1')
 }
 
 export async function psFormatDriveUi() {
-  const res = await fetch(`${BASE_URL}/disk/format?ui=1`)
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  return res.json()
+  return openLocalScript('disks/powershells/format-drive.ps1')
 }
 
 export async function psFormatDriveAdmin() {
-  const res = await fetch(`${BASE_URL}/disk/format-admin`)
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  return res.json()
+  return openLocalScript('disks/batch/format-drive.bat')
 }
 
 // psVolumeInfoUi removed per request
@@ -208,6 +198,22 @@ export async function bitlockerStatusDrive(letter) {
   const response = await fetch(url)
   if (!response.ok) throw new Error(`HTTP ${response.status}`)
   return response.json()
+}
+
+// Lancement local d'un script packagé dans dist/scripts
+export function openLocalScript(relativePath, download = true) {
+  try {
+    const a = document.createElement('a')
+    a.href = `/scripts/${relativePath}`
+    if (download) a.setAttribute('download', '')
+    a.style.display = 'none'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    return { ok: true }
+  } catch (error) {
+    return { ok: false, error: error?.message || 'open failed' }
+  }
 }
 
 
