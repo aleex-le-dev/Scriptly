@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { probeLocalAgent } from './services/api'
 import { DarkModeProvider } from './contexts/DarkModeContext'
 import { Search } from './components/Search'
 import { Catalog } from './components/Catalog'
@@ -7,6 +8,18 @@ import './App.css'
 
 function App() {
   const [query, setQuery] = useState('')
+  const [agentUp, setAgentUp] = useState(false)
+
+  useEffect(() => {
+    let alive = true
+    const check = async () => {
+      const ok = await probeLocalAgent()
+      if (alive) setAgentUp(ok)
+    }
+    check()
+    const id = setInterval(check, 5000)
+    return () => { alive = false; clearInterval(id) }
+  }, [])
 
   return (
     <DarkModeProvider>
@@ -32,6 +45,18 @@ function App() {
         {/* Contenu principal */}
         <div className="w-full pt-24 pb-10">
           <div className="max-w-6xl mx-auto px-4">
+            <div className={`mb-4 p-3 rounded border ${agentUp ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
+              {agentUp ? (
+                <div className="flex items-center gap-2 text-sm">
+                  <span>✅ Agent local détecté sur 127.0.0.1:3001</span>
+                  <a className="underline" href="http://127.0.0.1:3001/health" target="_blank" rel="noreferrer">vérifier</a>
+                </div>
+              ) : (
+                <div className="text-sm">
+                  ⚠ Aucun agent local détecté. Les scripts seront téléchargés au lieu d'être exécutés automatiquement.
+                </div>
+              )}
+            </div>
             <Catalog query={query} />
           </div>
         </div>

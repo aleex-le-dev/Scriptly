@@ -19,6 +19,37 @@ export async function fetchHealth() {
   return response.json()
 }
 
+// Détecte si l'agent local (http://127.0.0.1:3001) est disponible
+export async function probeLocalAgent(timeoutMs = 1500) {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeoutMs)
+  try {
+    const res = await fetch('http://127.0.0.1:3001/health', {
+      signal: controller.signal,
+      headers: { 'Accept': 'application/json' },
+      cache: 'no-store',
+    })
+    clearTimeout(timer)
+    if (!res.ok) return false
+    const data = await res.json().catch(() => ({}))
+    return String(data?.status).toLowerCase() === 'ok'
+  } catch {
+    clearTimeout(timer)
+    return false
+  }
+}
+
+async function callLocalAgent(action) {
+  try {
+    const url = `http://127.0.0.1:3001/run?action=${encodeURIComponent(action)}`
+    const res = await fetch(url, { method: 'POST' })
+    if (!res.ok) return { ok: false, status: res.status }
+    return await res.json().catch(() => ({ ok: true }))
+  } catch {
+    return { ok: false }
+  }
+}
+
 export async function runPowershellMessage() {
   // Remplacé par un lancement local via openLocalScript si nécessaire
   const response = await fetch(`${BASE_URL}/test-message`)
@@ -167,26 +198,38 @@ export async function listDrives() {
 
 // Disks tools API
 export async function psCheckBitlockerAdmin() {
+  const viaAgent = await callLocalAgent('check-bitlocker-admin')
+  if (viaAgent?.ok) return viaAgent
   return openLocalScript('disks/batch/check-bitlocker.bat')
 }
 
 export async function psBitlockerOffAdmin() {
+  const viaAgent = await callLocalAgent('bitlocker-off-admin')
+  if (viaAgent?.ok) return viaAgent
   return openLocalScript('disks/batch/bitlocker-off.bat')
 }
 
 export async function psChkdskUi() {
+  const viaAgent = await callLocalAgent('chkdsk-ui')
+  if (viaAgent?.ok) return viaAgent
   return openLocalScript('disks/powershells/chkdsk-drive.ps1')
 }
 
 export async function psDefragUi() {
+  const viaAgent = await callLocalAgent('defrag-ui')
+  if (viaAgent?.ok) return viaAgent
   return openLocalScript('disks/powershells/defrag-drive.ps1')
 }
 
 export async function psFormatDriveUi() {
+  const viaAgent = await callLocalAgent('format-drive-ui')
+  if (viaAgent?.ok) return viaAgent
   return openLocalScript('disks/powershells/format-drive.ps1')
 }
 
 export async function psFormatDriveAdmin() {
+  const viaAgent = await callLocalAgent('format-drive-admin')
+  if (viaAgent?.ok) return viaAgent
   return openLocalScript('disks/batch/format-drive.bat')
 }
 
