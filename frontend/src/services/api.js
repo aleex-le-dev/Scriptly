@@ -24,7 +24,8 @@ export async function probeLocalAgent(timeoutMs = 1500) {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), timeoutMs)
   try {
-    const res = await fetch('http://127.0.0.1:3001/health', {
+    const targets = ['http://127.0.0.1:3001/health','http://localhost:3001/health']
+    const res = await fetch(targets[0], {
       signal: controller.signal,
       headers: { 'Accept': 'application/json' },
       cache: 'no-store',
@@ -32,7 +33,15 @@ export async function probeLocalAgent(timeoutMs = 1500) {
     clearTimeout(timer)
     if (!res.ok) return false
     const data = await res.json().catch(() => ({}))
-    return String(data?.status).toLowerCase() === 'ok'
+    let ok = String(data?.status).toLowerCase() === 'ok'
+    if (!ok) {
+      const res2 = await fetch(targets[1], { signal: controller.signal, headers: { 'Accept': 'application/json' }, cache: 'no-store' }).catch(() => null)
+      if (res2 && res2.ok) {
+        const d2 = await res2.json().catch(() => ({}))
+        ok = String(d2?.status).toLowerCase() === 'ok'
+      }
+    }
+    return ok
   } catch {
     clearTimeout(timer)
     return false

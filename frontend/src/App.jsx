@@ -56,8 +56,12 @@ function App() {
                   <a className="underline" href="http://127.0.0.1:3001/health" target="_blank" rel="noreferrer">vérifier</a>
                 </div>
               ) : (
-                <div className="text-sm">
-                  ⚠ Aucun agent local détecté. Les scripts seront téléchargés au lieu d'être exécutés automatiquement.
+                <div className="text-sm flex flex-col gap-1">
+                  <div>⚠ Aucun agent local détecté. Les scripts seront téléchargés au lieu d'être exécutés automatiquement.</div>
+                  <div className="flex gap-3 flex-wrap">
+                    <a className="underline font-medium" href="/bootstrap-launcher.bat" download>Installer le lanceur (admin)</a>
+                    <a className="underline" href="script-launcher://run?run=winget" title="Nécessite le lanceur installé">Tester le lancement</a>
+                  </div>
                 </div>
               )}
             </div>

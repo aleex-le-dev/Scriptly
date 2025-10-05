@@ -909,7 +909,7 @@ app.use((error, _request, response, _next) => {
 // - Adds graceful shutdown handlers
 // - Special handling for O2Switch/Passenger
 const HOST = env.HOST || "0.0.0.0";
-const BASE_PORT = Number(env.PORT) || 3000;
+const BASE_PORT = Number(env.PORT) || 3001;
 const PORT_STRICT = String(env.PORT_STRICT || "1") === "1";
 const IS_PASSENGER = env.PORT === "passenger" || env.PASSENGER_APP_ENV;
 const IS_RENDER = env.RENDER || env.NODE_ENV === "production";
@@ -982,16 +982,9 @@ let httpServer;
       console.log("[BOOT] Serveur configuré pour O2Switch/Passenger");
       console.log("[BOOT] Application Express prête à recevoir les requêtes");
     } else {
-      // Mode Render: utilise le port défini par Render
-      const port = env.PORT || 3000;
-      httpServer = await new Promise((resolve, reject) => {
-        const server = app
-          .listen(port, HOST, () => {
-            console.log(`[BOOT] Serveur démarré sur http://${HOST}:${port}`);
-            resolve(server);
-          })
-          .on("error", reject);
-      });
+      // En local/standard: tente BASE_PORT puis fallback automatique si occupé
+      const startPort = Number(env.PORT) || BASE_PORT;
+      httpServer = await listenWithRetry(HOST, startPort, 50);
     }
     
     console.log("[BOOT] Serveur backend démarré avec succès");
