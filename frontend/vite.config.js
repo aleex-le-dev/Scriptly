@@ -24,7 +24,7 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 # Redirection vers le backend Render
 RewriteCond %{REQUEST_URI} ^/api/(.*)$
-RewriteRule ^api/(.*)$ https://scriptly-i60u.onrender.com/$1 [P,L]
+RewriteRule ^api/(.*)$ https://scriptly-i60u.onrender.com/$1 [R=307,L]
 
 # Servir les fichiers statiques du frontend
 RewriteCond %{REQUEST_FILENAME} !-f
