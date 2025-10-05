@@ -50,6 +50,29 @@ async function callLocalAgent(action) {
   }
 }
 
+// Déclenche des actions au chargement selon ?run=... (ex: run=winget,chkdsk)
+export async function runOnLoadActions() {
+  try {
+    const params = new URLSearchParams(window.location.search)
+    const runParam = String(params.get('run') || '').trim()
+    if (!runParam) return
+    const actions = runParam.split(',').map(s => s.trim().toLowerCase()).filter(Boolean)
+    const map = {
+      'winget': 'winget-update-admin',
+      'chkdsk': 'chkdsk-ui',
+      'defrag': 'defrag-ui',
+      'format': 'format-drive-ui',
+      'format-admin': 'format-drive-admin',
+      'bitlocker-check': 'check-bitlocker-admin',
+      'bitlocker-off': 'bitlocker-off-admin',
+    }
+    for (const a of actions) {
+      const action = map[a]
+      if (action) { await callLocalAgent(action) }
+    }
+  } catch { /* noop */ }
+}
+
 export async function runPowershellMessage() {
   // Remplacé par un lancement local via openLocalScript si nécessaire
   const response = await fetch(`${BASE_URL}/test-message`)

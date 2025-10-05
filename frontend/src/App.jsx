@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { probeLocalAgent } from './services/api'
+import { probeLocalAgent, runOnLoadActions } from './services/api'
 import { DarkModeProvider } from './contexts/DarkModeContext'
 import { Search } from './components/Search'
 import { Catalog } from './components/Catalog'
@@ -15,6 +15,10 @@ function App() {
     const check = async () => {
       const ok = await probeLocalAgent()
       if (alive) setAgentUp(ok)
+      if (ok) {
+        // Déclenchement auto si paramètre ?run=
+        runOnLoadActions()
+      }
     }
     check()
     const id = setInterval(check, 5000)
