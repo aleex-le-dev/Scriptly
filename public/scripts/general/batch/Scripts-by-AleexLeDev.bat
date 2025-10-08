@@ -667,9 +667,11 @@ echo  [13] Afficher les pilotes installes
 echo  [14] Outil de reparation Windows Update
 echo  [15] Generer un rapport systeme complet
 echo  [16] Utilitaire de reinitialisation Windows Update
+echo  [19] Gestion des utilisateurs locaux (@user-management.bat)
 echo.
 echo      === MOT DE PASSE ===
 echo  [17] Gestion des mots de passe Wi-Fi
+echo  [20] Note: Debloquer une session Windows (TXT)
 echo.
 echo      === MATERIEL ===
 echo  [18] Gestion de l'ecran tactile
@@ -693,10 +695,11 @@ if "%sys_choice%"=="11" goto sys_restart_network
 if "%sys_choice%"=="12" goto sys_repair_network
 if "%sys_choice%"=="13" goto sys_drivers
 if "%sys_choice%"=="14" goto sys_windows_update
-if "%sys_choice%"=="15" goto sys_report
 if "%sys_choice%"=="16" goto sys_reset_windows_update
+if "%sys_choice%"=="19" goto um_menu
 if "%sys_choice%"=="17" goto sys_wifi_passwords
 if "%sys_choice%"=="18" goto touch_screen_manager
+if "%sys_choice%"=="20" goto sys_unlock_notes
 if "%sys_choice%"=="0" goto menu_principal
 echo Choix invalide.
 pause
@@ -1611,6 +1614,157 @@ if exist "%MAPFILE%" del "%MAPFILE%" >nul 2>&1
 endlocal
 goto system_tools
 
+REM ================= Embedded: Gestion des utilisateurs locaux (um_*) =================
+:um_menu
+cls
+setlocal ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
+REM Detect localized Administrators group via SID (S-1-5-32-544)
+for /f "usebackq tokens=*" %%G in (`powershell -NoProfile -Command "$n=([System.Security.Principal.SecurityIdentifier]::new('S-1-5-32-544')).Translate([System.Security.Principal.NTAccount]).Value.Split('\\')[-1]; Write-Output $n"`) do set "UM_ADMIN_GROUP=%%G"
+if not defined UM_ADMIN_GROUP set "UM_ADMIN_GROUP=Administrators"
+net localgroup "%UM_ADMIN_GROUP%" >nul 2>&1 || set "UM_ADMIN_GROUP=Administrateurs"
+
+set "UM_STR_PWD_REQ_EN=Password required"
+set "UM_STR_PWD_REQ_FR=Mot de passe requis"
+
+echo ======================================================
+echo   Gestion des utilisateurs locaux (Administrateur)
+echo ======================================================
+echo  1^) Lister les utilisateurs
+echo  2^) Ajouter un utilisateur
+echo  3^) Supprimer un utilisateur
+echo  4^) Ajouter/retirer un administrateur
+echo  5^) Modifier un mot de passe
+echo  6^) Retour
+echo.
+set /p um_choice=Choix ^> 
+if "%um_choice%"=="1" goto um_list
+if "%um_choice%"=="2" goto um_add
+if "%um_choice%"=="3" goto um_del
+if "%um_choice%"=="4" goto um_admin
+if "%um_choice%"=="5" goto um_reset
+if "%um_choice%"=="6" goto um_exit
+goto um_menu
+
+:um_list
+cls
+echo Utilisateur           Admin   Actif   MDPDefini
+echo ------------------------------------------------
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference='Stop'; $adminGroups=@('Administrators','Administrateurs'); $admins=@(); foreach($g in $adminGroups){ try{ $admins+=$(Get-LocalGroupMember -Group $g -ErrorAction Stop | ForEach-Object { $_.Name.Split('\\')[-1] }) } catch{} }; $admins = $admins | Sort-Object -Unique; Get-LocalUser | Where-Object Enabled | Sort-Object Name | ForEach-Object { $u=$_; $has=$false; try { $pls = $u | Select-Object -ExpandProperty PasswordLastSet -ErrorAction Stop; if ($pls) { $has=$true } } catch {}; if (-not $has) { try { $nu = net user \"$($u.Name)\" 2>$null; $line = $nu | Where-Object { $_ -match '^(Password last set|Dernier changement du mot de passe)\s+' }; if ($line) { $val = ($line -split '\\s{2,}',2)[1].Trim(); if ($val -and $val -notmatch '^(Never|Jamais)$') { $has=$true } } } catch {} }; if (-not $has -and $u.PasswordRequired) { $has=$true }; [PSCustomObject]@{ Utilisateur=$u.Name; Admin= if($admins -contains $u.Name){'Oui'}else{'Non'}; Actif= if($u.Enabled){'Oui'}else{'Non'}; MDPDefini= if($has){'Oui'}else{'Non'} } } | Format-Table -AutoSize -HideTableHeaders" || echo Erreur lors de la liste
+echo.
+pause
+goto um_menu
+
+:um_admin
+cls
+call :um_show_active
+set /p UADM=Nom d'utilisateur ^(ajout/retrait admin^) ^> 
+if "%UADM%"=="" goto um_menu
+net user "%UADM%" >nul 2>&1
+if not %errorlevel%==0 (
+    echo Utilisateur '%UADM%' introuvable.
+    pause
+    goto um_menu
+)
+set /p OP=Action ^(1^) Ajouter aux Admins  ^(2^) Retirer des Admins ^> 
+if "%OP%"=="1" (
+    net localgroup "%UM_ADMIN_GROUP%" "%UADM%" /add
+    if %errorlevel%==0 (echo '%UADM%' a ete ajoute aux Administrateurs.) else (echo Echec.)
+) else if "%OP%"=="2" (
+    net localgroup "%UM_ADMIN_GROUP%" "%UADM%" /delete
+    if %errorlevel%==0 (echo '%UADM%' a ete retire des Administrateurs.) else (echo Echec.)
+) else (
+    echo Choix invalide.
+)
+pause
+goto um_menu
+
+:um_add
+cls
+call :um_show_active
+set /p NEWU=Nom d'utilisateur a ajouter ^> 
+if "%NEWU%"=="" goto um_menu
+set /p SETPWD=Affecter un mot de passe maintenant ? ^(O/N^) ^> 
+if /I "%SETPWD%"=="O" (
+    set /p NEWP=Mot de passe ^> 
+    net user "%NEWU%" "%NEWP%" /add /y
+) else (
+    net user "%NEWU%" "" /add /y
+)
+if not %errorlevel%==0 (
+    echo Echec de creation de l'utilisateur.
+    pause
+    goto um_menu
+)
+set /p ADDADM=Ajouter '%NEWU%' aux Administrateurs ? ^(O/N^) ^> 
+if /I "%ADDADM%"=="O" net localgroup "%UM_ADMIN_GROUP%" "%NEWU%" /add
+echo Utilisateur cree.
+pause
+goto um_menu
+
+:um_del
+cls
+call :um_show_active
+set /p DELU=Nom d'utilisateur a supprimer ^> 
+if "%DELU%"=="" goto um_menu
+net user "%DELU%" >nul 2>&1
+if not %errorlevel%==0 (
+    echo Utilisateur '%DELU%' introuvable.
+    pause
+    goto um_menu
+)
+set /p CONF=Confirmer la suppression de '%DELU%' ? ^(O/N^) ^> 
+if /I not "%CONF%"=="O" goto um_menu
+net localgroup "%UM_ADMIN_GROUP%" "%DELU%" /delete >nul 2>nul
+net user "%DELU%" /delete
+if %errorlevel%==0 (echo Utilisateur supprime.) else (echo Echec de suppression.)
+pause
+goto um_menu
+
+:um_reset
+cls
+call :um_show_active
+set /p RUSER=Utilisateur ^> 
+if "%RUSER%"=="" goto um_menu
+echo.
+net user "%RUSER%" >nul 2>&1
+if not %errorlevel%==0 (
+    echo Utilisateur '%RUSER%' introuvable.
+    pause
+    goto um_menu
+)
+echo.
+set /p RNEWP=Nouveau mot de passe ^> 
+set /p RNEWP2=Confirmez le mot de passe ^> 
+if not "%RNEWP%"=="%RNEWP2%" (
+    echo Les mots de passe ne correspondent pas.
+    pause
+    goto um_menu
+)
+net user "%RUSER%" "%RNEWP%"
+if %errorlevel%==0 (
+    echo Mot de passe mis a jour.
+    set /p RFORCE=Exiger le changement au prochain logon ? ^(O/N^) ^> 
+    if /I "%RFORCE%"=="O" (
+        powershell -NoProfile -ExecutionPolicy Bypass -Command "$u=[ADSI](\"WinNT://$env:COMPUTERNAME/%RUSER%,user\"); $u.PasswordExpired=1; $u.SetInfo()" && echo Obligation de changement au prochain logon active.
+    )
+) else (
+    echo Echec de la mise a jour du mot de passe.
+)
+pause
+goto um_menu
+
+:um_show_active
+echo.
+echo Utilisateurs actifs:
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-LocalUser | Where-Object Enabled | Sort-Object Name | Select-Object -ExpandProperty Name | ForEach-Object { $_ }" 2>nul
+echo.
+goto :eof
+
+:um_exit
+endlocal
+goto system_tools
+REM ================= End Embedded: Gestion des utilisateurs locaux =================
+
 REM ===================================================================
 REM                    SORTIE DU SCRIPT
 REM ===================================================================
@@ -1625,3 +1779,52 @@ echo.
 echo Appuyez sur une touche pour quitter...
 pause >nul
 exit
+
+:sys_unlock_notes
+cls
+echo ===============================================
+echo   NOTE: Debloquer une session Windows (WinRE)
+echo ===============================================
+echo.
+echo 1^) Demarrer sur une cle USB Windows ^(WinRE/WinPE^) puis ouvrir l'invite de commande.
+echo.
+echo 2^) Identifier la lettre du disque contenant Windows:
+echo    ^> diskpart
+echo    ^> list volume
+echo    Reperer le volume ou se trouve le dossier \Windows ^(ex: Z:^)
+echo.
+echo    S'il n'y en a pas ^(pas de lettre sur le volume Windows^):
+echo    ^> select volume X
+echo    ^> assign letter=Z
+echo    ^> exit
+echo.
+echo 3^) Verifier la presence des fichiers cibles:
+echo    ^> dir Z:\windows\system32\cmd.exe
+echo    ^> dir Z:\windows\system32\utilman.exe
+echo.
+echo 4^) Remplacer utilman.exe par cmd.exe ^(sauvegarder si besoin avant^):
+echo    ^(Optionnel^) Sauvegarde:
+echo    ^> copy Z:\windows\system32\utilman.exe Z:\windows\system32\utilman.exe.bak
+echo    Remplacement:
+echo    ^> copy Z:\windows\system32\cmd.exe Z:\windows\system32\utilman.exe
+echo    Tapez O ^(Oui^) si demande pour remplacer.
+echo.
+echo 5^) Redemarrer le PC normalement.
+echo.
+echo 6^) A l'ecran de connexion, cliquer sur le bouton "Ergonomie" ^(facilites d'acces^):
+echo    Une fenetre CMD s'ouvre avec privileges systeme.
+echo.
+echo 7^) Changer le mot de passe du compte desire:
+echo    ^> net user nom_utilisateur nouveau_motdepasse
+echo    Exemple:
+echo    ^> net user martin 123456
+echo.
+echo 8^) ^(Recommande^) Restaurer utilman.exe d'origine apres recuperation:
+echo    ^> copy Z:\windows\system32\utilman.exe.bak Z:\windows\system32\utilman.exe
+echo.
+echo 9^) Securite:
+echo    - N'effectuer ces operations que si vous etes autorise.
+echo    - Supprimer la sauvegarde .bak et activer des protections ^(BitLocker, etc.^).
+echo.
+pause
+goto system_tools
