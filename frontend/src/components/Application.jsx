@@ -1,7 +1,7 @@
 // Composant Application: gestion des mises à jour via winget
 // - Ouvre une fenêtre CMD avec le menu winget (admin requis)
 
-import { appsWingetUpdateAdmin, openLocalScript } from '../services/api'
+import { openLocalScript } from '../services/api'
 import { Highlight } from './Highlight'
 import { ScriptItem } from './ScriptItem'
 import { normalizeText } from '../utils/text'
@@ -9,11 +9,7 @@ import { normalizeText } from '../utils/text'
 export function Application({ query = '' }) {
   const openWingetManager = async () => {
     try {
-      // Lancement local prioritaire
-      const local = openLocalScript('applications/batch/winget-update-admin.bat')
-      if (!local?.ok) {
-        await appsWingetUpdateAdmin()
-      }
+      await openLocalScript('applications/batch/winget-update-admin.bat')
     } catch { /* noop */ }
   }
   const visible = (text) => {

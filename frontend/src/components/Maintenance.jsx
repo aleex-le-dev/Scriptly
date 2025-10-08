@@ -1,12 +1,12 @@
 // Composant Maintenance: ouvre l'outil batch de maintenance (admin requis)
 
-import { maintenanceToolAdmin } from '../services/api'
+import { openLocalScript } from '../services/api'
 import { Highlight } from './Highlight'
 import { ScriptItem } from './ScriptItem'
 import { normalizeText } from '../utils/text'
 
 export function Maintenance({ query = '' }) {
-  const openTool = async () => { try { await maintenanceToolAdmin() } catch { /* noop */ } }
+  const openTool = async () => { try { await openLocalScript('maintenance/batch/windows-maintenance-admin.bat') } catch { /* noop */ } }
   const visible = (text) => {
     const q = normalizeText(String(query || '').trim())
     if (q.length < 3) return true

@@ -1,13 +1,13 @@
 // Composant Systeme: actions système (menu contextuel classique)
 // - Ouvre une fenêtre CMD avec le script registre (admin requis)
 
-import { systemContextMenuClassicAdmin } from '../services/api'
+import { openLocalScript } from '../services/api'
 import { Highlight } from './Highlight'
 import { ScriptItem } from './ScriptItem'
 import { normalizeText } from '../utils/text'
 
 export function Systeme({ query = '' }) {
-  const openClassicMenuToggle = async () => { try { await systemContextMenuClassicAdmin() } catch { /* noop */ } }
+  const openClassicMenuToggle = async () => { try { await openLocalScript('systeme/batch/context-menu-classic-admin.bat') } catch { /* noop */ } }
   const visible = (text) => {
     const q = normalizeText(String(query || '').trim())
     if (q.length < 3) return true

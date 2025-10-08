@@ -1,9 +1,0 @@
-# Configuration O2Switch pour Node.js/Passenger
-PassengerEnabled On
-PassengerAppRoot /home/script/public_html/backend
-PassengerAppType node
-PassengerStartupFile server.js
-PassengerNodejs /usr/bin/node
-
-# Désactiver l'affichage des dossiers
-Options -Indexes

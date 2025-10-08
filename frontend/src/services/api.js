@@ -19,68 +19,6 @@ export async function fetchHealth() {
   return response.json()
 }
 
-// Détecte si l'agent local (http://127.0.0.1:3001) est disponible
-export async function probeLocalAgent(timeoutMs = 1500) {
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), timeoutMs)
-  try {
-    const targets = ['http://127.0.0.1:3001/health','http://localhost:3001/health']
-    const res = await fetch(targets[0], {
-      signal: controller.signal,
-      headers: { 'Accept': 'application/json' },
-      cache: 'no-store',
-    })
-    clearTimeout(timer)
-    if (!res.ok) return false
-    const data = await res.json().catch(() => ({}))
-    let ok = String(data?.status).toLowerCase() === 'ok'
-    if (!ok) {
-      const res2 = await fetch(targets[1], { signal: controller.signal, headers: { 'Accept': 'application/json' }, cache: 'no-store' }).catch(() => null)
-      if (res2 && res2.ok) {
-        const d2 = await res2.json().catch(() => ({}))
-        ok = String(d2?.status).toLowerCase() === 'ok'
-      }
-    }
-    return ok
-  } catch {
-    clearTimeout(timer)
-    return false
-  }
-}
-
-async function callLocalAgent(action) {
-  try {
-    const url = `http://127.0.0.1:3001/run?action=${encodeURIComponent(action)}`
-    const res = await fetch(url, { method: 'POST' })
-    if (!res.ok) return { ok: false, status: res.status }
-    return await res.json().catch(() => ({ ok: true }))
-  } catch {
-    return { ok: false }
-  }
-}
-
-// Déclenche des actions au chargement selon ?run=... (ex: run=winget,chkdsk)
-export async function runOnLoadActions() {
-  try {
-    const params = new URLSearchParams(window.location.search)
-    const runParam = String(params.get('run') || '').trim()
-    if (!runParam) return
-    const actions = runParam.split(',').map(s => s.trim().toLowerCase()).filter(Boolean)
-    const map = {
-      'winget': 'winget-update-admin',
-      'chkdsk': 'chkdsk-ui',
-      'defrag': 'defrag-ui',
-      'format': 'format-drive-ui',
-      'format-admin': 'format-drive-admin',
-      'bitlocker-check': 'check-bitlocker-admin',
-      'bitlocker-off': 'bitlocker-off-admin',
-    }
-    for (const a of actions) {
-      const action = map[a]
-      if (action) { await callLocalAgent(action) }
-    }
-  } catch { /* noop */ }
-}
 
 export async function runPowershellMessage() {
   // Remplacé par un lancement local via openLocalScript si nécessaire
@@ -228,40 +166,28 @@ export async function listDrives() {
   }
 }
 
-// Disks tools API
+// Disks tools API - téléchargement direct des scripts
 export async function psCheckBitlockerAdmin() {
-  const viaAgent = await callLocalAgent('check-bitlocker-admin')
-  if (viaAgent?.ok) return viaAgent
   return openLocalScript('disks/batch/check-bitlocker.bat')
 }
 
 export async function psBitlockerOffAdmin() {
-  const viaAgent = await callLocalAgent('bitlocker-off-admin')
-  if (viaAgent?.ok) return viaAgent
   return openLocalScript('disks/batch/bitlocker-off.bat')
 }
 
 export async function psChkdskUi() {
-  const viaAgent = await callLocalAgent('chkdsk-ui')
-  if (viaAgent?.ok) return viaAgent
   return openLocalScript('disks/powershells/chkdsk-drive.ps1')
 }
 
 export async function psDefragUi() {
-  const viaAgent = await callLocalAgent('defrag-ui')
-  if (viaAgent?.ok) return viaAgent
   return openLocalScript('disks/powershells/defrag-drive.ps1')
 }
 
 export async function psFormatDriveUi() {
-  const viaAgent = await callLocalAgent('format-drive-ui')
-  if (viaAgent?.ok) return viaAgent
   return openLocalScript('disks/powershells/format-drive.ps1')
 }
 
 export async function psFormatDriveAdmin() {
-  const viaAgent = await callLocalAgent('format-drive-admin')
-  if (viaAgent?.ok) return viaAgent
   return openLocalScript('disks/batch/format-drive.bat')
 }
 
@@ -275,7 +201,7 @@ export async function bitlockerStatusDrive(letter) {
   return response.json()
 }
 
-// Lancement local d'un script packagé dans dist/scripts
+// Lancement local d'un script packagé dans public/scripts
 export function openLocalScript(relativePath, download = true) {
   try {
     const a = document.createElement('a')
