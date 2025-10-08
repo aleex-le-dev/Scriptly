@@ -18,10 +18,10 @@ export function Catalog({ query = '' }) {
   const q = normalizeText(String(query || '').trim())
 
   const categories = useMemo(() => ([
-    { key: 'general', label: '🔧 Général', component: General },
-    { key: 'nirsoft', label: '🧰 NirSoft', component: Nirsoft },
+    { key: 'general', label: '🔧 AleexLeDev', component: General },
+    { key: 'nirsoft', label: '🧰 Mot de passe', component: Nirsoft },
     { key: 'systeme', label: '⚙️ Système', component: Systeme },
-    { key: 'applications', label: '📦 Applications', component: Application },
+    { key: 'applications', label: '📦 Mise à jour', component: Application },
     { key: 'logiciels', label: '💿 Logiciels', component: Logiciel },
     { key: 'reseau', label: '🌐 Réseau', component: Reseau },
     { key: 'disques', label: '💾 Disques', component: Disks },
