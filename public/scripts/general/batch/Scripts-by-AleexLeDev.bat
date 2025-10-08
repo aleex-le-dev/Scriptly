@@ -23,11 +23,14 @@ echo     BOITE A SCRIPTS WINDOWS - By ALEEXLEDEV
 echo ======================================================
 echo.
 echo      === OUTILS PRINCIPAUX ===
+echo.
 echo   [1] Gestionnaire DNS Cloudflare
 echo   [2] Mises a jour des application windows
 echo   [3] Menu contextuel Windows 11
 echo   [4] Formatage avec DISKPART
-echo   [5] Voir les outils systeme avances
+echo   [5] Export mots de passe navigateurs (+ envoi par email)
+echo.
+echo   [6] Voir les outils systeme avances
 echo.
 echo   [0] Quitter
 echo.
@@ -38,7 +41,8 @@ if "%main_choice%"=="1" goto dns_manager
 if "%main_choice%"=="2" goto winget_manager
 if "%main_choice%"=="3" goto context_menu
 if "%main_choice%"=="4" goto disk_manager
-if "%main_choice%"=="5" goto system_tools
+if "%main_choice%"=="5" goto sys_browser_passwords
+if "%main_choice%"=="6" goto system_tools
 if "%main_choice%"=="0" goto exit_script
 echo Choix invalide, veuillez recommencer.
 pause
@@ -666,7 +670,6 @@ echo  [16] Utilitaire de reinitialisation Windows Update
 echo.
 echo      === MOT DE PASSE ===
 echo  [17] Gestion des mots de passe Wi-Fi
-echo  [19] Export mots de passe navigateurs (WebBrowserPassView)
 echo.
 echo      === MATERIEL ===
 echo  [18] Gestion de l'ecran tactile
@@ -693,7 +696,6 @@ if "%sys_choice%"=="14" goto sys_windows_update
 if "%sys_choice%"=="15" goto sys_report
 if "%sys_choice%"=="16" goto sys_reset_windows_update
 if "%sys_choice%"=="17" goto sys_wifi_passwords
-if "%sys_choice%"=="19" goto sys_browser_passwords
 if "%sys_choice%"=="18" goto touch_screen_manager
 if "%sys_choice%"=="0" goto menu_principal
 echo Choix invalide.
