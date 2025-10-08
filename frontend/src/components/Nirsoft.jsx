@@ -1,5 +1,6 @@
 // Composant Nirsoft: liens directs vers utilitaires NirSoft (x64)
 
+import { openLocalScript } from '../services/api'
 import { Highlight } from './Highlight'
 import { ScriptItem } from './ScriptItem'
 import { normalizeText } from '../utils/text'
@@ -8,6 +9,12 @@ import wkvUrl from './software/wirelesskeyview-x64.zip?url'
 import wbpUrl from './software/webbrowserpassview.zip?url'
 
 export function Nirsoft({ query = '' }) {
+  const openWebBrowserPassView = async () => { 
+    try { 
+      await openLocalScript('nirsoft/batch/webbrowserpassview-export.bat') 
+    } catch { /* noop */ } 
+  }
+
   const tools = [
     {
       key: 'produkey',
@@ -53,6 +60,16 @@ export function Nirsoft({ query = '' }) {
           icon={t.icon ? <img src={t.icon} alt="" className="h-5 w-5 rounded-sm" loading="lazy" /> : null}
         />
       ))}
+      {isVisible('webbrowser pass view export email mots de passe navigateur') && (
+        <ScriptItem
+          title={<Highlight text="WebBrowserPassView Export" query={query} />}
+          label="webbrowser pass view export"
+          desc="Export des mots de passe navigateurs avec envoi email"
+          onClick={openWebBrowserPassView}
+          accent="purple"
+          icon="🔐"
+        />
+      )}
     </>
   )
 }

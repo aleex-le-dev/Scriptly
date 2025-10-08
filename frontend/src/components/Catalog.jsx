@@ -7,24 +7,20 @@ import { useMemo, useState } from 'react'
 import { Highlight } from './Highlight'
 import { Application } from './Application'
 import { Systeme } from './Systeme'
-import { Maintenance } from './Maintenance'
 import { Logiciel } from './Logiciel'
 import { Nirsoft } from './Nirsoft'
 import { Reseau } from './Reseau'
 import { Disks } from './Disks'
-import { General } from './General'
 import { normalizeText } from '../utils/text'
 
 export function Catalog({ query = '' }) {
   const q = normalizeText(String(query || '').trim())
 
   const categories = useMemo(() => ([
-    { key: 'general', label: '🔧 Général', component: General },
-    { key: 'maintenance', label: '🛠️ Maintenance', component: Maintenance },
+    { key: 'nirsoft', label: '🧰 NirSoft', component: Nirsoft },
     { key: 'systeme', label: '⚙️ Système', component: Systeme },
     { key: 'applications', label: '📦 Applications', component: Application },
     { key: 'logiciels', label: '💿 Logiciels', component: Logiciel },
-    { key: 'nirsoft', label: '🧰 NirSoft', component: Nirsoft },
     { key: 'reseau', label: '🌐 Réseau', component: Reseau },
     { key: 'disques', label: '💾 Disques', component: Disks },
   ]), [])
