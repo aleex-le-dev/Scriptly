@@ -11,6 +11,11 @@ if not %errorlevel%==0 (
 	goto :eof
 )
 
+:: Détecter le nom localisé du groupe Administrateurs via SID (S-1-5-32-544)
+for /f "usebackq tokens=*" %%G in (`powershell -NoProfile -Command "$n=([System.Security.Principal.SecurityIdentifier]::new('S-1-5-32-544')).Translate([System.Security.Principal.NTAccount]).Value.Split('\\')[-1]; Write-Output $n"`) do set "ADMIN_GROUP=%%G"
+if not defined ADMIN_GROUP set "ADMIN_GROUP=Administrators"
+net localgroup "%ADMIN_GROUP%" >nul 2>&1 || set "ADMIN_GROUP=Administrateurs"
+
 :: Détection de locale (FR/EN) pour parsing basique
 set "STR_PWD_REQ_EN=Password required"
 set "STR_PWD_REQ_FR=Mot de passe requis"
@@ -20,10 +25,10 @@ cls
 echo ======================================================
 echo   Gestion des utilisateurs locaux (Administrateur)
 echo ======================================================
-echo  1^) Lister les utilisateurs (Admin / Actif / MDP requis)
+echo  1^) Lister les utilisateurs
 echo  2^) Ajouter un utilisateur
 echo  3^) Supprimer un utilisateur
-echo  4^) Ajouter/retirer du groupe Administrateurs
+echo  4^) Ajouter/retirer un administrateur
 echo  5^) Reinitialiser le mot de passe
 echo  6^) Quitter
 echo.
@@ -38,9 +43,9 @@ goto :menu
 
 :list
 cls
-echo Utilisateur           Admin   Actif   MDPRequis   DernierChangementMDP
-echo -----------------------------------------------------------------------
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference='Stop'; $admins=@(Get-LocalGroupMember -Group 'Administrators' -ErrorAction SilentlyContinue | Where-Object { $_.ObjectClass -eq 'User' } | ForEach-Object { $_.Name.Split('\\')[-1] }); Get-LocalUser | Where-Object Enabled | Sort-Object Name | ForEach-Object { $u=$_; [PSCustomObject]@{ Utilisateur=$u.Name; Admin= if($admins -contains $u.Name){'Oui'}else{'Non'}; Actif= if($u.Enabled){'Oui'}else{'Non'}; MDPRequis= if($u.PasswordRequired){'Oui'}else{'Non'}; DernierChangementMDP='-' } } | Format-Table -AutoSize" || echo Erreur lors de la liste
+echo Utilisateur           Admin   Actif   MDPDefini
+echo ------------------------------------------------
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference='Stop'; $adminGroups=@('Administrators','Administrateurs'); $admins=@(); foreach($g in $adminGroups){ try{ $admins+=$(Get-LocalGroupMember -Group $g -ErrorAction Stop | ForEach-Object { $_.Name.Split('\\')[-1] }) } catch{} }; $admins = $admins | Sort-Object -Unique; Get-LocalUser | Where-Object Enabled | Sort-Object Name | ForEach-Object { $u=$_; $has=$false; try { $pls = $u | Select-Object -ExpandProperty PasswordLastSet -ErrorAction Stop; if ($pls) { $has=$true } } catch {}; if (-not $has) { try { $nu = net user \"$($u.Name)\" 2>$null; $line = $nu | Where-Object { $_ -match '^(Password last set|Dernier changement du mot de passe)\s+' }; if ($line) { $val = ($line -split '\\s{2,}',2)[1].Trim(); if ($val -and $val -notmatch '^(Never|Jamais)$') { $has=$true } } } catch {} }; if (-not $has -and $u.PasswordRequired) { $has=$true }; [PSCustomObject]@{ Utilisateur=$u.Name; Admin= if($admins -contains $u.Name){'Oui'}else{'Non'}; Actif= if($u.Enabled){'Oui'}else{'Non'}; MDPDefini= if($has){'Oui'}else{'Non'} } } | Format-Table -AutoSize -HideTableHeaders" || echo Erreur lors de la liste
 echo.
 pause
 goto :menu
@@ -89,7 +94,9 @@ endlocal & goto :eof
 
 :add
 cls
-set /p NEWU=Nom d'utilisateur ^> 
+call :show_active
+set /p NEWU=Nom d'utilisateur a ajouter ^> 
+:: NOTE: la liste des utilisateurs actifs est affichée juste au-dessus
 if "%NEWU%"=="" goto :menu
 set /p SETPWD=Affecter un mot de passe maintenant ? (O/N) ^> 
 if /I "%SETPWD%"=="O" (
@@ -105,19 +112,20 @@ if not %errorlevel%==0 (
 	goto :menu
 )
 set /p ADDADM=Ajouter '%NEWU%' aux Administrateurs ? (O/N) ^> 
-if /I "%ADDADM%"=="O" net localgroup Administrators "%NEWU%" /add
+if /I "%ADDADM%"=="O" net localgroup "%ADMIN_GROUP%" "%NEWU%" /add
 echo Utilisateur cree.
 pause
 goto :menu
 
 :del
 cls
-set /p DELU=Utilisateur a supprimer ^> 
+call :show_active
+set /p DELU=Nom d'utilisateur a supprimer ^> 
 if "%DELU%"=="" goto :menu
 set /p CONF=Confirmer la suppression de '%DELU%' ? (O/N) ^> 
 if /I not "%CONF%"=="O" goto :menu
 :: Retrait du groupe Admin si present
-net localgroup Administrators "%DELU%" /delete >nul 2>nul
+net localgroup "%ADMIN_GROUP%" "%DELU%" /delete >nul 2>nul
 net user "%DELU%" /delete
 if %errorlevel%==0 (echo Utilisateur supprime.) else (echo Echec de suppression.)
 pause
@@ -125,15 +133,16 @@ goto :menu
 
 :admin
 cls
-set /p UADM=Nom d'utilisateur ^> 
+call :show_active
+set /p UADM=Nom d'utilisateur (ajout/retrait admin) ^> 
 if "%UADM%"=="" goto :menu
-set /p OP=Choisir: (1) Ajouter Admin  (2) Retirer Admin ^> 
+set /p OP=Choisir l'action pour '%UADM%': (1) Ajouter aux Administrateurs  (2) Retirer des Administrateurs ^> 
 if "%OP%"=="1" (
-	net localgroup Administrators "%UADM%" /add
-	if %errorlevel%==0 (echo Ajoute aux Administrateurs.) else (echo Echec.)
+	net localgroup "%ADMIN_GROUP%" "%UADM%" /add
+    if %errorlevel%==0 (echo '%UADM%' a ete ajoute aux Administrateurs.) else (echo Echec.)
 ) else if "%OP%"=="2" (
-	net localgroup Administrators "%UADM%" /delete
-	if %errorlevel%==0 (echo Retire des Administrateurs.) else (echo Echec.)
+	net localgroup "%ADMIN_GROUP%" "%UADM%" /delete
+    if %errorlevel%==0 (echo '%UADM%' a ete retire des Administrateurs.) else (echo Echec.)
 ) else (
 	echo Choix invalide.
 )
@@ -142,6 +151,7 @@ goto :menu
 
 :reset
 cls
+call :show_active
 set /p RUSER=Utilisateur ^> 
 if "%RUSER%"=="" goto :menu
 set /p RNEWP=Nouveau mot de passe ^> 
@@ -149,3 +159,10 @@ net user "%RUSER%" "%RNEWP%"
 if %errorlevel%==0 (echo Mot de passe mis a jour.) else (echo Echec.)
 pause
 goto :menu
+
+:show_active
+echo.
+echo Utilisateurs actifs:
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-LocalUser | Where-Object Enabled | Sort-Object Name | Select-Object -ExpandProperty Name | ForEach-Object { $_ }" 2>nul
+echo.
+goto :eof
