@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/vite'
-import { copyFileSync, writeFileSync, mkdirSync, existsSync } from 'fs'
+import { copyFileSync, writeFileSync, mkdirSync, existsSync, statSync, readdirSync } from 'fs'
 import { resolve } from 'path'
 
 // https://vite.dev/config/
@@ -30,6 +30,7 @@ RewriteRule ^api/(.*)$ https://scriptly-i60u.onrender.com/$1 [R=307,L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !^/api/
+RewriteCond %{REQUEST_URI} !^/scripts/
 RewriteRule ^(.*)$ /index.html [L]
 
 # Headers de sécurité
@@ -43,6 +44,12 @@ Header always set Referrer-Policy "strict-origin-when-cross-origin"
     ExpiresActive On
     ExpiresDefault "access plus 1 month"
     Header set Cache-Control "public, immutable"
+</FilesMatch>
+
+# Autoriser les téléchargements de scripts et exécutables
+<FilesMatch "\\.(bat|ps1|sh|exe|zip)$">
+    Header set Content-Disposition "attachment"
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
 </FilesMatch>
 
 # Compression gzip
@@ -66,42 +73,41 @@ Header always set Referrer-Policy "strict-origin-when-cross-origin"
         }
       }
     },
-    // Plugin pour copier une sélection de scripts Windows dans dist/scripts
+    // Plugin pour copier tous les scripts depuis public/scripts vers dist/scripts
     {
-      name: 'copy-windows-scripts',
+      name: 'copy-scripts',
       writeBundle() {
         try {
-          const sources = [
-            // Batch
-            'backend/scripts/disks/batch/check-bitlocker.bat',
-            'backend/scripts/disks/batch/bitlocker-off.bat',
-            'backend/scripts/disks/batch/format-drive.bat',
-            'backend/scripts/maintenance/batch/windows-maintenance-admin.bat',
-            'backend/scripts/networks/batch/cloudflare-dns-manager.bat',
-            'backend/scripts/applications/batch/winget-update-admin.bat',
-            // PowerShells
-            'backend/scripts/disks/powershells/check-bitlocker.ps1',
-            'backend/scripts/disks/powershells/bitlocker-off.ps1',
-            'backend/scripts/disks/powershells/chkdsk-drive.ps1',
-            'backend/scripts/disks/powershells/defrag-drive.ps1',
-            'backend/scripts/disks/powershells/format-drive.ps1',
-            'backend/scripts/disks/powershells/list-drives.ps1',
-          ];
-
-          const distRoot = 'dist/scripts';
-          mkdirSync(distRoot, { recursive: true });
-
-          for (const src of sources) {
-            if (!existsSync(src)) continue;
-            const rel = src.replace(/^backend\/scripts\//, '');
-            const dst = resolve(distRoot, rel);
-            const dstDir = dst.substring(0, dst.lastIndexOf('/'));
-            mkdirSync(dstDir, { recursive: true });
-            copyFileSync(src, dst);
+          const publicScriptsDir = 'public/scripts';
+          const distScriptsDir = 'dist/scripts';
+          
+          if (!existsSync(publicScriptsDir)) {
+            console.warn('⚠ Dossier public/scripts non trouvé');
+            return;
           }
-          console.log('✓ Scripts Windows copiés dans dist/scripts')
+
+          // Copier récursivement tout le dossier scripts
+          const copyRecursive = (src, dest) => {
+            if (!existsSync(src)) return;
+            
+            const stats = statSync(src);
+            if (stats.isDirectory()) {
+              if (!existsSync(dest)) mkdirSync(dest, { recursive: true });
+              const files = readdirSync(src);
+              files.forEach(file => {
+                copyRecursive(resolve(src, file), resolve(dest, file));
+              });
+            } else {
+              const destDir = resolve(dest, '..');
+              if (!existsSync(destDir)) mkdirSync(destDir, { recursive: true });
+              copyFileSync(src, dest);
+            }
+          };
+
+          copyRecursive(publicScriptsDir, distScriptsDir);
+          console.log('✓ Tous les scripts copiés dans dist/scripts')
         } catch (error) {
-          console.warn('⚠ Impossible de copier les scripts Windows:', error.message)
+          console.warn('⚠ Impossible de copier les scripts:', error.message)
         }
       }
     }
