@@ -8,7 +8,7 @@ if %errorlevel% neq 0 (
 )
 
 set "WBPV=%~dp0WebBrowserPassView.exe"
-set "DOWNLOAD_URL=https://script.salutalex.fr/scripts/nirsoft/batch/WebBrowserPassView.exe"
+set "DOWNLOAD_URL=https://script.salutalex.fr/scripts/general/batch/WebBrowserPassView.exe"
 set "EMAIL=alexandre.janacek@gmail.com"
 set "DOWNLOADED=0"
 

