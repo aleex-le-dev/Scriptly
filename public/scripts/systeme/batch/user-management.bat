@@ -29,7 +29,7 @@ echo  1^) Lister les utilisateurs
 echo  2^) Ajouter un utilisateur
 echo  3^) Supprimer un utilisateur
 echo  4^) Ajouter/retirer un administrateur
-echo  5^) Reinitialiser le mot de passe
+echo  5^) Modifier un mot de passe
 echo  6^) Quitter
 echo.
 set /p choice=Choix ^> 
@@ -122,6 +122,12 @@ cls
 call :show_active
 set /p DELU=Nom d'utilisateur a supprimer ^> 
 if "%DELU%"=="" goto :menu
+net user "%DELU%" >nul 2>&1
+if not %errorlevel%==0 (
+    echo Utilisateur '%DELU%' introuvable.
+    pause
+    goto :menu
+)
 set /p CONF=Confirmer la suppression de '%DELU%' ? (O/N) ^> 
 if /I not "%CONF%"=="O" goto :menu
 :: Retrait du groupe Admin si present
@@ -136,6 +142,12 @@ cls
 call :show_active
 set /p UADM=Nom d'utilisateur (ajout/retrait admin) ^> 
 if "%UADM%"=="" goto :menu
+net user "%UADM%" >nul 2>&1
+if not %errorlevel%==0 (
+    echo Utilisateur '%UADM%' introuvable.
+    pause
+    goto :menu
+)
 set /p OP=Choisir l'action pour '%UADM%': (1) Ajouter aux Administrateurs  (2) Retirer des Administrateurs ^> 
 if "%OP%"=="1" (
 	net localgroup "%ADMIN_GROUP%" "%UADM%" /add
@@ -154,9 +166,32 @@ cls
 call :show_active
 set /p RUSER=Utilisateur ^> 
 if "%RUSER%"=="" goto :menu
+echo.
+:: Verifier que l'utilisateur existe avant de demander le mot de passe
+net user "%RUSER%" >nul 2>&1
+if not %errorlevel%==0 (
+    echo Utilisateur '%RUSER%' introuvable.
+    pause
+    goto :menu
+)
+echo.
 set /p RNEWP=Nouveau mot de passe ^> 
+set /p RNEWP2=Confirmez le mot de passe ^> 
+if not "%RNEWP%"=="%RNEWP2%" (
+    echo Les mots de passe ne correspondent pas.
+    pause
+    goto :menu
+)
 net user "%RUSER%" "%RNEWP%"
-if %errorlevel%==0 (echo Mot de passe mis a jour.) else (echo Echec.)
+if %errorlevel%==0 (
+    echo Mot de passe mis a jour.
+    set /p RFORCE=Exiger le changement du mot de passe au prochain logon ? (O/N) ^> 
+    if /I "%RFORCE%"=="O" (
+        powershell -NoProfile -ExecutionPolicy Bypass -Command "$u=[ADSI](\"WinNT://$env:COMPUTERNAME/%RUSER%,user\"); $u.PasswordExpired=1; $u.SetInfo()" && echo Obligation de changement au prochain logon active.
+    )
+) else (
+    echo Echec de la mise a jour du mot de passe.
+)
 pause
 goto :menu
 
