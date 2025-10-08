@@ -29,6 +29,14 @@ export function Logiciel({ query = '' }) {
       href: 'https://www.sumatrapdfreader.org/dl/rel/3.5.2/SumatraPDF-3.5.2-64-install.exe',
       icon: 'https://www.sumatrapdfreader.org/favicon.ico',
       keywords: 'logiciel sumatra pdf lecteur telechargement direct'
+    },
+    {
+      key: 'iobit-unlocker',
+      title: 'IObit Unlocker',
+      desc: 'Déverrouille et supprime les fichiers récalcitrants',
+      href: 'https://www.iobit.com/fr/iobit-unlocker.php#',
+      icon: '🔓',
+      keywords: 'iobit unlocker debloquer supprimer fichier recalcitrant'
     }
   ]
 
@@ -40,7 +48,7 @@ export function Logiciel({ query = '' }) {
 
   return (
     <>
-      {apps.filter(a => isVisible(a.title + ' ' + a.desc + ' ' + a.keywords + ' google')).map(app => (
+      {apps.filter(a => isVisible(a.title + ' ' + a.desc + ' ' + a.keywords + ' google iobit unlocker')).map(app => (
         <ScriptItem
           key={app.key}
           title={<Highlight text={app.title} query={query} />}
