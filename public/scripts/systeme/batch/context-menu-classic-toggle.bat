@@ -11,16 +11,14 @@ echo    Restauration du menu contextuel classique Windows 11
 echo ========================================================
 echo.
 
-REM Verification des privileges administrateur
-net session >nul 2>&1
-if %errorLevel% neq 0 (
-    echo ERREUR: Ce script doit etre execute en tant qu'administrateur
-    echo Clic droit sur le fichier .bat et "Executer en tant qu'administrateur"
-    echo.
-    pause
-    exit
+REM Verification/Elecation automatique des privileges administrateur (UAC)
+whoami /groups | findstr /c:"S-1-16-12288" >nul
+if not %errorlevel%==0 (
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process -FilePath '%~f0' -Verb RunAs"
+    exit /b
 )
 
+:menu
 echo Choix disponibles :
 echo.
 echo [1] Activer le menu contextuel classique (recommande)

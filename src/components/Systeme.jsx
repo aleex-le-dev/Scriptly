@@ -7,7 +7,8 @@ import { ScriptItem } from './ScriptItem'
 import { normalizeText } from '../utils/text'
 
 export function Systeme({ query = '' }) {
-  const openClassicMenuToggle = async () => { try { await openLocalScript('systeme/batch/context-menu-classic-admin.bat') } catch { /* noop */ } }
+  const openClassicMenuToggle = async () => { try { await openLocalScript('systeme/batch/context-menu-classic-toggle.bat') } catch { /* noop */ } }
+  const openUserManagement = async () => { try { await openLocalScript('systeme/batch/user-management.bat') } catch { /* noop */ } }
   const visible = (text) => {
     const q = normalizeText(String(query || '').trim())
     if (q.length < 3) return true
@@ -24,6 +25,16 @@ export function Systeme({ query = '' }) {
           onClick={openClassicMenuToggle}
           accent="amber"
           icon="🗂️"
+        />
+      )}
+      {visible('systeme utilisateur user management admin ajouter supprimer mot de passe') && (
+        <ScriptItem
+          title={<Highlight text="Gestion des utilisateurs locaux" query={query} />}
+          label="utilisateurs locaux admin ajout suppression mot de passe"
+          desc="Lister, ajouter/supprimer, droits administrateurs et réinitialiser le mot de passe"
+          onClick={openUserManagement}
+          accent="teal"
+          icon="👤"
         />
       )}
     </>
