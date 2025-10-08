@@ -1,12 +1,20 @@
-# React + Vite
+## Scripts et fonctionnalités
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+- Gestion utilisateurs (Système): `public/scripts/systeme/batch/user-management.bat`
+  - Lister utilisateurs actifs (Admin, Actif, MDP défini)
+  - Ajouter, supprimer, ajouter/retirer des administrateurs
+  - Modifier un mot de passe et forcer le changement au prochain logon
 
-Currently, two official plugins are available:
+- Menu contextuel classique (Système): `public/scripts/systeme/batch/context-menu-classic-toggle.bat`
+  - Active/désactive le menu classique de Windows 11 (élevé UAC automatique)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Verrouillage d’accès UI
+  - Mot de passe de session: composant `Gate` (mot de passe `AetA`)
+  - Bouton 🔒 pour effacer la session et re-verrouiller
+  - Blocage clic droit et F12/Fn+F12
 
-## Expanding the ESLint configuration
+## Utilisation
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. `npm install`
+2. `npm run dev`
+3. Accéder à l’interface, entrer le mot de passe `AetA`.
