@@ -48,7 +48,7 @@ export function Logiciel({ query = '' }) {
     },
     {
       key: 'office-2024',
-      title: 'Office 2024',
+      title: 'Office 2024 (7.0Go)',
       desc: 'Téléchargement direct Microsoft Office 2024',
       href: 'https://drive.usercontent.google.com/download?id=1wf1eqVkXIM0f0R2963Ee4RKK-a_rgWld&export=download&authuser=0&confirm=t&uuid=941d1835-9870-4115-8baa-5155c2bcbeb8&at=AKSUxGOpxt6HuTVCq4_qMaWEBFoX:1761170678446',
       icon: 'https://www.trustedtechteam.com/cdn/shop/files/office-2024.png?v=1756999675',
