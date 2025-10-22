@@ -48,11 +48,27 @@ export function Logiciel({ query = '' }) {
     },
     {
       key: 'office-2024',
-      title: 'Office 2024 (7.0Go)',
+      title: 'Office 2024',
       desc: 'Téléchargement direct Microsoft Office 2024',
       href: 'https://drive.usercontent.google.com/download?id=1wf1eqVkXIM0f0R2963Ee4RKK-a_rgWld&export=download&authuser=0&confirm=t&uuid=941d1835-9870-4115-8baa-5155c2bcbeb8&at=AKSUxGOpxt6HuTVCq4_qMaWEBFoX:1761170678446',
       icon: 'https://www.trustedtechteam.com/cdn/shop/files/office-2024.png?v=1756999675',
       keywords: 'office microsoft 2024 telechargement direct'
+    },
+    {
+      key: 'driver-booster',
+      title: 'Driver Booster',
+      desc: 'Mise à jour automatique des pilotes',
+      href: 'https://drive.usercontent.google.com/download?id=1R6zCNdlUMDYQI4WZEeGvMuzh0yhvrDPA&export=download&authuser=0&confirm=t&uuid=ec0c94cf-5845-4234-b872-46be8a3f8ce4&at=AKSUxGMDblcPROvgJw-8LkfLsmGp:1761171837415',
+      icon: '🔧',
+      keywords: 'driver booster pilotes mise a jour iobit'
+    },
+    {
+      key: 'crystaldiskinfo',
+      title: 'CrystalDiskInfo',
+      desc: 'État de santé des disques durs',
+      href: 'https://drive.usercontent.google.com/download?id=1CafGMGAKjIXigVzARPhH1yZJVYdDuCqp&export=download&authuser=0&confirm=t&uuid=5b498f2d-b9d0-41be-ac01-d523ce2d0565&at=AKSUxGPvWpwMKZapAzRU_1WjhV-Z:1761171910613',
+      icon: '💾',
+      keywords: 'crystaldiskinfo disque dur sante smart'
     }
   ]
 
@@ -64,7 +80,7 @@ export function Logiciel({ query = '' }) {
 
   return (
     <>
-      {apps.filter(a => isVisible(a.title + ' ' + a.desc + ' ' + a.keywords + ' google iobit unlocker activation office windows microsoft')).map(app => (
+      {apps.filter(a => isVisible(a.title + ' ' + a.desc + ' ' + a.keywords + ' google iobit unlocker activation office windows microsoft driver booster crystaldiskinfo')).map(app => (
         <ScriptItem
           key={app.key}
           title={<Highlight text={app.title} query={query} />}
