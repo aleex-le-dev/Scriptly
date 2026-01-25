@@ -2,7 +2,7 @@
 setlocal EnableExtensions EnableDelayedExpansion
 if defined MSYSTEM ("%ComSpec%" /c "%~f0" & exit /b)
 if not defined CMDCMDLINE ("%ComSpec%" /c "%~f0" & exit /b)
-chcp 1252 >nul >nul
+chcp 65001 >nul
 title Boite a Scripts Windows - By ALEEXLEDEV (v1.0)
 color 0B
 
@@ -11,6 +11,7 @@ net session >nul 2>&1
 if %errorlevel% neq 0 (
     echo Ce script requiert des privileges administrateur.
     echo Demande d'elevation en cours...
+    timeout /t 2 >nul
     powershell -Command "Start-Process '%~f0' -Verb RunAs"
     exit /b
 )
@@ -229,7 +230,7 @@ goto dns_manager
 :get_interface
 set "interface="
 for /f "skip=3 tokens=1,2,3*" %%a in ('netsh interface show interface') do (
-    if /i "%%b"=="ConnectÃƒÂ©" (
+    if /i "%%b"=="Connecté" (
         set "interface=%%d"
         goto :interface_found
     )
@@ -239,7 +240,7 @@ for /f "skip=3 tokens=1,2,3*" %%a in ('netsh interface show interface') do (
     )
 )
 for /f "skip=3 tokens=1,2,3*" %%a in ('netsh interface show interface') do (
-    if /i "%%c"=="DÃƒÂ©diÃƒÂ©" (
+    if /i "%%c"=="Dédié" (
         set "interface=%%d"
         goto :interface_found
     )
