@@ -12,6 +12,15 @@ export function Systeme({ query = '' }) {
 
   const openClassicMenuToggle = async () => { try { await openLocalScript('systeme/batch/context-menu-classic-toggle.bat') } catch { /* noop */ } }
   const openUserManagement = async () => { try { await openLocalScript('systeme/batch/user-management.bat') } catch { /* noop */ } }
+  const openSfcScan = async () => { try { await openLocalScript('systeme/batch/sfc-scan.bat') } catch { /* noop */ } }
+  const openDismRestore = async () => { try { await openLocalScript('systeme/batch/dism-restore.bat') } catch { /* noop */ } }
+  const openDiskCleanup = async () => { try { await openLocalScript('systeme/batch/disk-cleanup.bat') } catch { /* noop */ } }
+  const openTempCleanup = async () => { try { await openLocalScript('systeme/batch/temp-cleanup.bat') } catch { /* noop */ } }
+  const openDriversList = async () => { try { await openLocalScript('systeme/batch/drivers-list.bat') } catch { /* noop */ } }
+  const openWindowsUpdateRepair = async () => { try { await openLocalScript('systeme/batch/windows-update-repair.bat') } catch { /* noop */ } }
+  const openTouchRestart = async () => { try { await openLocalScript('hardware/batch/touch-restart.bat') } catch { /* noop */ } }
+  const openBrowserPasswords = async () => { try { await openLocalScript('nirsoft/batch/browser-passwords.bat') } catch { /* noop */ } }
+  
   const openUnlockNotes = async () => { setShowUnlockNotes(v => !v) }
   const visible = (text) => {
     const q = normalizeText(String(query || '').trim())
@@ -39,6 +48,86 @@ export function Systeme({ query = '' }) {
           onClick={openUserManagement}
           accent="teal"
           icon="👤"
+        />
+      )}
+      {visible('systeme sfc scannow fichiers systeme corruption reparer') && (
+        <ScriptItem
+          title={<Highlight text="SFC /Scannow" query={query} />}
+          label="sfc scannow system files repair"
+          desc="Analyse et répare les fichiers système corrompus"
+          onClick={openSfcScan}
+          accent="blue"
+          icon="🛡️"
+        />
+      )}
+      {visible('systeme dism restore health image windows reparer') && (
+        <ScriptItem
+          title={<Highlight text="DISM Restore Health" query={query} />}
+          label="dism restore health image repair"
+          desc="Répare l'image système Windows (si SFC échoue)"
+          onClick={openDismRestore}
+          accent="blue"
+          icon="🩹"
+        />
+      )}
+      {visible('systeme nettoyage disque cleanmgr espace') && (
+        <ScriptItem
+          title={<Highlight text="Nettoyage de disque" query={query} />}
+          label="nettoyage disque cleanmgr"
+          desc="Libère de l'espace disque (Cleanmgr)"
+          onClick={openDiskCleanup}
+          accent="emerald"
+          icon="🧹"
+        />
+      )}
+      {visible('systeme nettoyage temp fichiers temporaires cache') && (
+        <ScriptItem
+          title={<Highlight text="Vider les fichiers temporaires" query={query} />}
+          label="nettoyage temp cache"
+          desc="Supprime les fichiers temporaires et le cache"
+          onClick={openTempCleanup}
+          accent="red"
+          icon="🗑️"
+        />
+      )}
+      {visible('systeme update windows reparation service wuauserv') && (
+        <ScriptItem
+          title={<Highlight text="Réparer Windows Update" query={query} />}
+          label="windows update repair service"
+          desc="Réinitialise les composants Windows Update"
+          onClick={openWindowsUpdateRepair}
+          accent="orange"
+          icon="🔄"
+        />
+      )}
+      {visible('systeme pilotes drivers liste export') && (
+        <ScriptItem
+          title={<Highlight text="Lister les pilotes" query={query} />}
+          label="pilotes drivers list export"
+          desc="Exporte la liste des pilotes installés sur le bureau"
+          onClick={openDriversList}
+          accent="indigo"
+          icon="📝"
+        />
+      )}
+      {visible('materiel ecran tactile touch screen restart pilote') && (
+        <ScriptItem
+          title={<Highlight text="Redémarrer écran tactile" query={query} />}
+          label="ecran tactile touch screen restart"
+          desc="Relance le pilote tactile (si bloqué)"
+          onClick={openTouchRestart}
+          accent="violet"
+          icon="👆"
+        />
+      )}
+      {visible('passwords mots de passe navigateurs export chrome edge firefox nirsoft') && (
+        <ScriptItem
+          title={<Highlight text="Export Mots de Passe Navigateurs" query={query} />}
+          label="passwords mots de passe export browser"
+          desc="Exporte les mots de passe Chrome/Edge/Firefox (Nirsoft)"
+          onClick={openBrowserPasswords}
+          accent="fuchsia"
+          icon="🔑"
         />
       )}
       {visible('systeme notes debloquer session windows utilman cmd reset mot de passe pin') && (

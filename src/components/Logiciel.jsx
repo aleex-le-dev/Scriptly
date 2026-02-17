@@ -1,10 +1,13 @@
 // Composant Logiciel: liens directs vers des logiciels (installateurs officiels)
 
+import { openLocalScript } from '../services/api'
 import { Highlight } from './Highlight'
 import { ScriptItem } from './ScriptItem'
 import { normalizeText } from '../utils/text'
 
 export function Logiciel({ query = '' }) {
+  const openWingetUpdateAll = async () => { try { await openLocalScript('applications/batch/winget-update-all.bat') } catch { /* noop */ } }
+
   const apps = [
     {
       key: 'chrome',
@@ -80,6 +83,15 @@ export function Logiciel({ query = '' }) {
 
   return (
     <>
+      {isVisible('update mise a jour applications logiciels winget upgrade all') && (
+        <ScriptItem
+          title={<Highlight text="Mettre à jour toutes les applications" query={query} />}
+          desc="Met à jour tous les logiciels installés via Winget"
+          onClick={openWingetUpdateAll}
+          accent="green"
+          icon="📥"
+        />
+      )}
       {apps.filter(a => isVisible(a.title + ' ' + a.desc + ' ' + a.keywords + ' google iobit unlocker activation office windows microsoft driver booster crystaldiskinfo')).map(app => (
         <ScriptItem
           key={app.key}
