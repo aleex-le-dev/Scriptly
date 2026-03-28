@@ -22,35 +22,36 @@ export default defineConfig({
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Redirection vers le backend Render
-RewriteCond %{REQUEST_URI} ^/api/(.*)$
-RewriteRule ^api/(.*)$ https://scriptly-i60u.onrender.com/$1 [R=307,L]
-
-# Servir les fichiers statiques du frontend
+# Servir les fichiers statiques du frontend (SPA)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_URI} !^/api/
 RewriteCond %{REQUEST_URI} !^/scripts/
 RewriteRule ^(.*)$ /index.html [L]
 
 # Headers de sécurité
-Header always set X-Content-Type-Options nosniff
-Header always set X-Frame-Options DENY
-Header always set X-XSS-Protection "1; mode=block"
-Header always set Referrer-Policy "strict-origin-when-cross-origin"
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
 
 # Cache pour les assets statiques
-<FilesMatch "\\.(css|js|png|jpg|jpeg|gif|ico|svg)$">
-    ExpiresActive On
-    ExpiresDefault "access plus 1 month"
-    Header set Cache-Control "public, immutable"
-</FilesMatch>
-
-# Autoriser les téléchargements de scripts et exécutables
-<FilesMatch "\\.(bat|ps1|sh|exe|zip)$">
-    Header set Content-Disposition "attachment"
-    Header set Cache-Control "no-cache, no-store, must-revalidate"
-</FilesMatch>
+<IfModule mod_expires.c>
+    <FilesMatch "\\\\.(css|js|png|jpg|jpeg|gif|ico|svg)$">
+        ExpiresActive On
+        ExpiresDefault "access plus 1 month"
+    </FilesMatch>
+</IfModule>
+<IfModule mod_headers.c>
+    <FilesMatch "\\\\.(css|js|png|jpg|jpeg|gif|ico|svg)$">
+        Header set Cache-Control "public, immutable"
+    </FilesMatch>
+    <FilesMatch "\\\\.(bat|ps1|sh|exe|zip)$">
+        Header set Content-Disposition "attachment"
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </FilesMatch>
+</IfModule>
 
 # Compression gzip
 <IfModule mod_deflate.c>

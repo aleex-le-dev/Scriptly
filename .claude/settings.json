@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -r \"openLocalScript\\\\|listDrives\\\\|psCheckBitlocker\\\\|psBitlockerOff\\\\|psChkdsk\\\\|psDefrag\\\\|psFormatDrive\" src/ --include=*.jsx --include=*.js)",
+      "Bash(npm install:*)"
+    ]
+  }
+}

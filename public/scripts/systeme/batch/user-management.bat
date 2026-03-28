@@ -30,7 +30,7 @@ echo  2^) Ajouter un utilisateur
 echo  3^) Supprimer un utilisateur
 echo  4^) Ajouter/retirer un administrateur
 echo  5^) Modifier un mot de passe
-echo  6^) Quitter
+echo  0^) Quitter
 echo.
 set /p choice=Choix ^> 
 if "%choice%"=="1" goto :list
@@ -39,6 +39,7 @@ if "%choice%"=="3" goto :del
 if "%choice%"=="4" goto :admin
 if "%choice%"=="5" goto :reset
 if "%choice%"=="6" goto :eof
+if "%choice%"=="0" goto :eof
 goto :menu
 
 :list

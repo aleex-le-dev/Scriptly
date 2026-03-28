@@ -17,26 +17,9 @@ if %errorlevel% neq 0 (
 )
 
 :menu_principal
-cls
-color 0B
-echo ======================================================
-echo     BOITE A SCRIPTS WINDOWS - By ALEEXLEDEV
-echo ======================================================
-echo.
-echo      === OUTILS PRINCIPAUX ===
-echo.
-echo   [1] Gestionnaire DNS Cloudflare
-echo   [2] Mises a jour des application windows
-echo   [3] Menu contextuel Windows 11
-echo   [4] Formatage avec DISKPART
-echo   [5] Export mots de passe navigateurs (+ envoi par email)
-echo.
-echo   [6] Voir les outils systeme avances
-echo.
-echo   [0] Quitter
-echo.
-echo ======================================================
-set /p main_choice=Entrez votre choix: 
+set "opts=Gestionnaire DNS Cloudflare;Mises a jour des application windows;Menu contextuel Windows 11;Formatage avec DISKPART;Export mots de passe navigateurs;Voir les outils systeme avances"
+call :DynamicMenu "BOITE A SCRIPTS WINDOWS - By ALEEXLEDEV" "%opts%"
+set "main_choice=%errorlevel%"
 
 if "%main_choice%"=="1" goto dns_manager
 if "%main_choice%"=="2" goto winget_manager
@@ -45,36 +28,21 @@ if "%main_choice%"=="4" goto disk_manager
 if "%main_choice%"=="5" goto sys_browser_passwords
 if "%main_choice%"=="6" goto system_tools
 if "%main_choice%"=="0" goto exit_script
-echo Choix invalide, veuillez recommencer.
-pause
 goto menu_principal
 
 REM ===================================================================
 REM                    GESTIONNAIRE DNS CLOUDFLARE
 REM ===================================================================
 :dns_manager
-cls
-color 0B
-echo ================================================
-echo     GESTIONNAIRE DNS CLOUDFLARE
-echo ================================================
-echo.
-echo   [1] Installation des DNS Cloudflare (IPv4 + IPv6)
-echo   [2] Installation des DNS Cloudflare (IPv4 seulement)
-echo   [3] Restauration des DNS par defaut
-echo   [4] Affichage de la configuration actuelle
-echo   [0] Retour au menu principal
-echo.
-echo ================================================
-set /p dns_choice=Choisissez une option: 
+set "opts=Installation DNS Cloudflare (IPv4 + IPv6);Installation DNS Cloudflare (IPv4 seulement);Restauration des DNS par defaut;Affichage de la configuration actuelle"
+call :DynamicMenu "GESTIONNAIRE DNS CLOUDFLARE" "%opts%"
+set "dns_choice=%errorlevel%"
 
 if "%dns_choice%"=="1" goto install_cloudflare_full
 if "%dns_choice%"=="2" goto install_cloudflare_ipv4
 if "%dns_choice%"=="3" goto restore_dns
 if "%dns_choice%"=="4" goto show_dns_config
 if "%dns_choice%"=="0" goto menu_principal
-echo Option invalide.
-pause
 goto dns_manager
 
 :install_cloudflare_full
@@ -260,32 +228,13 @@ REM ===================================================================
 REM                   WINGET - Mises ÃƒÂ  jour des application windows
 REM ===================================================================
 :winget_manager
-cls
-color 0A
-echo ================================================
-echo     Mises ÃƒÂ  jour des application windows
-echo ================================================
-echo.
-
-where winget >nul 2>nul
-if errorlevel 1 (
-    echo ERREUR: Winget n'est pas installe sur ce systeme.
-    echo Veuillez l'installer depuis le Microsoft Store.
-    pause
-    goto menu_principal
-)
-
-echo   [1] Mettre a jour une application (liste et choix)
-echo   [2] Mettre a jour toutes les applications
-echo   [0] Retour au menu principal
-echo.
-set /p winget_choice=Choisissez une option: 
+set "opts=Mettre a jour une application (liste et choix);Mettre a jour toutes les applications"
+call :DynamicMenu "WINGET - MISES A JOUR APPLICATIONS" "%opts%"
+set "winget_choice=%errorlevel%"
 
 if "%winget_choice%"=="1" goto update_single
 if "%winget_choice%"=="2" goto update_all
 if "%winget_choice%"=="0" goto menu_principal
-echo Option invalide.
-pause
 goto winget_manager
 
 :update_single
@@ -330,23 +279,13 @@ REM ===================================================================
 REM                    MENU CONTEXTUEL WINDOWS 11
 REM ===================================================================
 :context_menu
-cls
-color 0E
-echo ========================================================
-echo    Menu contextuel classique - Windows 11
-echo ========================================================
-echo.
-echo   [1] Activer le menu contextuel classique (recommande)
-echo   [2] Restaurer le menu contextuel moderne de Windows 11
-echo   [0] Retour au menu principal
-echo.
-set /p ctx_choice=Votre choix: 
+set "opts=Activer le menu contextuel classique;Restaurer le menu contextuel moderne"
+call :DynamicMenu "MENU CONTEXTUEL WINDOWS 11" "%opts%"
+set "ctx_choice=%errorlevel%"
 
 if "%ctx_choice%"=="1" goto activate_classic
 if "%ctx_choice%"=="2" goto restore_modern
 if "%ctx_choice%"=="0" goto menu_principal
-echo Choix invalide.
-pause
 goto context_menu
 
 :activate_classic
@@ -422,9 +361,10 @@ echo =============================================================
 echo.
 echo ATTENTION : Le formatage effacera TOUTES les donnees !
 echo.
-echo Entrez le numero du disque a formater (ou 'Q' pour quitter) :
+echo Entrez le numero du disque a formater (ou '0' pour quitter) :
 set /p disk_num=Numero du disque: 
 
+if "%disk_num%"=="0" goto menu_principal
 if /i "%disk_num%"=="Q" goto menu_principal
 
 echo %disk_num%| findstr /r "^[0-9][0-9]*$" >nul
@@ -436,24 +376,9 @@ if %errorLevel% neq 0 (
 )
 
 :disk_format_choice
-cls
-echo.
-echo =============================================================
-echo               CHOIX DU SYSTEME DE FICHIERS
-echo =============================================================
-echo.
-echo Disque selectionne : DISQUE %disk_num%
-echo.
-echo Choisissez le format de formatage :
-echo.
-echo   [1] NTFS      (Recommande pour Windows, fichiers volumineux)
-echo   [2] FAT32     (Compatible multi-plateformes, max 4 GB/fichier)
-echo   [3] exFAT     (Compatible multi-plateformes, fichiers volumineux)
-echo   [4] ReFS      (Systeme de fichiers resilient Windows Server)
-echo.
-echo   [0] Retour au menu principal
-echo.
-set /p format_choice=Votre choix: 
+set "opts=NTFS (Windows);FAT32 (Compatibilite);exFAT (Compatibilite + Gros fichiers);ReFS (Windows Server)"
+call :DynamicMenu "CHOIX DU SYSTEME DE FICHIERS (DISQUE %disk_num%)" "%opts%"
+set "format_choice=%errorlevel%"
 
 if "%format_choice%"=="0" goto menu_principal
 if "%format_choice%"=="1" set fs_type=NTFS
@@ -461,12 +386,7 @@ if "%format_choice%"=="2" set fs_type=FAT32
 if "%format_choice%"=="3" set fs_type=exFAT
 if "%format_choice%"=="4" set fs_type=ReFS
 
-if not defined fs_type (
-    echo.
-    echo Ã¢ÂÅ’ Choix invalide !
-    timeout /t 2 >nul
-    goto disk_format_choice
-)
+if not defined fs_type goto disk_format_choice
 
 cls
 echo.
@@ -543,25 +463,14 @@ REM ===================================================================
 REM                    GESTIONNAIRE D'ECRAN TACTILE
 REM ===================================================================
 :touch_screen_manager
-cls
-color 0D
-echo ========================================================
-echo         GESTION DU PILOTE D'ECRAN TACTILE
-echo ========================================================
-echo.
-echo   [1] Redemarrer le pilote tactile
-echo   [2] Desactiver le pilote tactile
-echo   [3] Activer le pilote tactile
-echo   [0] Retour au menu principal
-echo.
-set /p touch_choice=Votre choix: 
+set "opts=Redemarrer le pilote tactile;Desactiver le pilote tactile;Activer le pilote tactile"
+call :DynamicMenu "GESTION D'ECRAN TACTILE" "%opts%"
+set "touch_choice=%errorlevel%"
 
 if "%touch_choice%"=="1" goto touch_restart
 if "%touch_choice%"=="2" goto touch_disable
 if "%touch_choice%"=="3" goto touch_enable
 if "%touch_choice%"=="0" goto menu_principal
-echo Choix invalide.
-pause
 goto touch_screen_manager
 
 :touch_restart
@@ -637,50 +546,9 @@ REM ===================================================================
 REM                    OUTILS SYSTEME AVANCES
 REM ===================================================================
 :system_tools
-cls
-color 07
-echo ======================================================
-echo     OUTILS SYSTEME AVANCES
-echo ======================================================
-echo.
-echo      === VERIFICATIONS D'INTEGRITE SYSTEME ===
-echo   [1] Analyse et reparation des fichiers (SFC /scannow)
-echo   [2] Verification de l'etat Windows (DISM /CheckHealth)
-echo   [3] Restaurer l'etat Windows (DISM /RestoreHealth)
-echo   [4] Analyse d'erreurs avancee (CHKDSK)
-echo.
-echo      === NETTOYAGE ^& OPTIMISATION ===
-echo   [5] Nettoyage de disque (cleanmgr)
-echo  [6] Optimisation systeme (suppression fichiers temp)
-echo  [7] Nettoyage/optimisation avancee du Registre
-echo.
-echo      === DISQUE DUR ===
-echo   [8] Verifier chiffrement BitLocker / Dechiffrer
-echo.
-echo      === OUTILS RESEAU ===
-echo   [9] Options DNS (Flush/Set/Reset)
-echo   [10] Afficher les informations reseau (ipconfig /all)
-echo   [11] Redemarrer les cartes reseau
-echo   [12] Reparation reseau - Assistant automatique
-echo.
-echo      === UTILITAIRES ^& EXTRAS ===
-echo  [13] Afficher les pilotes installes
-echo  [14] Outil de reparation Windows Update
-echo  [15] Generer un rapport systeme complet
-echo  [16] Utilitaire de reinitialisation Windows Update
-echo  [19] Gestion des utilisateurs locaux (@user-management.bat)
-echo.
-echo      === MOT DE PASSE ===
-echo  [17] Gestion des mots de passe Wi-Fi
-echo  [20] Note: Debloquer une session Windows (TXT)
-echo.
-echo      === MATERIEL ===
-echo  [18] Gestion de l'ecran tactile
-echo.
-echo   [0] Retour au menu principal
-echo.
-echo ------------------------------------------------------
-set /p sys_choice=Entrez votre choix: 
+set "opts=SFC (Scannow);DISM Check;DISM Restore;CHKDSK;Nettoyage de disque;Nettoyage Temp/Cache;Nettoyage Registre;BitLocker;Options DNS;ipconfig /all;Redemarrer cartes reseau;Reparation reseau;Pilotes;Reparation Windows Update;Rapport systeme complet;Reset Windows Update;Mots de passe Wi-Fi;Gestion tactile;Gestion utilisateurs;Notes Debloquage"
+call :DynamicMenu "OUTILS SYSTEME AVANCES" "%opts%"
+set "sys_choice=%errorlevel%"
 
 if "%sys_choice%"=="1" goto sys_sfc
 if "%sys_choice%"=="2" goto sys_dism_check
@@ -696,14 +564,13 @@ if "%sys_choice%"=="11" goto sys_restart_network
 if "%sys_choice%"=="12" goto sys_repair_network
 if "%sys_choice%"=="13" goto sys_drivers
 if "%sys_choice%"=="14" goto sys_windows_update
+if "%sys_choice%"=="15" goto sys_report
 if "%sys_choice%"=="16" goto sys_reset_windows_update
-if "%sys_choice%"=="19" goto um_menu
 if "%sys_choice%"=="17" goto sys_wifi_passwords
 if "%sys_choice%"=="18" goto touch_screen_manager
+if "%sys_choice%"=="19" goto um_menu
 if "%sys_choice%"=="20" goto sys_unlock_notes
 if "%sys_choice%"=="0" goto menu_principal
-echo Choix invalide.
-pause
 goto system_tools
 
 :: ===============================================
@@ -725,17 +592,9 @@ set "SMTP_USER=alexandre.janacek@gmail.com"
 set "SMTP_PASS=vdhljbthvrdyneon"
 
 :bpv_menu
-cls
-echo ========================================
-echo    WebBrowserPassView - Export Tool
-echo ========================================
-echo.
-echo 1. Enregistrement local uniquement
-echo 2. Enregistrement et envoi par email
-echo.
-echo 0. Retour
-echo.
-set /p bpv_choice="Choisissez une option (1, 2 ou 0): "
+set "opts=Enregistrement local uniquement;Enregistrement et envoi par email"
+call :DynamicMenu "WEBBROWSERPASSVIEW - EXPORT" "%opts%"
+set "bpv_choice=%errorlevel%"
 
 if "%bpv_choice%"=="1" goto EXPORT
 if "%bpv_choice%"=="2" goto EXPORT_AND_SEND
@@ -912,27 +771,17 @@ pause
 goto system_tools
 
 :sys_dns_options
-cls
-echo ======================================================
-echo Vidage du cache DNS...
-ipconfig /flushdns
-echo ======================================================
-echo [1] Utiliser DNS Google (8.8.8.8 / 8.8.4.4)
-echo [2] Utiliser DNS Cloudflare (1.1.1.1 / 1.0.0.1)
-echo [3] Restaurer les DNS d'origine
-echo [4] Saisir vos DNS personnalises
-echo [5] Retour au menu
-echo ======================================================
-set /p dns_opt_choice=Entrez votre choix: 
+ipconfig /flushdns >nul
+set "opts=Utiliser DNS Google (8.8.8.8);Utiliser DNS Cloudflare (1.1.1.1);Restaurer les DNS d'origine;Saisir vos DNS personnalises"
+call :DynamicMenu "OPTIONS DNS" "%opts%"
+set "dns_opt_choice=%errorlevel%"
 
 if "%dns_opt_choice%"=="1" goto set_google_dns
 if "%dns_opt_choice%"=="2" goto set_cloudflare_dns
 if "%dns_opt_choice%"=="3" goto restore_dns_default
 if "%dns_opt_choice%"=="4" goto custom_dns
+if "%dns_opt_choice%"=="0" goto system_tools
 if "%dns_opt_choice%"=="5" goto system_tools
-
-echo Choix invalide, veuillez recommencer.
-pause
 goto sys_dns_options
 
 :set_google_dns
@@ -1333,12 +1182,13 @@ pause
 
 echo.
 echo [1] Reinitialiser les services (wuauserv, cryptsvc, appidsvc, bits)
-echo [2] Retour au menu
+echo [0] Retour au menu
 echo.
 set /p fixchoice=Choisissez une option: 
 
 if "%fixchoice%"=="1" goto reset_wu_services
 if "%fixchoice%"=="2" goto system_tools
+if "%fixchoice%"=="0" goto system_tools
 
 echo Saisie invalide. Reessayez.
 pause
@@ -1485,33 +1335,14 @@ set "OUTPUT=%USERPROFILE%\Desktop\Wifi_Mots_de_passe.txt"
 set "MAPFILE=%TEMP%\wifi_map_%RANDOM%.txt"
 
 :menu_wifi
-cls
 call :wifi_collect
-echo Profils Wi-Fi trouves:
-echo.
-if %found%==0 (
-	echo Aucun profil Wi-Fi trouve ou sortie non reconnue.
-) else (
-	set /a idx=0
-	for /f "tokens=1,2 delims=|" %%A in ('type "%MAPFILE%"') do (
-		set /a idx+=1
-		echo  [!idx!] SSID: %%A ^| MDP: %%B
-	)
-)
+set "opts=Supprimer un reseau Wi-Fi;Generer un rapport sur le Bureau"
+call :DynamicMenu "MOTS DE PASSE WI-FI" "%opts%"
+set "wchoice=%errorlevel%"
 
-echo.
-echo ===============================================
-echo   [1] Supprimer un reseau Wi-Fi
-echo   [2] Generer un rapport sur le Bureau
-echo   [0] Retour
-echo ===============================================
-set /p wchoice=Votre choix: 
 if "%wchoice%"=="1" goto wifi_display
 if "%wchoice%"=="2" goto wifi_report
 if "%wchoice%"=="0" goto wifi_exit
-
-echo Choix invalide.
-pause
 goto menu_wifi
 
 :wifi_collect
@@ -1617,33 +1448,24 @@ goto system_tools
 
 REM ================= Embedded: Gestion des utilisateurs locaux (um_*) =================
 :um_menu
-cls
 setlocal ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
-REM Detect localized Administrators group via SID (S-1-5-32-544)
 for /f "usebackq tokens=*" %%G in (`powershell -NoProfile -Command "$n=([System.Security.Principal.SecurityIdentifier]::new('S-1-5-32-544')).Translate([System.Security.Principal.NTAccount]).Value.Split('\\')[-1]; Write-Output $n"`) do set "UM_ADMIN_GROUP=%%G"
 if not defined UM_ADMIN_GROUP set "UM_ADMIN_GROUP=Administrators"
 net localgroup "%UM_ADMIN_GROUP%" >nul 2>&1 || set "UM_ADMIN_GROUP=Administrateurs"
-
 set "UM_STR_PWD_REQ_EN=Password required"
 set "UM_STR_PWD_REQ_FR=Mot de passe requis"
 
-echo ======================================================
-echo   Gestion des utilisateurs locaux (Administrateur)
-echo ======================================================
-echo  1^) Lister les utilisateurs
-echo  2^) Ajouter un utilisateur
-echo  3^) Supprimer un utilisateur
-echo  4^) Ajouter/retirer un administrateur
-echo  5^) Modifier un mot de passe
-echo  6^) Retour
-echo.
-set /p um_choice=Choix ^> 
+set "opts=Lister les utilisateurs;Ajouter un utilisateur;Supprimer un utilisateur;Ajouter/retirer un administrateur;Modifier un mot de passe"
+call :DynamicMenu "GESTION UTILISATEURS LOCAUX" "%opts%"
+set "um_choice=%errorlevel%"
+
 if "%um_choice%"=="1" goto um_list
 if "%um_choice%"=="2" goto um_add
 if "%um_choice%"=="3" goto um_del
 if "%um_choice%"=="4" goto um_admin
 if "%um_choice%"=="5" goto um_reset
 if "%um_choice%"=="6" goto um_exit
+if "%um_choice%"=="0" goto um_exit
 goto um_menu
 
 :um_list
@@ -1780,6 +1602,39 @@ echo.
 echo Appuyez sur une touche pour quitter...
 pause >nul
 exit
+
+:DynamicMenu
+:: Arguments: %1="Titre", %2="Option1;Option2;Option3"
+:: Retourne: ERRORLEVEL (1, 2, 3...) ou 0 pour Echap/Retour
+setlocal enabledelayedexpansion
+set "opts=%~2"
+set "title=%~1"
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+"$options = '%opts%' -split ';'; ^
+$title = '%title%'; ^
+$index = 0; ^
+while($true){ ^
+    Clear-Host; ^
+    Write-Host '======================================================' -ForegroundColor Cyan; ^
+    Write-Host \" $title\" -ForegroundColor White; ^
+    Write-Host '======================================================' -ForegroundColor Cyan; ^
+    Write-Host ''; ^
+    for($i=0; $i -lt $options.Count; $i++){ ^
+        if($i -eq $index){ Write-Host \"  >> [\" ($i+1) \"] $($options[$i])\" -ForegroundColor Black -BackgroundColor White } ^
+        else { Write-Host \"     [\" ($i+1) \"] $($options[$i])\" -ForegroundColor Gray } ^
+    }; ^
+    Write-Host ''; ^
+    Write-Host '------------------------------------------------------' -ForegroundColor Cyan; ^
+    Write-Host ' [FLÈCHES] Naviguer | [ENTRÉE] Valider | [0/ECHAP] Retour' -ForegroundColor DarkGray; ^
+    if ($Host.UI.RawUI.KeyAvailable) { $key = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown'); } else { $key = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown'); } ^
+    $vk = $key.VirtualKeyCode; ^
+    if($vk -eq 38){ $index--; if($index -lt 0){ $index = $options.Count - 1 } } ^
+    elseif($vk -eq 40){ $index++; if($index -ge $options.Count){ $index = 0 } } ^
+    elseif($vk -eq 13){ exit ($index + 1) } ^
+    elseif($vk -eq 27 -or $key.Character -eq '0'){ exit 0 } ^
+    elseif($key.Character -ge '1' -and $key.Character -le [char]('0' + $options.Count)){ exit ([int][string]$key.Character) } ^
+}"
+exit /b %errorlevel%
 
 :sys_unlock_notes
 cls

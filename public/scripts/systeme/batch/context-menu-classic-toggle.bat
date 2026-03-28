@@ -23,13 +23,14 @@ echo Choix disponibles :
 echo.
 echo [1] Activer le menu contextuel classique (recommande)
 echo [2] Restaurer le menu contextuel moderne de Windows 11
-echo [3] Quitter
+echo [0] Quitter
 echo.
-set /p choice="Votre choix (1, 2 ou 3) : "
+set /p choice="Votre choix (1, 2 ou 0) : "
 
 if "%choice%"=="1" goto :activate_classic
 if "%choice%"=="2" goto :restore_modern
 if "%choice%"=="3" goto :exit
+if "%choice%"=="0" goto :exit
 goto :invalid_choice
 
 :activate_classic

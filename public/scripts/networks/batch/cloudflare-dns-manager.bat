@@ -21,16 +21,17 @@ echo   1. Installer les DNS Cloudflare (IPv4 + IPv6)
 echo   2. Installer les DNS Cloudflare (IPv4 seulement)
 echo   3. Restaurer les DNS par defaut
 echo   4. Afficher la configuration actuelle
-echo   5. Quitter
+echo   0. Quitter
 echo.
 echo ================================================
 echo.
-set /p choice="Choisissez une option (1-5): "
+set /p choice="Choisissez une option (1-4, 0 pour quitter): "
 
 if "%choice%"=="1" goto install_cloudflare_full
 if "%choice%"=="2" goto install_cloudflare_ipv4
 if "%choice%"=="3" goto restore_dns
 if "%choice%"=="4" goto show_config
+if "%choice%"=="0" goto exit
 if "%choice%"=="5" goto exit
 goto invalid_choice
 
