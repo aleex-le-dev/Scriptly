@@ -6,11 +6,10 @@ import { ScriptItem } from './ScriptItem'
 import { normalizeText } from '../utils/text'
 
 export function Disks({ query = '' }) {
-  const openPsCheckAdmin = () => openLocalScript('disks/batch/check-bitlocker.bat')
-  const openPsOffAdmin = () => openLocalScript('disks/batch/bitlocker-off.bat')
-  const openPsChkdsk = () => openLocalScript('disks/powershells/chkdsk-drive.ps1')
+  const openBitlockerManager = () => openLocalScript('disks/batch/bitlocker-manager.bat')
+  const openChkdskAll = () => openLocalScript('disks/batch/chkdsk-all.bat')
   const openPsDefrag = () => openLocalScript('disks/powershells/defrag-drive.ps1')
-  const openPsFormatAdmin = () => openLocalScript('disks/batch/format-drive.bat')
+  const openFormatDrive = () => openLocalScript('disks/batch/format-drive.bat')
 
   const visible = (text) => {
     const q = normalizeText(String(query || '').trim())
@@ -20,20 +19,17 @@ export function Disks({ query = '' }) {
 
   return (
     <>
-      {visible('bitlocker verifier status manage-bde') && (
-        <ScriptItem title={<Highlight text="Vérifier BitLocker" query={query} />} label="bitlocker" icon="🔒" desc="Ouvre la vérification (admin)" onClick={openPsCheckAdmin} accent="gray" />
+      {visible('bitlocker verifier status manage-bde dechiffrer desactiver') && (
+        <ScriptItem title={<Highlight text="BitLocker (vérifier / déchiffrer)" query={query} />} label="bitlocker manage-bde" icon="🔒" desc="Vérifie le chiffrement et propose le déchiffrement (admin)" onClick={openBitlockerManager} accent="gray" />
       )}
-      {visible('bitlocker off desactiver disable') && (
-        <ScriptItem title={<Highlight text="Désactiver BitLocker" query={query} />} label="bitlocker off" icon="🛑" desc="Désactive sur un volume (admin)" onClick={openPsOffAdmin} accent="gray" />
-      )}
-      {visible('chkdsk verifier disque erreurs') && (
-        <ScriptItem title={<Highlight text="CHKDSK" query={query} />} label="chkdsk" icon="🧰" desc="Analyse et réparation" onClick={openPsChkdsk} accent="gray" />
+      {visible('chkdsk verifier disque erreurs analyse tous lecteurs') && (
+        <ScriptItem title={<Highlight text="CHKDSK (tous les lecteurs)" query={query} />} label="chkdsk all drives" icon="🧰" desc="Analyse et réparation de tous les disques" onClick={openChkdskAll} accent="gray" />
       )}
       {visible('defragmenter optimiser disque') && (
         <ScriptItem title={<Highlight text="Défragmenter" query={query} />} label="defrag défragmenter" icon="🧩" desc="Optimise les disques" onClick={openPsDefrag} accent="gray" />
       )}
-      {visible('formater format drive disque cle admin') && (
-        <ScriptItem title={<Highlight text="Diskpart (admin)" query={query} />} label="diskpart format drive" icon="💽" desc="Outil de formatage disque dur et clé usb" onClick={openPsFormatAdmin} accent="gray" />
+      {visible('formater format drive disque cle admin diskpart ntfs fat32 exfat') && (
+        <ScriptItem title={<Highlight text="Diskpart - Formatage (admin)" query={query} />} label="diskpart format drive ntfs fat32" icon="💽" desc="Formatage complet avec choix du système de fichiers" onClick={openFormatDrive} accent="gray" />
       )}
     </>
   )

@@ -30,6 +30,16 @@ export function Application({ query = '' }) {
           icon="📦"
         />
       )}
+      {visible('applications activer activation windows office licence cle mas microsoft') && (
+        <ScriptItem
+          title={<Highlight text="Activer Windows / Office (MAS)" query={query} />}
+          label="activer activation windows office licence mas microsoft"
+          desc="Script d'activation Microsoft (MAS) — télécharge le .zip depuis Google Drive"
+          href="https://drive.google.com/file/d/1y3sInTwbmVzaAfMRVAnjONgtWPfJNobb/view?usp=drive_link"
+          accent="green"
+          icon="🔑"
+        />
+      )}
     </>
   )
 }

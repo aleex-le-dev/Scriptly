@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(grep -r \"openLocalScript\\\\|listDrives\\\\|psCheckBitlocker\\\\|psBitlockerOff\\\\|psChkdsk\\\\|psDefrag\\\\|psFormatDrive\" src/ --include=*.jsx --include=*.js)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(ls -d public/scripts/*/)",
+      "Bash(ls -d c:/Users/Alex/Documents/DEV/GITHUB/Scriptly/public/scripts/*/)"
     ]
   }
 }

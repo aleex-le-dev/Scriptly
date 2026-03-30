@@ -1,7 +1,6 @@
 @echo off
-if defined MSYSTEM ("%ComSpec%" /c "%~f0" & exit /b)
 chcp 65001 >nul
-title Nettoyage de disque
+title Informations Reseau
 
 net session >nul 2>&1
 if %errorlevel% neq 0 (
@@ -10,4 +9,7 @@ if %errorlevel% neq 0 (
 )
 
 cls
-cleanmgr
+echo Affichage des informations reseau...
+ipconfig /all
+pause
+exit

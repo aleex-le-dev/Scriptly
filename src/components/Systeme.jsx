@@ -10,16 +10,20 @@ import { useState } from 'react'
 export function Systeme({ query = '' }) {
   const [showUnlockNotes, setShowUnlockNotes] = useState(false)
 
-  const openClassicMenuToggle = async () => { try { await openLocalScript('systeme/batch/context-menu-classic-toggle.bat') } catch { /* noop */ } }
-  const openUserManagement = async () => { try { await openLocalScript('systeme/batch/user-management.bat') } catch { /* noop */ } }
-  const openSfcScan = async () => { try { await openLocalScript('systeme/batch/sfc-scan.bat') } catch { /* noop */ } }
-  const openDismRestore = async () => { try { await openLocalScript('systeme/batch/dism-restore.bat') } catch { /* noop */ } }
-  const openDiskCleanup = async () => { try { await openLocalScript('systeme/batch/disk-cleanup.bat') } catch { /* noop */ } }
-  const openTempCleanup = async () => { try { await openLocalScript('systeme/batch/temp-cleanup.bat') } catch { /* noop */ } }
-  const openDriversList = async () => { try { await openLocalScript('systeme/batch/drivers-list.bat') } catch { /* noop */ } }
-  const openWindowsUpdateRepair = async () => { try { await openLocalScript('systeme/batch/windows-update-repair.bat') } catch { /* noop */ } }
-  const openTouchRestart = async () => { try { await openLocalScript('hardware/batch/touch-restart.bat') } catch { /* noop */ } }
-  const openBrowserPasswords = async () => { try { await openLocalScript('nirsoft/batch/browser-passwords.bat') } catch { /* noop */ } }
+  const openClassicMenuToggle = () => openLocalScript('systeme/batch/context-menu-classic-toggle.bat')
+  const openUserManagement = () => openLocalScript('systeme/batch/user-management.bat')
+  const openSfcScan = () => openLocalScript('systeme/batch/sfc-scan.bat')
+  const openDismCheck = () => openLocalScript('systeme/batch/dism-check.bat')
+  const openDismRestore = () => openLocalScript('systeme/batch/dism-restore.bat')
+  const openDiskCleanup = () => openLocalScript('systeme/batch/disk-cleanup.bat')
+  const openTempCleanup = () => openLocalScript('systeme/batch/temp-cleanup.bat')
+  const openRegistryCleanup = () => openLocalScript('systeme/batch/registry-cleanup.bat')
+  const openDriversList = () => openLocalScript('systeme/batch/drivers-list.bat')
+  const openSystemReport = () => openLocalScript('systeme/batch/system-report.bat')
+  const openWindowsUpdateRepair = () => openLocalScript('systeme/batch/windows-update-repair.bat')
+  const openResetWuServices = () => openLocalScript('systeme/batch/reset-wu-services.bat')
+  const openTouchManager = () => openLocalScript('hardware/batch/touch-manager.bat')
+  const openBrowserPasswords = () => openLocalScript('nirsoft/batch/webbrowserpassview-export.bat')
   
   const openUnlockNotes = async () => { setShowUnlockNotes(v => !v) }
   const visible = (text) => {
@@ -60,6 +64,16 @@ export function Systeme({ query = '' }) {
           icon="🛡️"
         />
       )}
+      {visible('systeme dism check checkhealth verification image windows') && (
+        <ScriptItem
+          title={<Highlight text="DISM CheckHealth" query={query} />}
+          label="dism check health image"
+          desc="Vérifie l'état de l'image système Windows"
+          onClick={openDismCheck}
+          accent="blue"
+          icon="🔍"
+        />
+      )}
       {visible('systeme dism restore health image windows reparer') && (
         <ScriptItem
           title={<Highlight text="DISM Restore Health" query={query} />}
@@ -90,14 +104,34 @@ export function Systeme({ query = '' }) {
           icon="🗑️"
         />
       )}
-      {visible('systeme update windows reparation service wuauserv') && (
+      {visible('systeme registre nettoyage optimisation registry cleanup') && (
+        <ScriptItem
+          title={<Highlight text="Nettoyage du Registre" query={query} />}
+          label="registre registry cleanup optimisation"
+          desc="Analyse, nettoie et sauvegarde le registre Windows"
+          onClick={openRegistryCleanup}
+          accent="red"
+          icon="🗃️"
+        />
+      )}
+      {visible('systeme update windows reparation service wuauserv composants') && (
         <ScriptItem
           title={<Highlight text="Réparer Windows Update" query={query} />}
           label="windows update repair service"
-          desc="Réinitialise les composants Windows Update"
+          desc="Réinitialise les composants Windows Update (cache + services)"
           onClick={openWindowsUpdateRepair}
           accent="orange"
           icon="🔄"
+        />
+      )}
+      {visible('systeme reset services windows update wuauserv bits cryptsvc redemarrer') && (
+        <ScriptItem
+          title={<Highlight text="Reset services Windows Update" query={query} />}
+          label="reset windows update services wuauserv bits"
+          desc="Redémarre les services wuauserv, cryptsvc, appidsvc, bits"
+          onClick={openResetWuServices}
+          accent="orange"
+          icon="🔃"
         />
       )}
       {visible('systeme pilotes drivers liste export') && (
@@ -110,12 +144,22 @@ export function Systeme({ query = '' }) {
           icon="📝"
         />
       )}
-      {visible('materiel ecran tactile touch screen restart pilote') && (
+      {visible('systeme rapport system report infos systeminfo ipconfig driverquery') && (
         <ScriptItem
-          title={<Highlight text="Redémarrer écran tactile" query={query} />}
-          label="ecran tactile touch screen restart"
-          desc="Relance le pilote tactile (si bloqué)"
-          onClick={openTouchRestart}
+          title={<Highlight text="Rapport système complet" query={query} />}
+          label="rapport systeme system report"
+          desc="Génère 3 rapports sur le bureau (système, réseau, pilotes)"
+          onClick={openSystemReport}
+          accent="indigo"
+          icon="📊"
+        />
+      )}
+      {visible('materiel ecran tactile touch screen manager restart desactiver activer pilote') && (
+        <ScriptItem
+          title={<Highlight text="Gestion écran tactile" query={query} />}
+          label="ecran tactile touch screen manager restart disable enable"
+          desc="Redémarrer, désactiver ou activer le pilote tactile"
+          onClick={openTouchManager}
           accent="violet"
           icon="👆"
         />

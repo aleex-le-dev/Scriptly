@@ -42,14 +42,6 @@ export function Logiciel({ query = '' }) {
       keywords: 'iobit unlocker debloquer supprimer fichier recalcitrant'
     },
     {
-      key: 'activation-office-windows',
-      title: 'Activation Office et Windows',
-      desc: 'Outil d\'activation pour Office et Windows',
-      href: 'https://drive.google.com/uc?export=download&id=1hvtgrHEb4uxshmCmBVlAySr50ETXA-Ah',
-      icon: '⚡',
-      keywords: 'activation office windows cle licence microsoft'
-    },
-    {
       key: 'office-2024',
       title: 'Office 2024',
       desc: 'Téléchargement direct Microsoft Office 2024',
