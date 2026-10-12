@@ -8,7 +8,7 @@ import { normalizeText } from '../utils/text'
 export function General({ query = '' }) {
   const openScriptsByAleexLeDev = async () => { 
     try { 
-      await openLocalScript('general/batch/Scripts-by-AleexLeDev.bat') 
+      await openLocalScript('general/batch/AlexToolkit.exe') 
     } catch { /* noop */ } 
   }
   
